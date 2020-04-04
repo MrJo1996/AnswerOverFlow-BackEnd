@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SimplyLifeBackEnd.iml" filepath="$PROJECT_DIR$/.idea/SimplyLifeBackEnd.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/AnswerOverFlow.iml" filepath="$PROJECT_DIR$/.idea/AnswerOverFlow.iml" />
     </modules>
   </component>
 </project>
