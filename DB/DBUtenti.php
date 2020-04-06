@@ -81,6 +81,7 @@ class DBUtenti
             "cod_chat"
         ]
     ];
+
     //Costruttore
     public function __construct()
     {
@@ -212,7 +213,7 @@ class DBUtenti
             "* " .
             "FROM " .
             $statsTab . " " .
-            "WHERE "  . " " .
+            "WHERE " . " " .
             $campi[0] . " = ?" .
             " AND " .
             $campi[1] . " = ?"
@@ -223,7 +224,7 @@ class DBUtenti
         $stmt->execute();
         //Ricevo la risposta del DB
         $stmt->store_result();
-        if($stmt->num_rows > 0){
+        if ($stmt->num_rows > 0) {
             $stmt->bind_result($cod_utente, $cod_categoria, $voti, $n_risposte);
             $statistiche = array();
 
@@ -240,7 +241,7 @@ class DBUtenti
         }
         //L'utente non ha ancora una tabella relativa alla categoria di riferimento quindi la creo, la prossima volta verrà selezionata per poi
         //aggiornarla nel back end, se avrò indietro dei valori aggiorno
-        else{
+        else {
             //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `media_voto`, `numero_risposte`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
             $query = (
                 "INSERT INTO " .
@@ -262,7 +263,8 @@ class DBUtenti
     }
 
     //Visualizzo il profilo di un utente
-    public function visualizzaProfilo($email){
+    public function visualizzaProfilo($email)
+    {
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY: SELECT * FROM `utente` WHERE Email = 'value'
@@ -282,7 +284,8 @@ class DBUtenti
     }
 
     //Modifica profilo utente
-    public function modificaProfilo($username, $password, $nome, $cognome, $bio, $email){
+    public function modificaProfilo($username, $password, $nome, $cognome, $bio, $email)
+    {
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY: UPDATE `utente` SET `Username`=[value-1], `Password`=[value-2],`Nome`=[value-3],`Cognome`=[value-4],`Bio`=[value-5] WHERE Email = “email_utente_corrente”
@@ -304,5 +307,57 @@ class DBUtenti
         $result = $stmt->execute();
         return $result;
     }
+
+// Funzione registrazione
+    public function registrazione($email, $username, $password, $nome, $cognome, $bio, $attivo)
+    {
+        $tabella = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$tabella];
+
+        $attivo = 0;
+
+        $query = (
+            "INSERT INTO " .
+            $tabella . " (" .
+            $campi[0] . ", " .
+            $campi[1] . ", " .
+            $campi[2] . ", " .
+            $campi[3] . ", " .
+            $campi[4] . ", " .
+            $campi[5] . ", " .
+            $campi[6] . ") " .              //mette in automatico attivo a 0
+
+            "VALUES (?,?,?,?,?,?,?)"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ssssssi", $email, $username, $password, $nome, $cognome, $bio, $attivo);
+        $result = ($stmt->execute());
+        return $result;
+    }
+
+    //Visualizza sondaggio
+    public function visualizzaSondaggio($codice_sondaggio)
+    {
+        $sondaggioTab = $this->tabelleDB[6];
+        $campi = $this->campiTabelleDB[$sondaggioTab];
+        //QUERY: SELECT * FROM `sondaggio` WHERE ID = 'value'
+        $query = (
+            "SELECT" .
+            "*" .
+            "FROM" .
+            $sondaggioTab . " " .
+            "WHERE" .
+            $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_sondaggio);
+        $result = $stmt->execute();
+        return $result;
+    }
+
+
+
+
 }
 ?>
