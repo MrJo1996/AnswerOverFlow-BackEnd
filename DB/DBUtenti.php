@@ -224,7 +224,32 @@ class DBUtenti
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("s", $email);
-        return $stmt->execute();
+        $result = $stmt->execute();
+        return $result;
+    }
+
+    //Modifica profilo utente
+    public function modificaProfilo($email, $username, $password, $nome, $cognome, $bio){
+        $utenteTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$utenteTab];
+        //QUERY: UPDATE `utente` SET `Nome`=[value-1], `Cognome`=[value-2],`Username`=[value-3],`Email`=[value-4],`Password`=[value-5],`Bio`=[value-6] WHERE Email = “email_utente_corrente”
+        $query = (
+            "UPDATE" .
+            $utenteTab . " " .
+            "SET" .
+            $campi[1] . " = ?," .
+            $campi[2] . " = ?," .
+            $campi[3] . " = ?," .
+            $campi[4] . " = ?," .
+            $campi[5] . " = ?" .
+            "WHERE" .
+            $campi[0] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("sssss", $username, $password, $nome, $cognome, $bio);
+        $result = $stmt->execute();
+        return $result;
     }
 }
 ?>
