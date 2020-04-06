@@ -199,6 +199,7 @@ class DBUtenti
         //La funzione termina con l'esecuzione della query che mi restituisce il codice della categoria
         return $stmt;
     }
+
     //Aggiorno le valutazioni in base all'esito ricevuto dalla risposta data
     public function aggiornaStats($id_utente, $id_categoria, $valutazione)
     {
@@ -207,5 +208,23 @@ class DBUtenti
         //QUERY: SELECT 'mediavoto' AND numero_risposte WHERE cod_utente = ? AND cod_categoria = ?
     }
 
+    //Visualizzo il profilo di un utente
+    public function visualizzaProfilo($email){
+        $utenteTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$utenteTab];
+        //QUERY: SELECT * FROM `utente` WHERE Email = 'value'
+        $query = (
+            "SELECT" .
+            "*" .
+            "FROM" .
+            $utenteTab . " " .
+            "WHERE" .
+            $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $email);
+        return $stmt->execute();
+    }
 }
 ?>
