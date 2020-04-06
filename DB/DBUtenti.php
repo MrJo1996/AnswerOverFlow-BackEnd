@@ -28,7 +28,8 @@ class DBUtenti
         "stats" => [
             "cod_utente",
             "cod_categoria",
-            "media_voto"
+            "somma_valutazioni",
+            "numero_valutazioni"
         ],
         "categoria" => [
             "codice_categoria",
@@ -200,12 +201,64 @@ class DBUtenti
         return $stmt;
     }
 
-    //Aggiorno le valutazioni in base all'esito ricevuto dalla risposta data
+    //Se la tabella è gia presente aggiorno le stats, altrimenti ne crea una nuova
     public function aggiornaStats($id_utente, $id_categoria, $valutazione)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
-        //QUERY: SELECT 'mediavoto' AND numero_risposte WHERE cod_utente = ? AND cod_categoria = ?
+        //QUERY: SELECT * FROM stats WHERE cod_utente = ? AND cod_categoria = ?
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $statsTab . " " .
+            "WHERE "  . " " .
+            $campi[0] . " = ?" .
+            " AND " .
+            $campi[1] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $id_utente, $id_categoria);
+        $stmt->execute();
+        //Ricevo la risposta del DB
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            $stmt->bind_result($cod_utente, $cod_categoria, $voti, $n_risposte);
+            $statistiche = array();
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campi[0]] = $cod_utente;
+                $temp[$campi[1]] = $cod_categoria;
+                $temp[$campi[2]] = $voti;
+                $temp[$campi[3]] = $n_risposte;
+                array_push($statistiche, $temp);
+            }
+
+            return $statistiche;
+        }
+        //L'utente non ha ancora una tabella relativa alla categoria di riferimento quindi la creo, la prossima volta verrà selezionata per poi
+        //aggiornarla nel back end, se avrò indietro dei valori aggiorno
+        else{
+            //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `media_voto`, `numero_risposte`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
+            $query = (
+                "INSERT INTO " .
+                $statsTab . " (" .
+                $campi[0] . ", " .
+                $campi[1] . ", " .
+                $campi[2] . ", " .
+                $campi[3] . ") " .
+                "VALUES " . "(" .
+                "? , " .
+                "? , " .
+                "? , " .
+                "? )"
+            );
+            $stmt = $this->connection->prepare($query);
+            $stmt->bind_param("iiii", $id_utente, $id_categoria, $valutazione, 1);
+            return $stmt->execute();
+        }
     }
 
     //Visualizzo il profilo di un utente
