@@ -282,10 +282,10 @@ class DBUtenti
     }
 
     //Modifica profilo utente
-    public function modificaProfilo($email, $username, $password, $nome, $cognome, $bio){
+    public function modificaProfilo($username, $password, $nome, $cognome, $bio, $email){
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
-        //QUERY: UPDATE `utente` SET `Nome`=[value-1], `Cognome`=[value-2],`Username`=[value-3],`Email`=[value-4],`Password`=[value-5],`Bio`=[value-6] WHERE Email = “email_utente_corrente”
+        //QUERY: UPDATE `utente` SET `Username`=[value-1], `Password`=[value-2],`Nome`=[value-3],`Cognome`=[value-4],`Bio`=[value-5] WHERE Email = “email_utente_corrente”
         $query = (
             "UPDATE" .
             $utenteTab . " " .
