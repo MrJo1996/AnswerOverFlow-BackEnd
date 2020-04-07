@@ -280,8 +280,7 @@ class DBUtenti
                 array_push($statistiche, $temp);
             }
             return $statistiche;
-        }
-        else return null;
+        } else return null;
     }
 
     //Se la riga relativa alle statistiche utente per categoria è presente viene aggiornata
@@ -428,7 +427,8 @@ class DBUtenti
     }
 
     //Modifica votazione (Mariano Buttino)
-    public function modificaVotazione ($codice_risposta, $valutazione) {
+    public function modificaVotazione($codice_risposta, $valutazione)
+    {
 
         $tabella = $this->tabelleDB[5];
 
@@ -449,7 +449,8 @@ class DBUtenti
     }
 
     //Modifica risposta (Mariano Buttino)
-    public function modificaRisposta ($codice_risposta, $descrizione) {
+    public function modificaRisposta($codice_risposta, $descrizione)
+    {
 
         $tabella = $this->tabelleDB[5];
 
@@ -471,7 +472,8 @@ class DBUtenti
     }
 
     //Visualizza sondaggio per categoria (Mariano Buttino)
-    public function visualizzaSondaggioPerCategoria ($codice_categoria, $codice_utente) {
+    public function visualizzaSondaggioPerCategoria($codice_categoria, $codice_utente)
+    {
 
         $sondaggioTab = $this->tabelleDB[6];
         $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
@@ -485,7 +487,7 @@ class DBUtenti
             $sondaggioTab . "." . $campiSondaggio[1] . ", " .
             $sondaggioTab . "." . $campiSondaggio[2] . " " .
             "FROM " . $sondaggioTab . " " .
-            "WHERE " . $sondaggioTab . "." . $campiSondaggio[3] . "= ?" . " AND " . $sondaggioTab . "." .$campiSondaggio[4] . "= ?"
+            "WHERE " . $sondaggioTab . "." . $campiSondaggio[3] . "= ?" . " AND " . $sondaggioTab . "." . $campiSondaggio[4] . "= ?"
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ii", $codice_categoria, $codice_utente);
@@ -552,7 +554,6 @@ class DBUtenti
     }
 
 
-
     public function VisualizzaMessaggio($cod_chat)
     {
         $messaggioTab = $this->tabelleDB[8];
@@ -560,7 +561,7 @@ class DBUtenti
 
         $query = (
             "SELECT "
-             . "*" .
+            . "*" .
             "FROM " .
             $messaggioTab . " " .
             "WHERE " .
@@ -572,7 +573,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_messaggio, $dataeora, $testo,$visualizzato,cod_chat);
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, cod_chat);
             $messaggio = array();
             while ($stmt->fetch()) {
                 $temp = array();
@@ -590,7 +591,92 @@ class DBUtenti
         }
 
 
-}
+    }
+
+
+//Ricerca domanda aperta num11 PARTE 1
+
+    public function ricercaDomandaAperta($categoria, $titoloDomanda)
+    {
+        $domandaTab = $this->tabelleDB[4];
+        $campiDomanda = $this->campiTabelleDB[$domandaTab];
+
+
+        $query = //QUERY: SELECT * FROM domanda WHERE timer > 0  AND categoria = $value OR titolo LIKE %$value%
+            "SELECT " .
+            $campiDomanda[0] . ", " .
+            $campiDomanda[1] . " " .
+            $campiDomanda[2] . ", " .
+            $campiDomanda[3] . " " .
+            $campiDomanda[4] . ", " .
+            $campiDomanda[5] . " " .
+            $campiDomanda[6] . ", " .
+
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE" .
+            $campiDomanda[2] > 0 .
+            "AND" . "(" . $campiDomanda[6] = " = ? "  . "OR" . titolo . "LIKE" % " = ? "  % ")";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+        $stmt->bind_param("ss", $categoria, $titoloDomanda);
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+            $domandaAperta = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campiDomanda[0]] = $codice_domanda;
+                $temp[$campiDomanda[1]] = $dataeora;
+                $temp[$campiDomanda[2]] = $timer;
+                $temp[$campiDomanda[3]] = $titolo;
+                $temp[$campiDomanda[4]] = $descrizione;
+                $temp[$campiDomanda[5]] = $cod_utente;
+                $temp[$campiDomanda[6]] = $cod_categoria;
+                array_push($domandaAperta, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $domandaAperta
+            }
+            return $domandaAperta; //ritorno array $domandaAperta riempito con i risultati della query effettuata.
+        } else {
+            return null;
+
+        }
+
+
+
+
+    }
+
+    //Ricerca sondaggio aperto num11 PARTE 2
+
+
+
+    public function cancellaSondaggio($id_sondaggio_selezionato)
+    {
+        $tabella = $this->tabelleDB[6]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "  DELETE * FROM Sondaggi where ID = $Id_sondaggio_selezionato"
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $id_sondaggio_selezionato);
+        $result = $stmt->execute();
+        $stmt->store_result();
+
+        return $result;
+    }
+
 
 }
+
+
+
+
 ?>
