@@ -356,8 +356,86 @@ class DBUtenti
         return $result;
     }
 
+    //Modifica votazione (Mariano Buttino)
+    public function modificaVotazione ($codice_risposta, $valutazione) {
 
+        $tabella = $this->tabelleDB[5];
 
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE TABLE SET valutazione = ? WHERE codice_risposta = ?"
+        $query = (
+            "UPDATE" .
+            $tabella . " " .
+            "SET" .
+            $campi[2] . " = ? " .
+            "WHERE" .
+            $campi[0] . " = ? "
+        );
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $codice_risposta, $valutazione);
+        return $stmt->execute();
+    }
+
+    //Modifica risposta (Mariano Buttino)
+    public function modificaRisposta ($codice_risposta, $descrizione) {
+
+        $tabella = $this->tabelleDB[5];
+
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE TABLE SET descrizione = ? WHERE codice_risposta = ?"
+        $query = (
+            "UPDATE" .
+            $tabella . " " .
+            "SET" .
+            $campi[1] . " = ? " .
+            "WHERE" .
+            $campi[0] . " = ? "
+        );
+
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("is", $codice_risposta, $descrizione);
+        return $stmt->execute();
+    }
+
+    //Visualizza sondaggio per categoria (Mariano Buttino)
+    public function visualizzaSondaggioPerCategoria ($codice_categoria, $codice_utente) {
+
+        $sondaggioTab = $this->tabelleDB[6];
+        $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
+        $categoriaTab = $this->tabelleDB[2];
+        $campiCategoria = $this->campiTabelleDB[$categoriaTab];
+        //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo,
+        // WHERE sondaggio.cod_categoria = " ? " AND sondaggio.cod_utente = " ? "
+        $query = (
+            "SELECT " .
+            $sondaggioTab . "." . $campiSondaggio[0] . ", " .
+            $sondaggioTab . "." . $campiSondaggio[1] . ", " .
+            $sondaggioTab . "." . $campiSondaggio[2] . " " .
+            "FROM " . $sondaggioTab . " " .
+            "WHERE " . $sondaggioTab . "." . $campiSondaggio[3] . "= ?" . " AND " . $sondaggioTab . "." .$campiSondaggio[4] . "= ?"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $codice_categoria, $codice_utente);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo);
+            $sondaggio = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campiSondaggio[0]] = $codice_sondaggio;
+                $temp[$campiSondaggio[1]] = $dataeora;
+                $temp[$campiSondaggio[2]] = $titolo;
+                array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
+            }
+            return $sondaggio; //ritorno array $sondaggio riempito con i risultati della query effettuata.
+        } else {
+            return null;
+        }
+    }
 
 }
 ?>
