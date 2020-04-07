@@ -508,5 +508,89 @@ class DBUtenti
         }
     }
 
+
+    public function login($username, $password)
+    {
+        $utenteTab = $this->tabelleDB[0];
+        $campiLogin = $this->campiTabelleDB[$utenteTab];
+
+        $query = (
+            "SELECT " .
+            $campiLogin[0] . ", " .
+            $campiLogin[1] . " " .
+
+            "FROM " .
+            $utenteTab . " " .
+            "WHERE " .
+            $campiLogin[1] . " = ? AND " .
+            $campiLogin[2] . " = ? "
+        );
+
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        //Ricevo la risposta del DB
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($email, $username);
+
+            $utente = array();
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiLogin[0]] = $email;
+                $temp[$campiLogin[1]] = $username;
+                array_push($utente, $temp);
+            }
+
+            return $utente;
+
+        } else {
+            return null;
+        }
+    }
+
+
+
+    public function VisualizzaMessaggio($cod_chat)
+    {
+        $messaggioTab = $this->tabelleDB[8];
+        $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
+
+        $query = (
+            "SELECT "
+             . "*" .
+            "FROM " .
+            $messaggioTab . " " .
+            "WHERE " .
+            $campiMessaggio[4] . " = ? "
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_chat);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo,$visualizzato,cod_chat);
+            $messaggio = array();
+            while ($stmt->fetch()) {
+                $temp = array();
+
+                $temp[$campiMessaggio[0]] = $codice_messaggio;
+                $temp[$campiMessaggio[1]] = $dataeora;
+                $temp[$campiMessaggio[2]] = $testo;
+                $temp[$campiMessaggio[3]] = $visualizzato;
+                $temp[$campiMessaggio[4]] = cod_chat;
+                array_push($messaggio, $temp);
+            }
+            return $messaggio;
+        } else {
+            return null;
+        }
+
+
+}
+
 }
 ?>
