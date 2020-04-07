@@ -307,7 +307,7 @@ class DBUtenti
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
-    
+
     //Visto che non è ancora presente in DB, la si crea
     public function insertStats($id_utente, $id_categoria, $valutazione)
     {
