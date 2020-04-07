@@ -28,7 +28,7 @@ class DBUtenti
         "stats" => [
             "cod_utente",
             "cod_categoria",
-            "somma_valutazioni",
+            "sommatoria_valutazioni",
             "numero_valutazioni"
         ],
         "categoria" => [
@@ -112,7 +112,7 @@ class DBUtenti
         $stmt->execute();
         //Ricevo la risposta del DB
         $stmt->store_result();
-        //Se ha trovato un match tra la mail inserita e il DB restituisce una bool TRUE
+        //Se ha trovato un match tra la mail inserita e la tab utente, restituisce una bool TRUE
         return $stmt->num_rows > 0;
     }
 
@@ -139,7 +139,7 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Seleziono tutto il contenuto di risposta secondo un determinato ID
+    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
     public function visualizzaRisposta($id_risposta)
     {
         $rispostaTab = $this->tabelleDB[5];
@@ -156,8 +156,25 @@ class DBUtenti
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_risposta);
-        //La funzione termina con l'esecuzione della query
-        return $stmt->execute();
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_risposta, $descrizione, $valutazione, $cod_utente, $cod_domanda);
+            $risposte = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_risposta;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $valutazione;
+                $temp[$campi[3]] = $cod_utente;
+                $temp[$campi[4]] = $cod_domanda;
+                array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
     }
 
     //Prendo la domanda alla quale una risposta fa riferimento
@@ -177,12 +194,25 @@ class DBUtenti
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_risposta);
-        //La funzione termina con l'esecuzione della query che mi restituisce il codice della domanda
-        return $stmt;
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($cod_domanda);
+            $domanda = array();
+            while ($stmt->fetch()) { //Vado a prendermi la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[4]] = $cod_domanda;
+                array_push($domanda, $temp); //Inserisco l'array $temp all'ultimo posto
+            }
+            return $domanda;
+        } else {
+            return null;
+        }
     }
 
     //Prendo la categoria della domanda
-    public function categoriaDomanda($id_domanda)
+    public function aChiAppartieniDomanda($id_domanda)
     {
         $domandaTab = $this->tabelleDB[4];
         $campi = $this->campiTabelleDB[$domandaTab];
@@ -198,12 +228,25 @@ class DBUtenti
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda);
-        //La funzione termina con l'esecuzione della query che mi restituisce il codice della categoria
-        return $stmt;
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($cod_categoria);
+            $categorie = array();
+            while ($stmt->fetch()) { //Vado a prendermi la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[6]] = $cod_categoria;
+                array_push($categorie, $temp);
+            }
+            return $categorie;
+        } else {
+            return null;
+        }
     }
 
-    //Se la tabella è gia presente aggiorno le stats, altrimenti ne crea una nuova
-    public function aggiornaStats($id_utente, $id_categoria, $valutazione)
+    //Si seleziona la tabella delle statistiche di un utente relativa ad una categoria
+    public function controlloStats($id_utente, $id_categoria)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
@@ -236,30 +279,58 @@ class DBUtenti
                 $temp[$campi[3]] = $n_risposte;
                 array_push($statistiche, $temp);
             }
-
             return $statistiche;
         }
-        //L'utente non ha ancora una tabella relativa alla categoria di riferimento quindi la creo, la prossima volta verrà selezionata per poi
-        //aggiornarla nel back end, se avrò indietro dei valori aggiorno
-        else {
-            //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `media_voto`, `numero_risposte`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
-            $query = (
-                "INSERT INTO " .
-                $statsTab . " (" .
-                $campi[0] . ", " .
-                $campi[1] . ", " .
-                $campi[2] . ", " .
-                $campi[3] . ") " .
-                "VALUES " . "(" .
-                "? , " .
-                "? , " .
-                "? , " .
-                "? )"
-            );
-            $stmt = $this->connection->prepare($query);
-            $stmt->bind_param("iiii", $id_utente, $id_categoria, $valutazione, 1);
-            return $stmt->execute();
-        }
+        else return null;
+    }
+
+    //Se la riga relativa alle statistiche utente per categoria è presente viene aggiornata
+    public function aggiornaStats($id_utente, $id_categoria, $valutazione, $n_val)
+    {
+        $statsTab = $this->tabelleDB[1];
+        $campi = $this->campiTabelleDB[$statsTab];
+        //QUERY: UPDATE `stats` SET `sommatoria_valutazioni` = '$valutazione', `numero_valutazioni` = '$n_val' WHERE `cod_utente` = '$id_utente' AND cod_categoria` = $id_categoria
+        $query = (
+            "UPDATE " .
+            $statsTab .
+            "SET " .
+            $campi[2] . " = ?, " .
+            $campi[3] . " = ? " .
+            "WHERE " .
+            $campi[0] . " = ? " .
+            "AND " .
+            $campi[1] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("iiii", $valutazione, $n_val, $id_utente, $id_categoria);
+        //Termina con la bool true se la sessione è andata a buon fine
+        return $stmt->execute();
+    }
+    
+    //Visto che non è ancora presente in DB, la si crea
+    public function insertStats($id_utente, $id_categoria, $valutazione)
+    {
+        $statsTab = $this->tabelleDB[1];
+        $campi = $this->campiTabelleDB[$statsTab];
+        //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
+        $query = (
+            "INSERT INTO " .
+            $statsTab . " (" .
+            $campi[0] . ", " .
+            $campi[1] . ", " .
+            $campi[2] . ", " .
+            $campi[3] . ") " .
+            "VALUES " . "(" .
+            "? , " .
+            "? , " .
+            "? , " .
+            "? )"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("iiii", $id_utente, $id_categoria, $valutazione, 1);
+        //Termina con la bool true se la sessione è andata a buon fine
+        return $stmt->execute();
     }
 
     //Visualizzo il profilo di un utente
