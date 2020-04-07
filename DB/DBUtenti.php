@@ -470,6 +470,29 @@ class DBUtenti
         $stmt->bind_param("is", $codice_risposta, $descrizione);
         return $stmt->execute();
     }
+//Modifica domanda num10 PARTE 2
+    public function modificaDomanda($Id_domanda_selezionata,$titolo,$descrizione)
+    {
+
+        $tabella = $this->tabelleDB[4];
+
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE Domanda SET titolo=$titolo_inserito, descrizione = $descrizione_inserita WHERE = $Id_domanda_selezionata"
+        $query = (
+            "UPDATE" .
+            $tabella . " " .
+            "SET" .
+            $campi[3] . " = ? " .
+            $campi[4] . " = ? " .
+            "WHERE" .
+            $campi[0] . " = ? "
+        );
+
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("iss", $Id_domanda_selezionata, $titolo,$descrizione);
+        return $stmt->execute();
+    }
 
     //Visualizza sondaggio per categoria (Mariano Buttino)
     public function visualizzaSondaggioPerCategoria($codice_categoria, $codice_utente)
@@ -673,6 +696,28 @@ class DBUtenti
         return $result;
     }
 
+//Cancella domanda num9 PARTE 2
+
+    public function cancellaDomanda($id_domanda_selezionata)
+    {
+        $tabella = $this->tabelleDB[4]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "  DELETE * FROM domanda where ID = $Id_domanda_selezionata"
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $id_domanda_selezionata);
+        $result = $stmt->execute();
+        $stmt->store_result();
+
+        return $result;
+    }
 
 }
 
