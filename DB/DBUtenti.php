@@ -816,7 +816,7 @@ class DBUtenti
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
 
-        // query = delete from 'utente' where e-mail= 'utente_selezionato'
+        // query = delete from 'utente' where e-mail= 'utente_selezionato' .00
 
         $query = (
             "DELETE " .
