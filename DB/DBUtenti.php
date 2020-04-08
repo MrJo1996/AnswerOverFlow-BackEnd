@@ -719,6 +719,31 @@ class DBUtenti
         return $result;
     }
 
+    //inserisci votazione num6
+    public function inserisciVotazione ($valutazione)
+    {
+        $RispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$RispostaTab];
+        //QUERY: //INSERT INTO  risposta (valutazione)
+        ////VALUES ($valore_valutazione);
+        ////WHERE   ID = $Id_risposta_selezionata
+        $query = (
+            "INSERT INTO " .
+            $RispostaTab . " (" .
+            $campi[2] . ") " .
+            "VALUES " . "(" .
+            "? )"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $valutazione);
+        return $stmt->execute();
+    }
+
+
+
+
+
+
 }
 
 
