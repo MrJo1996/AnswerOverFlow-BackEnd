@@ -739,7 +739,32 @@ class DBUtenti
         return $stmt->execute();
     }
 
+    public function modificaSondaggio($codice_sondaggio,$dataeora,$titolo,$cod_utente,$cod_categoria)
+    {
 
+        $Sondaggiotabella = $this->tabelleDB[6];
+
+        $campi = $this->campiTabelleDB[$Sondaggiotabella];
+        //query:  UPDATE sondaggio
+        //SET  DataeOra=$valore Titolo=$titolo_inserito cod_utente=$valore cod_categoria=$valore
+        //WHERE codice_sondaggio=$valore
+        $query = (
+            "UPDATE" .
+            $Sondaggiotabella . " " .
+            "SET" .
+            $campi[1] . " = ? ".
+            $campi[2] . " = ? ".
+            $campi[3] . " = ? " .
+            $campi[4] . " = ? " .
+            "WHERE" .
+            $campi[0] . " = ? "
+        );
+
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("idsii", $codice_sondaggio, $dataeora,$titolo,$cod_utente,$cod_categoria);
+        return $stmt->execute();
+    }
 
 
 
