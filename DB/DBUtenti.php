@@ -836,7 +836,122 @@ class DBUtenti
         return $result;
     }
 
+ //Cancella risposta
+    public function cancellaRisposta($id_risposta_selezionata)
+    {
+        $tabella = $this->tabelleDB[5]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "  DELETE * FROM Risposta where ID = $Id_risposta_selezionata"
 
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $id_risposta_selezionata);
+        $result = $stmt->execute();
+        $stmt->store_result();
+
+        return $result;
+    }
+
+    // Rierca domanda NON aperta
+    public function ricercaDomanda($categoria, $titoloDomanda)
+    {
+        $domandaTab = $this->tabelleDB[4];
+        $campiDomanda = $this->campiTabelleDB[$domandaTab];
+
+        //QUERY: SELECT * FROM domanda WHERE categoria = $value OR titolo LIKE %$value%
+        $query = (
+            "SELECT " .
+            $campiDomanda[0] . ", " .
+            $campiDomanda[1] . " " .
+            $campiDomanda[2] . ", " .
+            $campiDomanda[3] . " " .
+            $campiDomanda[4] . ", " .
+            $campiDomanda[5] . " " .
+            $campiDomanda[6] . ", " .
+
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE" .
+            "(" . $campiDomanda[6] = " = ? "  . "OR" . titolo . "LIKE" % " = ? "  % ")" );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+        $stmt->bind_param("ss", $categoria, $titoloDomanda);
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+            $domanda= array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campiDomanda[0]] = $codice_domanda;
+                $temp[$campiDomanda[1]] = $dataeora;
+                $temp[$campiDomanda[2]] = $timer;
+                $temp[$campiDomanda[3]] = $titolo;
+                $temp[$campiDomanda[4]] = $descrizione;
+                $temp[$campiDomanda[5]] = $cod_utente;
+                $temp[$campiDomanda[6]] = $cod_categoria;
+                array_push($domanda, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $domanda
+            }
+            return $domanda; //ritorno array $domanda riempito con i risultati della query effettuata.
+        } else {
+            return null;
+
+        }
+    }
+
+    // Rierca sondaggio NON aperto
+    public function ricercaSondaggio($categoria, $titoloSondaggio)
+    {
+        $sondaggioTab = $this->tabelleDB[6];
+        $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
+
+        //QUERY: SELECT * FROM sondaggio WHERE categoria = $value OR titolo LIKE %$value%
+        $query = (
+            "SELECT " .
+            $campiSondaggio[0] . ", " .
+            $campiSondaggio[1] . " " .
+            $campiSondaggio[2] . ", " .
+            $campiSondaggio[3] . " " .
+            $campiSondaggio[4] . ", " .
+
+            "FROM " .
+            $sondaggioTab . " " .
+            "WHERE" .
+            "(" . $campiSondaggio[6] = " = ? "  . "OR" . titolo . "LIKE" % " = ? "  % ")" );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+        $stmt->bind_param("ss", $categoria, $titoloSondaggio);
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $cod_utente, $cod_categoria);
+            $sondaggio= array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campiSondaggio[0]] = $codice_sondaggio;
+                $temp[$campiSondaggio[1]] = $dataeora;
+                $temp[$campiSondaggio[2]] = $titolo;
+                $temp[$campiSondaggio[3]] = $cod_utente;
+                $temp[$campiSondaggio[4]] = $cod_categoria;
+
+                array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
+            }
+            return $sondaggio; //ritorno array $sondaggio riempito con i risultati della query effettuata.
+        } else {
+            return null;
+
+        }
+
+    }
 }
 
 
