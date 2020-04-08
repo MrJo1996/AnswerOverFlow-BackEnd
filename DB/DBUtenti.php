@@ -766,7 +766,75 @@ class DBUtenti
         return $stmt->execute();
     }
 
+    //Visualizzo una domanda tramite il suo codice(ID)
+    public function visualizzaDomanda($id_domanda){
 
+        $domandaTab = $this->tabelleDB[7];
+        $campi = $this->campiTabelleDB[$domandaTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE " .
+            $campi[0] . " = ?"
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $id_domanda);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if($stmt->num_rows > 0){
+            $stmt->bind_result($codice_domanda, $dateeora, $timer, $titolo, $descriozione, $cod_utente, $cod_categoria);
+            $domande = array(); //controlla
+            while ($stmt->fetch()){
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_domanda;
+                $temp[$campi[1]] = $dateeora;
+                $temp[$campi[2]] = $timer;
+                $temp[$campi[3]] = $titolo;
+                $temp[$campi[4]] = $descriozione;
+                $temp[$campi[5]] = $cod_utente;
+                $temp[$campi[6]] = $cod_categoria;
+                array_push($domande,$temp);
+
+            }
+            return $domande;
+        } else{
+            return null;
+        }
+
+    }
+
+    public function eliminaProfilo($email){
+
+        $utenteTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$utenteTab];
+
+        // query = delete from 'utente' where e-mail= 'utente_selezionato'
+
+        $query = (
+            "DELETE " .
+            "* " .
+            "FROM " .
+            $utenteTab. " " .
+            "WHERE " .
+            $campi[0] . " = ?"
+        );
+
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $email);
+        $result = $stmt->execute();
+        $stmt->store_result();
+
+        return $result;
+    }
 
 
 }
