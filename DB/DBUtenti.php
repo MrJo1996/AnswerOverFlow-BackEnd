@@ -378,7 +378,7 @@ class DBUtenti
         return $result;
     }
 
-// Funzione registrazione
+    // Funzione registrazione
     public function registrazione($email, $username, $password, $nome, $cognome, $bio, $attivo)
     {
         $tabella = $this->tabelleDB[0];
@@ -811,6 +811,7 @@ class DBUtenti
 
     }
 
+
     public function eliminaProfilo($email){
 
         $utenteTab = $this->tabelleDB[0];
@@ -952,8 +953,28 @@ class DBUtenti
         }
 
     }
-}
 
+    //Inserisci domanda
+    public function inserisciDomanda ($dataeora, $timer, $titolo, $descrizione)
+    {
+        $DomandaTab = $this->tabelleDB[4];
+        $campiDomanda = $this->campiTabelleDB[$DomandaTab];
+
+        $query = (
+            "INSERT INTO" . " " .
+            $DomandaTab . " ( " .
+            $campiDomanda[1] . " , " .
+            $campiDomanda[2] . " , " .
+            $campiDomanda[3] . " , " .
+            $campiDomanda[4] . " ) " .
+            "VALUES" . " ( " .
+            " ? , ? , ? , ? ) "
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("siss", $dataeora, $timer, $titolo, $descrizione);
+        return $stmt->execute();
+    }
+}
 
 
 
