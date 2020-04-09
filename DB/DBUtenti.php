@@ -778,7 +778,7 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_utente, $cod_categoria)
+    public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria)
     {
 
         $Sondaggiotabella = $this->tabelleDB[6];
@@ -793,7 +793,6 @@ class DBUtenti
             "SET" .
             $campi[1] . " = ? " .
             $campi[2] . " = ? " .
-            $campi[3] . " = ? " .
             $campi[4] . " = ? " .
             "WHERE" .
             $campi[0] . " = ? "
@@ -801,7 +800,7 @@ class DBUtenti
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("idsii", $codice_sondaggio, $dataeora, $titolo, $cod_utente, $cod_categoria);
+        $stmt->bind_param("issi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
         return $stmt->execute();
     }
 
