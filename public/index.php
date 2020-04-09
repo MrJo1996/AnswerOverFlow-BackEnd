@@ -48,7 +48,27 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
+$app->post('/visualizzarisposta', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_scadenza = $requestData['codice_risposta'];
+//Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaRisposta($codice_scadenza);
 
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        //metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse; //Invio la risposta del servizio REST al client
+    } else {
+        $responseData['error'] = true; //Campo errore = false
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 /*  Gli endpoint sono delle richieste http accessibili al Client gestite poi dal nostro Server REST.
     Tra i tipi di richieste http, le più usate sono:
     - get (richiesta dati -> elaborazione server -> risposta server)
