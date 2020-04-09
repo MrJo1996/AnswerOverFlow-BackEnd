@@ -472,26 +472,32 @@ class DBUtenti
     }
 
 //Modifica domanda num10 PARTE 2
-    public function modificaDomanda($Id_domanda_selezionata, $titolo, $descrizione)
+    public function modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria)
     {
 
         $tabella = $this->tabelleDB[4];
 
         $campi = $this->campiTabelleDB[$tabella];
-        //query:  "UPDATE Domanda SET titolo=$titolo_inserito, descrizione = $descrizione_inserita WHERE = $Id_domanda_selezionata"
+        //query:  UPDATE Domanda
+        //                        SET titolo=$titolo_inserito,dataeora=$valore,timer=$valore,  descrizione = $descrizione_inserita,           cod_categoria=$valore.
+        //
+        //                        WHERE = $Id_domanda_selezionata 
         $query = (
             "UPDATE" .
             $tabella . " " .
             "SET" .
+            $campi[1] . " = ? " .
+            $campi[2] . " = ? " .
             $campi[3] . " = ? " .
             $campi[4] . " = ? " .
+            $campi[6] . " = ? " .
             "WHERE" .
             $campi[0] . " = ? "
         );
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iss", $Id_domanda_selezionata, $titolo, $descrizione);
+        $stmt->bind_param("isissi", $codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria);
         return $stmt->execute();
     }
 
