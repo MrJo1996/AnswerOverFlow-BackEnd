@@ -119,8 +119,6 @@ class DBUtenti
     //Una volta che l'utente mi ha confermato la mail inviata cambio la password
     public function recuperaPassword($email, $password)
     {
-        $password = hash('sha256', $password);
-
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY:  "UPDATE TABLE SET password = ? WHERE email = ?"
@@ -263,7 +261,7 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $id_utente, $id_categoria);
+        $stmt->bind_param("si", $id_utente, $id_categoria);
         $stmt->execute();
         //Ricevo la risposta del DB
         $stmt->store_result();
@@ -292,7 +290,7 @@ class DBUtenti
         $query = (
             "UPDATE " .
             $statsTab .
-            "SET " .
+            " SET " .
             $campi[2] . " = ?, " .
             $campi[3] . " = ? " .
             "WHERE " .
@@ -302,7 +300,7 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iiii", $valutazione, $n_val, $id_utente, $id_categoria);
+        $stmt->bind_param("iisi", $valutazione, $n_val, $id_utente, $id_categoria);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
@@ -320,14 +318,14 @@ class DBUtenti
             $campi[1] . ", " .
             $campi[2] . ", " .
             $campi[3] . ") " .
-            "VALUES " . "(" .
+            "VALUES " . "( " .
             "? , " .
             "? , " .
             "? , " .
-            "? )"
+            "1 )"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iiii", $id_utente, $id_categoria, $valutazione, 1);
+        $stmt->bind_param("sii", $id_utente, $id_categoria, $valutazione);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
