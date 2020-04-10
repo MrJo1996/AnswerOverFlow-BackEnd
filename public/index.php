@@ -48,6 +48,26 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 });
 
+/*  Gli endpoint sono delle richieste http accessibili al Client gestite poi dal nostro Server REST.
+    Tra i tipi di richieste http, le più usate sono:
+    - get (richiesta dati -> elaborazione server -> risposta server)
+    - post (invio dati criptati e richiesta dati -> elaborazione server -> risposta server)
+    - delete (invio dato (id di solito) e richiesta eliminazione -> elaborazione server -> risposta server)
+
+    Slim facilita per noi la gestione della richiesta http mettendo a disposizione funzioni facili da implementare
+    hanno la forma:
+
+    app->"richiesta http"('/nome endpoint', function (Request "dati inviati dal client", Response "dati risposti dal server") {
+
+        //logica del servizio  ---- (COME SI FA IL JS)
+
+        return "risposta";
+
+    } */
+
+/*************** LISTA DI ENDPOINT **************/
+
+// endpoint: /visualizzaRisposta OK
 $app->post('/visualizzarisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -69,28 +89,8 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
         return $response->withJson($responseData);
     }
 });
-/*  Gli endpoint sono delle richieste http accessibili al Client gestite poi dal nostro Server REST.
-    Tra i tipi di richieste http, le più usate sono:
-    - get (richiesta dati -> elaborazione server -> risposta server)
-    - post (invio dati criptati e richiesta dati -> elaborazione server -> risposta server)
-    - delete (invio dato (id di solito) e richiesta eliminazione -> elaborazione server -> risposta server)
 
-    Slim facilita per noi la gestione della richiesta http mettendo a disposizione funzioni facili da implementare
-    hanno la forma:
 
-    app->"richiesta http"('/nome endpoint', function (Request "dati inviati dal client", Response "dati risposti dal server") {
-
-        //logica del servizio  ---- (COME SI FA IL JS)
-
-        return "risposta";
-
-    }
-
- */
-
-/*************** LISTA DI ENDPOINT **************/
-
-/* aggiungo ad $app tutta la lista di endpoint che voglio */
 
 /**** ENDPOINT ****/
 
