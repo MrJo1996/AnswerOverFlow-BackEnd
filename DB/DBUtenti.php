@@ -93,7 +93,7 @@ class DBUtenti
     //---- METODI PER GESTIRE LE QUERY ----
 
     //Funzione di controllo presenza email per recuperare la password
-    public function recuperoPsw($email)
+    public function controlloEmail($email)
     {
         $utenteTab = $this->tabelleDB[0]; //Tabella per la query
         $campi = $this->campiTabelleDB[$utenteTab]; //Campi per la query
