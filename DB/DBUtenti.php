@@ -60,6 +60,7 @@ class DBUtenti
             "codice_sondaggio",
             "dataeora",
             "titolo",
+            "timer",
             "cod_utente",
             "cod_categoria"
         ],
