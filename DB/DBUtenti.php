@@ -508,13 +508,14 @@ class DBUtenti
         $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
         $categoriaTab = $this->tabelleDB[2];
         $campiCategoria = $this->campiTabelleDB[$categoriaTab];
-        //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo,
+        //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo, sondaggio.timer,
         // WHERE sondaggio.cod_categoria = " ? " AND sondaggio.cod_utente = " ? "
         $query = (
             "SELECT " .
             $sondaggioTab . "." . $campiSondaggio[0] . ", " .
             $sondaggioTab . "." . $campiSondaggio[1] . ", " .
-            $sondaggioTab . "." . $campiSondaggio[2] . " " .
+            $sondaggioTab . "." . $campiSondaggio[2] . ", " .
+            $sondaggioTab . "." . $campiSondaggio[3] . " " .
             "FROM " . $sondaggioTab . " " .
             "WHERE " . $sondaggioTab . "." . $campiSondaggio[3] . "= ?" . " AND " . $sondaggioTab . "." . $campiSondaggio[4] . "= ?"
         );
@@ -523,7 +524,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo);
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer);
             $sondaggio = array();
             while ($stmt->fetch()) { //Scansiono la risposta della query
                 $temp = array();
@@ -531,6 +532,7 @@ class DBUtenti
                 $temp[$campiSondaggio[0]] = $codice_sondaggio;
                 $temp[$campiSondaggio[1]] = $dataeora;
                 $temp[$campiSondaggio[2]] = $titolo;
+                $temp[$campiSondaggio[3]] = $timer;
                 array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
             }
             return $sondaggio; //ritorno array $sondaggio riempito con i risultati della query effettuata.
