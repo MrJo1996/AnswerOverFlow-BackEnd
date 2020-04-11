@@ -9,7 +9,7 @@ class EmailHelper
 {
 
     /**
-     * Emailelper constructor.
+     * EmailHelper constructor.
      */
     public function __construct()
     {
@@ -34,7 +34,7 @@ class EmailHelper
 
             //Recipients
             $mail->setFrom('unimolshare@gmail.com', 'UnimolShare - Automatic Password Recovery');
-            $mail->addAddress('andreacb94@gmail.com', 'TEST Andrea');     // Add a recipient
+            $mail->addAddress('chrispeluso98@gmail.com', 'TEST Chris');     // Add a recipient
             $mail->Subject = 'UnimolShare - Recupero credenziali';
 
             //Content
@@ -70,7 +70,7 @@ class EmailHelper
 
             //Recipients
             $mail->setFrom('unimolshare@gmail.com', 'UnimolShare - Automatic Password Recovery');
-            $mail->addAddress('andreacb94@gmail.com', 'TEST Andrea');     // Add a recipient
+            $mail->addAddress('chrispeluso98@gmail.com', 'TEST Chris');     // Add a recipient
             $mail->Subject = 'UnimolShare - Conferma registrazione';
 
             //Content

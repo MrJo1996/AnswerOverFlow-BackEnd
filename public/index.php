@@ -111,27 +111,43 @@ $app->post('/controlloEmail', function (Request $request, Response $response)
     }
 });
 
-// endpoint: /recuperaPassword funziona ma
-// è da creare il set di funzioni che gestiscono la situazione del recupero password
-$app->post('/recuperaPassword', function (Request $request, Response $response)
-{
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $email = $requestData['email'];
-    $password = $requestData['password'];
-    $responseData['data'] = $db->recuperaPassword($email, $password);
+//endpoint /recupero password/modifica password
+//ci sono da apportare modifiche alla funzione EmailSender
+$app->post('/recupero', function (Request $request, Response $response) {
 
-    if($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = "Operazione andata a buon fine";
-        $response->getBody()->write(json_encode(array("Esito cambio Password" => $responseData)));
-        $newResponse = $response-> withHeader('Content-type', 'application/json');
-        return $newResponse;
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $email = $requestData['email'];
+
+    //Risposta del servizio REST
+    $responseData = array();
+    $emailSender = new EmailHelperAltervista(); //È da modificare il link con il quale viene inviata la mail di recupero
+    $randomizerPassword = new RandomPasswordHelper();
+
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($db->controlloEmail($email)) {
+
+        $nuovaPassword = $randomizerPassword->generatePassword(6);
+
+        if ($db->recuperaPassword($email, $nuovaPassword)) {
+            if ($emailSender->sendResetPasswordEmail($email, $nuovaPassword)) {
+                $responseData['error'] = false;
+                $responseData['message'] = "Email di recupero password inviata";
+            } else {
+                $responseData['error'] = true; //Campo errore = true
+                $responseData['message'] = "Impossibile inviare l'email di recupero";
+            }
+        } else { //Se la connessione al DB fallisce
+            $responseData['error'] = true;
+            $responseData['message'] = 'Impossibile comunicare col Database';
+        }
+
+    } else { //Se le credenziali non sono corrette
+        $responseData['error'] = true;
+        $responseData['message'] = 'Email non presente nel DB';
     }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
 // endpoint: /aChiAppartieniRisposta OK
@@ -198,9 +214,36 @@ $app->post('/controlloStats', function (Request $request, Response $response)
     }
 });
 
-// endpoint: /aggiornaStats funziona ma
-// è da creare il set di funzioni che gestisce la nuova statistica
-$app->post('/aggiornaStats', function (Request $request, Response $response)
+// endpoint: /aggiornaStats   OK
+$app->post('/aggiornaStats', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['email'];
+    $codice_categoria = $requestData['codice_categoria'];
+    $ultima_valutazione = $requestData['valutazione'];
+    $statistiche = $db->controlloStats($email, $codice_categoria);
+    if ($statistiche != null){ //Se la mail e la categoria hanno già una stats
+        $nuova_valutazione = $statistiche[0]['sommatoria_valutazioni'] + $ultima_valutazione;
+        $nuovo_n_valutazioni = $statistiche[0]['numero_valutazioni'] + 1;
+        if ($db->aggiornaStats($email, $codice_categoria, $nuova_valutazione, $nuovo_n_valutazioni )) { //vengono aggiornate
+            $responseData['error'] = false;
+            $responseData['message'] = "Statistiche aggiornate";
+        } else { //non è stato possibile aggiornarle
+            $responseData['error'] = true;
+            $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
+        }
+    } elseif ($db->insertStats($email, $codice_categoria, $ultima_valutazione)) { //Altrimenti la si crea
+        $responseData['error'] = false;
+        $responseData['message'] = "Statistiche create";
+    } else { //non è stato possibile crearle
+        $responseData['error'] = true;
+        $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+    }
+    return $response->withJson($responseData);
+});
+
+/* endpoint: per testare aggiornaStats
+$app->post('/aggiornaStats1', function (Request $request, Response $response)
 {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -221,9 +264,9 @@ $app->post('/aggiornaStats', function (Request $request, Response $response)
         $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
         return $response->withJson($responseData);
     }
-});
+}); */
 
-// endpoint: /insertStats OK
+/* endpoint per testare insertStats
 $app->post('/insertStats', function (Request $request, Response $response)
 {
     $db = new DBUtenti();
@@ -244,7 +287,7 @@ $app->post('/insertStats', function (Request $request, Response $response)
         $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
         return $response->withJson($responseData);
     }
-});
+});*/
 
 /**** ENDPOINT ****/
 
