@@ -289,6 +289,77 @@ $app->post('/insertStats', function (Request $request, Response $response)
     }
 });*/
 
+// endpoint: /modificaVotazione
+$app->post('/modificaVotazione', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_risposta = $requestData['codice_risposta'];
+    $valutazione = $requestData['valutazione'];
+
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->modificaVotazione($codice_risposta, $valutazione);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+// endpoint: /modificaRisposta
+
+$app->post('/modificaRisposta', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_risposta = $requestData['codice_risposta'];
+    $descrizione = $requestData['descrizione'];
+
+//Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->modificaVotazione($codice_risposta, $descrizione);
+//Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+//endpoint: / visualizza sondaggio per categoria
+
+$app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_categoria = $requestData['cod_categoria'];
+//Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaSondaggioPerCategoria($codice_categoria);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
+        //metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse; //Invio la risposta del servizio REST al client
+    } else {
+        $responseData['error'] = true; //Campo errore = false
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 /**** ENDPOINT ****/
 
 

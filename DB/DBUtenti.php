@@ -501,13 +501,11 @@ class DBUtenti
     }
 
     //Visualizza sondaggio per categoria (Mariano Buttino)
-    public function visualizzaSondaggioPerCategoria($codice_categoria, $codice_utente)
+    public function visualizzaSondaggioPerCategoria($codice_categoria)
     {
 
         $sondaggioTab = $this->tabelleDB[6];
         $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
-        $categoriaTab = $this->tabelleDB[2];
-        $campiCategoria = $this->campiTabelleDB[$categoriaTab];
         //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo, sondaggio.timer,
         // WHERE sondaggio.cod_categoria = " ? " AND sondaggio.cod_utente = " ? "
         $query = (
@@ -517,7 +515,7 @@ class DBUtenti
             $sondaggioTab . "." . $campiSondaggio[2] . ", " .
             $sondaggioTab . "." . $campiSondaggio[3] . " " .
             "FROM " . $sondaggioTab . " " .
-            "WHERE " . $sondaggioTab . "." . $campiSondaggio[3] . "= ?" . " AND " . $sondaggioTab . "." . $campiSondaggio[4] . "= ?"
+            "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . "= ?"
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ii", $codice_categoria, $codice_utente);
