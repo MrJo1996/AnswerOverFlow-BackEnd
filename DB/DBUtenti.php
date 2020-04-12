@@ -518,7 +518,7 @@ class DBUtenti
             "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . "= ?"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $codice_categoria, $codice_utente);
+        $stmt->bind_param("i", $codice_categoria);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
