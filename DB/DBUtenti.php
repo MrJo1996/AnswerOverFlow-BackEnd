@@ -858,7 +858,7 @@ class DBUtenti
             $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
             $domande = array(); //controlla
             while ($stmt->fetch()) {
-                $temp = array();
+                $temp = array(); //
                 //indicizzo key con i dati nell'array
                 $temp[$campi[0]] = $codice_domanda;
                 $temp[$campi[1]] = $dataeora;
