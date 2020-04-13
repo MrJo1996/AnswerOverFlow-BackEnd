@@ -332,24 +332,45 @@ class DBUtenti
     }
 
     //Visualizzo il profilo di un utente
-    public function visualizzaProfilo($email)
-    {
+    public function visualizzaProfilo($email){
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
-        //QUERY: SELECT * FROM `utente` WHERE Email = 'value'
+        //QUERY: SELECT email, username, nome, cognome, bio FROM `utente` WHERE Email = 'value'
         $query = (
             "SELECT" .
-            "*" .
+            $utenteTab . "." . $campi[0] . "," .
+            $utenteTab . "." . $campi[1] . "," .
+            $utenteTab . "." . $campi[3] . "," .
+            $utenteTab . "." . $campi[4] . "," .
+            $utenteTab . "." . $campi[5] . " " .
             "FROM" .
             $utenteTab . " " .
             "WHERE" .
-            $campi[0] . "= ?"
+            $utenteTab . "." . $campi[0] . "= ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("s", $email);
-        $result = $stmt->execute();
-        return $result;
+        $stmt->execute();
+        $stmt->store_result();
+
+        if($stmt->num_rows > 0){
+            $stmt->bind_result($email, $username, $nome, $cognome, $bio);
+            $user = array();
+
+            while($stmt->fetch()){
+                $temp = array();
+                $temp[$campi[0]] = $email;
+                $temp[$campi[1]] = $username;
+                $temp[$campi[3]] = $nome;
+                $temp[$campi[4]] = $cognome;
+                $temp[$campi[5]] = $bio;
+                array_push($user, $temp);
+            }
+            return $user;
+        } else{
+            return null;
+        }
     }
 
     //Modifica profilo utente
@@ -361,7 +382,7 @@ class DBUtenti
         $query = (
             "UPDATE" .
             $utenteTab . " " .
-            "SET" .
+            "SET" . " " .
             $campi[1] . " = ?," .
             $campi[2] . " = ?," .
             $campi[3] . " = ?," .

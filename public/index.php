@@ -360,6 +360,51 @@ $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Respo
     }
 });
 
+//endpoint: /visualizzaProfilo
+$app->post('/visualizzaProfilo', function (Request $request, Response $response){
+   $db = new DBUtenti();
+
+   $requestData = $request->getParsedBody();
+   $email = $requestData['email'];
+
+   $responseData['data'] = $db->visualizzaProfilo($email);
+   if($responseData['data'] != null){
+       $responseData['error'] = false;
+       $responseData['message'] = 'Elemento visualizzato con successo';
+       $response->getBody()->write(json_encode(array("Profilo"=>$responseData)));
+       $newResponse = $response->withHeader('Content-type', 'application/json');
+       return $newResponse;
+   }else{
+       $responseData['error'] = true;
+       $responseData['message'] = 'Errore imprevisto';
+       return $response->withJson($responseData);
+   }
+});
+
+//endpoint: /modificaProfilo
+$app->post('/modificaProfilo', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $username = $requestData['username'];
+    $password = $requestData['password'];
+    $nome = $requestData['nome'];
+    $cognome = $requestData['cognome'];
+    $bio = $requestData['bio'];
+    $email = $requestData['email'];
+
+    $responseData = array();
+    $responseDB = $db->modificaProfilo($username, $password, $nome, $cognome, $bio, $email);
+
+    if($responseDB){
+        $responseData['error'] = false;
+        $responseData['message'] = 'Modifica effettuata con successo';
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Impossibile effettuare la modifica';
+    }
+    return $response->withJson($responseData);
+});
 /**** ENDPOINT ****/
 
 
