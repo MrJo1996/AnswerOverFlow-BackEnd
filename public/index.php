@@ -405,6 +405,42 @@ $app->post('/modificaProfilo', function (Request $request, Response $response){
     }
     return $response->withJson($responseData);
 });
+
+// endpoint: /visualizzaDomanda
+$app->post('/visualizzadomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_domanda = $requestData['codice_domanda'];
+    //Controllo la domanda dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaDomanda($codice_domanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse; //Invio la risposta del servizio REST al client
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**** ENDPOINT ****/
 
 
