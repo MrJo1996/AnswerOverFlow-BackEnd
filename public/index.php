@@ -428,8 +428,62 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
     }
+
+
 });
 
+// endpoint: /registrazione     OK
+$app->post('/registrazione', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $email = $requestData['email'];
+    $username = $requestData['username'];
+    $password = $requestData['password'];
+    $nome = $requestData['nome'];
+    $cognome = $requestData['cognome'];
+    $bio = $requestData['bio'];
+
+
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseDB = $db->registrazione($email, $username, $password, $nome, $cognome, $bio);
+    if ($responseDB == 1) { //Se la registrazione è andata a buon fine
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Registrazione avvenuta con successo'; //Messaggio di esito positivo
+    } else if ($responseDB == 2) { //Se l'email è già presente nel DB
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Account già  esistente!'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+
+});
+
+//endpoint: /visualizzaSondaggio
+$app->post('/visualizzaSondaggio', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $codice_sondaggio = $requestData['codice_sondaggio'];
+
+    $responseData['data'] = $db->visualizzaSondaggio($codice_sondaggio);
+    if($responseData['data'] != null){
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Sondaggio"=>$responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 
 
 
