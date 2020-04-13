@@ -1062,25 +1062,33 @@ class DBUtenti
     }
 
     //Inserisci sondaggio
-    public function inserisciSondaggio($timer, $titolo, $cod_utente, $cod_categoria)
+    public function inserisciSondaggio( $dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
     {
-        $DomandaTab = $this->tabelleDB[4];
+        $DomandaTab = $this->tabelleDB[6];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
 
-        //QUERY: INSERT INTO sondaggio(ID_Sondaggio,Titolo, Timer, cod_utente, cod_categoria) VALUES($timer, $titolo, $cod_utente, $cod_categoria)
+        //QUERY: INSERT INTO sondaggio( dataeora, timer, titolo, cod_utente, cod_categoria) VALUES($dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
 
+
+        /*    "codice_sondaggio",
+            "dataeora",
+            "titolo",
+            "timer",
+            "cod_utente",
+            "cod_categoria"*/
         $query = (
             "INSERT INTO" . " " .
             $DomandaTab . " ( " .
             $campiDomanda[1] . " , " .
             $campiDomanda[2] . " , " .
             $campiDomanda[3] . " , " .
-            $campiDomanda[4] . " ) " .
+            $campiDomanda[4] . " , " .
+            $campiDomanda[5] . " ) " .
             "VALUES" . " ( " .
-            " ? , ? , ? , ? ) "
+            " ? , ? , ? , ? ,? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sssi", $timer, $titolo, $cod_utente, $cod_categoria);
+        $stmt->bind_param("isisi", $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
         return $stmt->execute();
     }
 

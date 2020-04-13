@@ -568,6 +568,36 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 
 
 
+// endpoint: /inserisciSondaggio    OK
+$app->post('/inseriscisondaggio', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $timer = $requestData['timer'];
+    $dataeora = $requestData['dataeora'];
+    $cod_utente = $requestData['cod_utente'];
+    $cod_categoria = $requestData['cod_categoria'];
+    $titolo = $requestData['titolo'];
+
+    $responseData = array();
+
+
+    $responseDB = $db->inserisciSondaggio($dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
+    if ($responseDB ) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Sondaggio inserito con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Sondaggio non inserito'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+});
+
 
 
 
