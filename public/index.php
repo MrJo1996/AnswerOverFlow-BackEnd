@@ -540,8 +540,6 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
-
-    $codice_domanda = $requestData['codice_domanda'];
     $dataeora = $requestData['dataeora'];
     $timer = $requestData['timer'];
     $titolo = $requestData['titolo'];
@@ -553,7 +551,7 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
     $responseData = array(); //La risposta e' un array di informazioni da compilare
 
 
-    $result = $db->inserisciDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+    $result = $db->inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($result) {
         $responseData['error'] = false; //Campo errore = false
@@ -568,7 +566,7 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 
 
 
-// endpoint: /inserisciSondaggio    OK
+// endpoint: /inserisciSondaggio  CASSETTA  OK
 $app->post('/inseriscisondaggio', function (Request $request, Response $response) {
 
     $db = new DBUtenti();

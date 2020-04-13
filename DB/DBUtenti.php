@@ -1038,15 +1038,23 @@ class DBUtenti
     }
 
     //Inserisci domanda
-    public function inserisciDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria)
+    public function inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria)
     {
         $DomandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
 
+        /* "codice_domanda",
+            "dataeora",
+            "timer",
+            "titolo",
+            "descrizione",
+            "cod_utente",
+            "cod_categoria"*/
+
         $query = (
             "INSERT INTO" . " " .
             $DomandaTab . " ( " .
-            $campiDomanda[0] . " , " .
+
             $campiDomanda[1] . " , " .
             $campiDomanda[2] . " , " .
             $campiDomanda[3] . " , " .
@@ -1054,10 +1062,10 @@ class DBUtenti
             $campiDomanda[5] . " , " .
             $campiDomanda[6] . " ) " .
             "VALUES" . " ( " .
-            " ? , ? , ? , ? , ? , ? , ? ) "
+            " ? , ? , ? , ? , ? , ?  ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("isisssi", $codice_domanda,$dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
+        $stmt->bind_param("iisssi", $dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
         return $stmt->execute();
     }
 
