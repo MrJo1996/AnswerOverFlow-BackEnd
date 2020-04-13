@@ -399,7 +399,7 @@ class DBUtenti
     }
 
     // Funzione registrazione
-    public function registrazione($email, $username, $password, $nome, $cognome, $bio, $attivo)
+    public function registrazione($email, $username, $password, $nome, $cognome, $bio)
     {
         $tabella = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$tabella];
@@ -429,21 +429,37 @@ class DBUtenti
     public function visualizzaSondaggio($codice_sondaggio)
     {
         $sondaggioTab = $this->tabelleDB[6];
-        $campi = $this->campiTabelleDB[$sondaggioTab];
+        $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
         //QUERY: SELECT * FROM `sondaggio` WHERE ID = 'value'
         $query = (
-            "SELECT" .
-            "*" .
-            "FROM" .
+            "SELECT " .
+            "* " .
+            "FROM " .
             $sondaggioTab . " " .
-            "WHERE" .
-            $campi[0] . "= ?"
+            "WHERE " .
+            $campiSondaggio[0] . " = ?"
         );
-        //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $codice_sondaggio);
-        $result = $stmt->execute();
-        return $result;
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $codice_utente, $codice_categoria);
+            $sondaggio = array();
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiSondaggio[0]] = $codice_sondaggio;
+                $temp[$campiSondaggio[1]] = $dataeora;
+                $temp[$campiSondaggio[2]] = $titolo;
+                $temp[$campiSondaggio[3]] = $timer;
+                $temp[$campiSondaggio[4]] = $codice_utente;
+                $temp[$campiSondaggio[5]] = $codice_categoria;
+                array_push($sondaggio, $temp);
+            }
+            return $sondaggio;
+        } else {
+            return null;
+        }
     }
 
     //Modifica votazione (Mariano Buttino)
