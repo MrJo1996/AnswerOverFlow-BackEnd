@@ -360,7 +360,7 @@ $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Respo
     }
 });
 
-//endpoint: /visualizzaProfilo
+//endpoint: /visualizzaProfilo...OK
 $app->post('/visualizzaProfilo', function (Request $request, Response $response){
    $db = new DBUtenti();
 

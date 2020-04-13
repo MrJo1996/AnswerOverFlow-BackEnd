@@ -337,15 +337,15 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY: SELECT email, username, nome, cognome, bio FROM `utente` WHERE Email = 'value'
         $query = (
-            "SELECT" .
+            "SELECT " .
             $utenteTab . "." . $campi[0] . "," .
             $utenteTab . "." . $campi[1] . "," .
             $utenteTab . "." . $campi[3] . "," .
             $utenteTab . "." . $campi[4] . "," .
             $utenteTab . "." . $campi[5] . " " .
-            "FROM" .
+            "FROM " .
             $utenteTab . " " .
-            "WHERE" .
+            "WHERE " .
             $utenteTab . "." . $campi[0] . "= ?"
         );
         //Invio la query
