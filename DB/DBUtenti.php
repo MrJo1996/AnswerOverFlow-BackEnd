@@ -855,15 +855,16 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_domanda, $dateeora, $timer, $titolo, $descriozione, $cod_utente, $cod_categoria);
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
             $domande = array(); //controlla
             while ($stmt->fetch()) {
+                $temp = array();
                 //indicizzo key con i dati nell'array
                 $temp[$campi[0]] = $codice_domanda;
-                $temp[$campi[1]] = $dateeora;
+                $temp[$campi[1]] = $dataeora;
                 $temp[$campi[2]] = $timer;
                 $temp[$campi[3]] = $titolo;
-                $temp[$campi[4]] = $descriozione;
+                $temp[$campi[4]] = $descrizione;
                 $temp[$campi[5]] = $cod_utente;
                 $temp[$campi[6]] = $cod_categoria;
                 array_push($domande, $temp);
