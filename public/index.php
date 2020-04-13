@@ -381,11 +381,12 @@ $app->post('/visualizzaProfilo', function (Request $request, Response $response)
    }
 });
 
-//endpoint: /modificaProfilo
+//endpoint: /modificaProfilo...OK
 $app->post('/modificaProfilo', function (Request $request, Response $response){
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();
+
     $username = $requestData['username'];
     $password = $requestData['password'];
     $nome = $requestData['nome'];

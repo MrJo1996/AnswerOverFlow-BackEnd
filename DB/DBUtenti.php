@@ -380,20 +380,20 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY: UPDATE `utente` SET `Username`=[value-1], `Password`=[value-2],`Nome`=[value-3],`Cognome`=[value-4],`Bio`=[value-5] WHERE Email = “email_utente_corrente”
         $query = (
-            "UPDATE" .
+            "UPDATE " .
             $utenteTab . " " .
-            "SET" . " " .
-            $campi[1] . " = ?," .
-            $campi[2] . " = ?," .
-            $campi[3] . " = ?," .
-            $campi[4] . " = ?," .
-            $campi[5] . " = ?" .
-            "WHERE" .
-            $campi[0] . " = ?"
+            "SET " .
+            $utenteTab . "." . $campi[1] . "= ?," .
+            $utenteTab . "." . $campi[2] . "= ?," .
+            $utenteTab . "." . $campi[3] . "= ?," .
+            $utenteTab . "." . $campi[4] . "= ?," .
+            $utenteTab . "." . $campi[5] . "= ? " .
+            "WHERE " .
+            $utenteTab . "." . $campi[0] . "= ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sssss", $username, $password, $nome, $cognome, $bio);
+        $stmt->bind_param("ssssss", $username, $password, $nome, $cognome, $bio, $email);
         $result = $stmt->execute();
         return $result;
     }
