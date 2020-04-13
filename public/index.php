@@ -486,9 +486,85 @@ $app->post('/visualizzaSondaggio', function (Request $request, Response $respons
 });
 
 
+$app->post('/login', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $username = $requestData['username'];
+    $password = $requestData['password'];
+
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->login($username, $password);
+    if ($responseData['data']) { //Se l'utente esiste ed e' corretta la password
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Accesso effettuato'; //Messaggio di esiso positivo
+
+
+    } else { //Se le credenziali non sono corrette
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Credenziali errate'; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
 
 
 
+$app->post('/visualizzaMessaggi', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $cod_chat = $requestData['cod_chat'];
+
+    $responseData['data'] = $db->visualizzaMessaggi($cod_chat);
+    if($responseData['data'] != null){
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Messaggi"=>$responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+
+
+
+$app->post('/inserisciDomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+
+    $codice_domanda = $requestData['codice_domanda'];
+    $dataeora = $requestData['dataeora'];
+    $timer = $requestData['timer'];
+    $titolo = $requestData['titolo'];
+    $descrizione = $requestData['descrizione'];
+    $cod_utente = $requestData['cod_utente'];
+    $cod_categoria = $requestData['cod_categoria'];
+
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+
+
+    $result = $db->inserisciDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($result) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Inserimento avvenuto con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Inserimento non effettuato'; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
 
 
 

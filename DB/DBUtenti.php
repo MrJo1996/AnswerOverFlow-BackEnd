@@ -620,26 +620,26 @@ class DBUtenti
     }
 
 
-    public function VisualizzaMessaggio($cod_chat)
+    public function visualizzaMessaggi($cod_chat)
     {
-        $messaggioTab = $this->tabelleDB[8];
+        $messaggioTab = $this->tabelleDB[9];
         $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
 
         $query = (
             "SELECT "
-            . "*" .
+            . "* " .
             "FROM " .
             $messaggioTab . " " .
-            "WHERE " .
+            " WHERE " .
             $campiMessaggio[4] . " = ? "
         );
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("s", $cod_chat);
+        $stmt->bind_param("i", $cod_chat);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, cod_chat);
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat);
             $messaggio = array();
             while ($stmt->fetch()) {
                 $temp = array();
@@ -648,7 +648,7 @@ class DBUtenti
                 $temp[$campiMessaggio[1]] = $dataeora;
                 $temp[$campiMessaggio[2]] = $testo;
                 $temp[$campiMessaggio[3]] = $visualizzato;
-                $temp[$campiMessaggio[4]] = cod_chat;
+                $temp[$campiMessaggio[4]] = $cod_chat;
                 array_push($messaggio, $temp);
             }
             return $messaggio;
@@ -1038,7 +1038,7 @@ class DBUtenti
     }
 
     //Inserisci domanda
-    public function inserisciDomanda($dataeora, $timer, $titolo, $descrizione)
+    public function inserisciDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria)
     {
         $DomandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
@@ -1046,15 +1046,18 @@ class DBUtenti
         $query = (
             "INSERT INTO" . " " .
             $DomandaTab . " ( " .
+            $campiDomanda[0] . " , " .
             $campiDomanda[1] . " , " .
             $campiDomanda[2] . " , " .
             $campiDomanda[3] . " , " .
-            $campiDomanda[4] . " ) " .
+            $campiDomanda[4] . " , " .
+            $campiDomanda[5] . " , " .
+            $campiDomanda[6] . " ) " .
             "VALUES" . " ( " .
-            " ? , ? , ? , ? ) "
+            " ? , ? , ? , ? , ? , ? , ? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("siss", $dataeora, $timer, $titolo, $descrizione);
+        $stmt->bind_param("isisssi", $codice_domanda,$dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
         return $stmt->execute();
     }
 
