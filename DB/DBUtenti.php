@@ -1072,8 +1072,8 @@ class DBUtenti
     //Inserisci sondaggio
     public function inserisciSondaggio( $dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
     {
-        $DomandaTab = $this->tabelleDB[6];
-        $campiDomanda = $this->campiTabelleDB[$DomandaTab];
+        $SondaggioTab = $this->tabelleDB[6];
+        $campiSondaggio = $this->campiTabelleDB[$SondaggioTab];
 
         //QUERY: INSERT INTO sondaggio( dataeora, timer, titolo, cod_utente, cod_categoria) VALUES($dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
 
@@ -1086,12 +1086,12 @@ class DBUtenti
             "cod_categoria"*/
         $query = (
             "INSERT INTO" . " " .
-            $DomandaTab . " ( " .
-            $campiDomanda[1] . " , " .
-            $campiDomanda[2] . " , " .
-            $campiDomanda[3] . " , " .
-            $campiDomanda[4] . " , " .
-            $campiDomanda[5] . " ) " .
+            $SondaggioTab . " ( " .
+            $campiSondaggio[1] . " , " .
+            $campiSondaggio[2] . " , " .
+            $campiSondaggio[3] . " , " .
+            $campiSondaggio[4] . " , " .
+            $campiSondaggio[5] . " ) " .
             "VALUES" . " ( " .
             " ? , ? , ? , ? ,? ) "
         );
