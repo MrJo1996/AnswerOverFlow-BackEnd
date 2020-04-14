@@ -476,13 +476,16 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$tabella];
         //query:  "UPDATE TABLE SET valutazione = ? WHERE codice_risposta = ?"
         $query = (
-            "UPDATE" .
+            "UPDATE " .
             $tabella . " " .
-            "SET" .
+            "SET " .
             $campi[2] . " = ? " .
-            "WHERE" .
-            $campi[0] . " = ? "
+            "WHERE " .
+            $campi[0] . " = ?"
         );
+
+        echo $query . "ciao";
+
         //invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ii", $codice_risposta, $valutazione);
@@ -498,18 +501,22 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$tabella];
         //query:  "UPDATE TABLE SET descrizione = ? WHERE codice_risposta = ?"
         $query = (
-            "UPDATE" .
+            "UPDATE " .
             $tabella . " " .
-            "SET" .
+            "SET " .
             $campi[1] . " = ? " .
-            "WHERE" .
+            "WHERE " .
             $campi[0] . " = ? "
         );
+
+        echo $query . "ciao";
 
         //invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("is", $codice_risposta, $descrizione);
-        return $stmt->execute();
+        $result = $stmt->execute();
+
+        return $result;
     }
 
 //Modifica domanda num10 PARTE 2
@@ -549,7 +556,7 @@ class DBUtenti
         $sondaggioTab = $this->tabelleDB[6];
         $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
         //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo, sondaggio.timer,
-        // WHERE sondaggio.cod_categoria = " ? " AND sondaggio.cod_utente = " ? "
+        // WHERE sondaggio.cod_categoria = " ? "
         $query = (
             "SELECT " .
             $sondaggioTab . "." . $campiSondaggio[0] . ", " .
@@ -557,8 +564,11 @@ class DBUtenti
             $sondaggioTab . "." . $campiSondaggio[2] . ", " .
             $sondaggioTab . "." . $campiSondaggio[3] . " " .
             "FROM " . $sondaggioTab . " " .
-            "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . "= ?"
+            "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . " = ?"
         );
+
+        echo $query . "ciao";
+
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $codice_categoria);
         $stmt->execute();

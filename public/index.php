@@ -319,7 +319,7 @@ $app->post('/modificaRisposta', function (Request $request, Response $response) 
 
 //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->modificaVotazione($codice_risposta, $descrizione);
+    $responseDB = $db->modificaRisposta($codice_risposta, $descrizione);
 //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
