@@ -1108,24 +1108,30 @@ class DBUtenti
         $chatTab = $this->tabelleDB[8];
         $campiChat = $this->campiTabelleDB[$chatTab];
 
+
+       /* "SELECT " .
+        "* " .
+        "FROM " .
+        $domandaTab . " " .
+        "WHERE " .
+        $campi[0] . " = ?"*/
+
         //QUERY:  SELECT id FROM chat WHERE FK_Utente0 = $cod_utente0 AND FK_Utente1=        $cod_utente1
         //               					OR           	        FK_Utente1 = $cod_utente0
         //                                                        AND FK_Utente0 = $cod_utente1
         $query = (
             "SELECT " .
-            $campiChat[0] . ", " .
-
+            $campiChat[0] .
             "FROM " .
             $chatTab . " " .
-            "WHERE" .
-            "(" . $campiChat[1] = " = ? " . "AND" . $campiChat[2] = " = ? "
-                    . "OR" .
-                    $campiChat[2] = " = ? " . "AND" . $campiChat[1] = " = ? " .
-                            ")");
+            "WHERE " .
+             $campiChat[1] . " = ?" . "AND " . $campiChat[2] . " = ?"
+                    . "OR " .
+                    $campiChat[2] . " = ?" . "AND " . $campiChat[1] . " = ? "    );
 
         $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
         $stmt->execute();
-        $stmt->bind_param("ss", $categoria, $titoloSondaggio);
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($cod_chat);
@@ -1188,16 +1194,17 @@ class DBUtenti
     public function inviaMessaggio($testo_messaggio, $cod_utente0, $cod_utente1)
     {
 
-        $idChat = trovaIdChat($cod_utente0, $cod_utente1);
+        $idChat = $this->trovaCodChat($cod_utente0, $cod_utente1);
+
         if (!$idChat) {                         //se la query non restituisce risultato, creo una nuova chat e inserisco il nuovo messaggio
             $this->creaChat($cod_utente0, $cod_utente1);
             $nuovoIdChat = $this->trovaCodChat($cod_utente0, $cod_utente1);
-            $this->inserisciMessaggio($testo_messaggio, $cod_utente0, $cod_utente1);
+            $this->inserisciMessaggio($testo_messaggio, $nuovoIdChat);
 
 
         } else {
             //chat già esistente, quindi inserisco messaggio nella tabella Messaggio
-            $this->inserisciMessaggio($testo_messaggio, $cod_utente0, $cod_utente1);
+            $this->inserisciMessaggio($testo_messaggio, $idChat);
 
         }
 

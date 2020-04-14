@@ -597,6 +597,34 @@ $app->post('/inseriscisondaggio', function (Request $request, Response $response
 });
 
 
+//ENDPOINT invia messaggio(NON FUNZIONA)
+
+$app->post('/inviamessaggio', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $testo_messaggio = $requestData['testo_messaggio'];
+    $cod_utente0 = $requestData['cod_utente0'];
+    $cod_utente1 = $requestData['cod_utente1'];
+
+    $responseData = array();
+
+
+    $responseDB = $db->inviaMessaggio($testo_messaggio, $cod_utente0, $cod_utente1);
+    if ($responseDB ) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Messaggio inviato con successo';
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Messaggio non inviato'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+});
 
 
 
