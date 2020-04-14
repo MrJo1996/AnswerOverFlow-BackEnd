@@ -534,7 +534,7 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
 
 
 
-
+//endpoint inserisci domanda: OK
 $app->post('/inserisciDomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -552,7 +552,7 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
     $responseData = array(); //La risposta e' un array di informazioni da compilare
 
 
-    $result = $db->inserisciDomanda($titolo, $dataeora, $timer,  $descrizione, $cod_utente, $cod_categoria);
+    $result = $db->inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($result) {
         $responseData['error'] = false; //Campo errore = false
@@ -713,9 +713,9 @@ $app->post('/ricercaDomanda', function (Request $request, Response $response){
     $requestData = $request->getParsedBody();
 
     $categoria = $requestData['categoria'];
-    $titoloDomanda = $requestData['titolo'];
+   // $titoloDomanda = $requestData['titolo'];
 
-        $responseData['data'] = $db->ricercaDomanda($categoria,$titoloDomanda);
+        $responseData['data'] = $db->ricercaDomanda($categoria/*,$titoloDomanda*/);
 
     if($responseData['data'] != null){
         $responseData['error'] = false;
@@ -729,8 +729,6 @@ $app->post('/ricercaDomanda', function (Request $request, Response $response){
         return $response->withJson($responseData);
     }
 });
-
-
 
 /**** ENDPOINT ****/
 

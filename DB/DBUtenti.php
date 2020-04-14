@@ -41,21 +41,14 @@ class DBUtenti
             "titolo"
         ],
         "domanda" => [
-            /*"codice_domanda",
-            "dataeora",
-            "timer",
-            "titolo",
-            "descrizione",
-            "cod_utente",
-            "cod_categoria"*/
-
             "codice_domanda",
-            "titolo",
             "dataeora",
             "timer",
+            "titolo",
             "descrizione",
             "cod_utente",
             "cod_categoria"
+
         ],
         "risposta" => [
             "codice_risposta",
@@ -952,30 +945,30 @@ class DBUtenti
     }
 
     // Rierca domanda NON aperta
-    public function ricercaDomanda($categoria, $titoloDomanda)
+    public function ricercaDomanda($categoria/*, $titoloDomanda*/)
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
-
+/*"codice_domanda",
+            "dataeora",
+            "timer",
+            "titolo",
+            "descrizione",
+            "cod_utente",
+            "cod_categoria"*/
         //QUERY: SELECT * FROM domanda WHERE categoria = $value OR titolo LIKE %$value%
         $query = (
             "SELECT " .
-            $campiDomanda[0] . ", " .
-            $campiDomanda[1] . " " .
-            $campiDomanda[2] . ", " .
-            $campiDomanda[3] . " " .
-            $campiDomanda[4] . ", " .
-            $campiDomanda[5] . " " .
-            $campiDomanda[6] . ", " .
-
+            "* " .
             "FROM " .
             $domandaTab . " " .
             "WHERE" .
-            "(" . $campiDomanda[6] = " = ? " . "OR" . titolo . "LIKE" % " = ? " % ")");
+          //  "(" . $campiDomanda[6] . " = ? " . "OR" . $campiDomanda[3] . "LIKE " . "%" . " = ? " . "%" . ")");
+            $campiDomanda[6] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $categoria/*, $titoloDomanda*/);
         $stmt->execute();
-        $stmt->bind_param("ss", $categoria, $titoloDomanda);
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
@@ -1085,7 +1078,7 @@ class DBUtenti
             " ? , ? , ? , ? , ? , ?  ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("siissi", $titolo,  $dataeora, $timer, $descrizione,$cod_utente,$cod_categoria);
+        $stmt->bind_param("iisssi",  $dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
         return $stmt->execute();
     }
 
