@@ -467,29 +467,31 @@ class DBUtenti
         }
     }
 
-    //Modifica votazione (Mariano Buttino)
-    public function modificaVotazione($codice_risposta, $valutazione)
+    //Modifica valutazione per id risposta
+    public function modificaValutazione($codice_risposta, $valutazione)
     {
-
         $tabella = $this->tabelleDB[5];
-
         $campi = $this->campiTabelleDB[$tabella];
-        //query:  "UPDATE TABLE SET valutazione = ? WHERE codice_risposta = ?"
+        //query:  "UPDATE risposta SET valutazione = ? WHERE  codice_risposta = ?"
         $query = (
             "UPDATE " .
             $tabella . " " .
             "SET " .
-            $campi[2] . " = ? " .
+            $campi[2] . "= ? " .
             "WHERE " .
-            $campi[0] . " = ?"
+            $campi[0] . "= ?"
         );
 
-        echo $query . "ciao";
+        echo "QUERY: " . $query;
 
-        //invio la query
+        //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $codice_risposta, $valutazione);
-        return $stmt->execute();
+        $stmt->bind_param("ii", $valutazione, $codice_risposta);
+
+        $result = $stmt->execute();
+
+        //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
     }
 
     //Modifica risposta (Mariano Buttino)
@@ -497,8 +499,8 @@ class DBUtenti
     {
 
         $tabella = $this->tabelleDB[5];
-
         $campi = $this->campiTabelleDB[$tabella];
+
         //query:  "UPDATE TABLE SET descrizione = ? WHERE codice_risposta = ?"
         $query = (
             "UPDATE " .
@@ -509,11 +511,9 @@ class DBUtenti
             $campi[0] . " = ? "
         );
 
-        echo $query . "ciao";
-
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("is", $codice_risposta, $descrizione);
+        $stmt->bind_param("si", $descrizione, $codice_risposta);
         $result = $stmt->execute();
 
         return $result;

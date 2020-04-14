@@ -286,16 +286,18 @@ $app->post('/insertStats', function (Request $request, Response $response)
 });*/
 
 // endpoint: /modificaVotazione
-$app->post('/modificaVotazione', function (Request $request, Response $response) {
+$app->post('/modificavalutazione', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
     $valutazione = $requestData['valutazione'];
-
+    echo "PARAMS:";
+    echo $codice_risposta . "     ";
+    echo $valutazione . "     ";
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->modificaVotazione($codice_risposta, $valutazione);
+    $responseDB = $db->modificaValutazione($codice_risposta, $valutazione);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
@@ -308,8 +310,8 @@ $app->post('/modificaVotazione', function (Request $request, Response $response)
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-// endpoint: /modificaRisposta
 
+// endpoint: /modificaRisposta
 $app->post('/modificaRisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
