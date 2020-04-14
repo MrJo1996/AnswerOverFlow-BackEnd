@@ -628,6 +628,62 @@ $app->post('/inviamessaggio', function (Request $request, Response $response) {
 
 
 
+    // endpoint: /modificaSondaggio
+
+    $app->post('/modificaSondaggio', function (Request $request, Response $response) {
+        $db = new DBUtenti();
+
+        $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+        $codice_sondaggio = $requestData['codice_sondaggio'];
+        $dataeora = $requestData['dataeota'];
+        $titolo = $requestData['titolo'];
+        $cod_categoria = $requestData['cod_categoria'];
+
+//Risposta del servizio REST
+        $responseData = array();
+        $responseDB = $db->modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+
+        if ($responseDB) {
+            $responseData['error'] = false;
+            $responseData['message'] = 'Modifica effettuata';
+
+        } else {
+            $responseData['error'] = true;
+            $responseData['message'] = "Impossibile effettuare la modifica";
+        }
+        return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+    });
+
+// endpoint: /inserisicVotazione
+$app->post('/inserisciVotazione', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $valutazione= $requestData['valutazione'];
+
+    $responseData = array();
+
+
+    $responseDB = $db->inserisciVotazione($valutazione);
+    if ($responseDB ) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Votazione inserita con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Votazione non inserita'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+});
+
+
+
+
+
 /**** ENDPOINT ****/
 
 

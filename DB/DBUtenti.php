@@ -517,7 +517,7 @@ class DBUtenti
         //query:  UPDATE Domanda
         //                        SET titolo=$titolo_inserito,dataeora=$valore,timer=$valore,  descrizione = $descrizione_inserita,           cod_categoria=$valore.
         //
-        //                        WHERE = $Id_domanda_selezionata 
+        //                        WHERE = $Id_domanda_selezionata
         $query = (
             "UPDATE" .
             $tabella . " " .
