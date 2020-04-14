@@ -918,12 +918,9 @@ class DBUtenti
         // query = delete from 'utente' where e-mail= 'utente_selezionato' .00
 
         $query = (
-            "DELETE " .
-            "* " .
-            "FROM " .
-            $utenteTab . " " .
-            "WHERE " .
-            $campi[0] . " = ?"
+            "DELETE FROM " .
+            $utenteTab . " WHERE " .
+            $campi[0] . " = ? "
         );
 
         //invio la query
