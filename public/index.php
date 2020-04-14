@@ -752,6 +752,53 @@ $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, R
     */
 });
 
+
+//endpoint: /rimuoviProfilo  OK
+$app->delete('/eliminaProfilo/{email}', function (Request $request, Response $response) {
+
+$db = new DBUtenti();
+
+$email = $request->getAttribute("email");
+
+//Stampa codice passed
+echo "\n\n email passata: " . $email;
+
+$responseData = array();
+
+$responseDB = $db->eliminaProfilo($email);
+if ($responseDB) {
+    $responseData['error'] = false;
+    $responseData['message'] = 'Profilo rimosso con successo'; //Messaggio di esito positivo
+
+} else {
+    $responseData['error'] = true;
+    $responseData['message'] = 'Errore, utente non rimosso'; //Messaggio di esito negativo
+}
+
+return $response->withJson($responseData);
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**** ENDPOINT ****/
 
 
