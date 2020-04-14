@@ -333,7 +333,8 @@ class DBUtenti
     }
 
     //Visualizzo il profilo di un utente
-    public function visualizzaProfilo($email){
+    public function visualizzaProfilo($email)
+    {
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
         //QUERY: SELECT email, username, nome, cognome, bio FROM `utente` WHERE Email = 'value'
@@ -355,11 +356,11 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
 
-        if($stmt->num_rows > 0){
+        if ($stmt->num_rows > 0) {
             $stmt->bind_result($email, $username, $nome, $cognome, $bio);
             $user = array();
 
-            while($stmt->fetch()){
+            while ($stmt->fetch()) {
                 $temp = array();
                 $temp[$campi[0]] = $email;
                 $temp[$campi[1]] = $username;
@@ -369,7 +370,7 @@ class DBUtenti
                 array_push($user, $temp);
             }
             return $user;
-        } else{
+        } else {
             return null;
         }
     }
@@ -952,13 +953,13 @@ class DBUtenti
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
-/*"codice_domanda",
-            "dataeora",
-            "timer",
-            "titolo",
-            "descrizione",
-            "cod_utente",
-            "cod_categoria"*/
+        /*"codice_domanda",
+                    "dataeora",
+                    "timer",
+                    "titolo",
+                    "descrizione",
+                    "cod_utente",
+                    "cod_categoria"*/
         //QUERY: SELECT * FROM domanda WHERE categoria = $value OR titolo LIKE %$value%
         $query = (
             "SELECT " .
@@ -966,7 +967,7 @@ class DBUtenti
             "FROM " .
             $domandaTab . " " .
             "WHERE" .
-          //  "(" . $campiDomanda[6] . " = ? " . "OR" . $campiDomanda[3] . "LIKE " . "%" . " = ? " . "%" . ")");
+            //  "(" . $campiDomanda[6] . " = ? " . "OR" . $campiDomanda[3] . "LIKE " . "%" . " = ? " . "%" . ")");
             $campiDomanda[6] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
@@ -1057,15 +1058,15 @@ class DBUtenti
             "cod_utente",
             "cod_categoria"*/
 
-       /*
-       STRUTTURA TABELLA CONCORDE CON QUELLA NEL DATABASE ATTUALE
-       "codice_domanda",
-            "titolo",
-            "dataeora",
-            "timer",
-            "descrizione",
-            "cod_utente",
-            "cod_categoria"*/
+        /*
+        STRUTTURA TABELLA CONCORDE CON QUELLA NEL DATABASE ATTUALE
+        "codice_domanda",
+             "titolo",
+             "dataeora",
+             "timer",
+             "descrizione",
+             "cod_utente",
+             "cod_categoria"*/
 
         $query = (
             "INSERT INTO" . " " .
@@ -1081,12 +1082,12 @@ class DBUtenti
             " ? , ? , ? , ? , ? , ?  ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisssi",  $dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
+        $stmt->bind_param("iisssi", $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
         return $stmt->execute();
     }
 
     //Inserisci sondaggio
-    public function inserisciSondaggio( $dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
+    public function inserisciSondaggio($dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
     {
         $SondaggioTab = $this->tabelleDB[6];
         $campiSondaggio = $this->campiTabelleDB[$SondaggioTab];
@@ -1124,12 +1125,12 @@ class DBUtenti
         $chatTab = $this->tabelleDB[8];
         $campiChat = $this->campiTabelleDB[$chatTab];
 
-       /* "SELECT " .
-        "* " .
-        "FROM " .
-        $domandaTab . " " .
-        "WHERE " .
-        $campi[0] . " = ?"*/
+        /* "SELECT " .
+         "* " .
+         "FROM " .
+         $domandaTab . " " .
+         "WHERE " .
+         $campi[0] . " = ?"*/
 
         //QUERY:  SELECT id FROM chat WHERE FK_Utente0 = $cod_utente0 AND FK_Utente1=        $cod_utente1
         //               					OR           	        FK_Utente1 = $cod_utente0
@@ -1140,9 +1141,9 @@ class DBUtenti
             "FROM " .
             $chatTab . " " .
             "WHERE " .
-             $campiChat[1] . " = ?" . "AND " . $campiChat[2] . " = ?"
-                    . "OR " .
-                    $campiChat[2] . " = ?" . "AND " . $campiChat[1] . " = ? "    );
+            $campiChat[1] . " = ?" . "AND " . $campiChat[2] . " = ?"
+            . "OR " .
+            $campiChat[2] . " = ?" . "AND " . $campiChat[1] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
@@ -1202,8 +1203,6 @@ class DBUtenti
     }
 
 
-
-
     //Invia Messaggio
 
     public function inviaMessaggio($testo_messaggio, $cod_utente0, $cod_utente1)
@@ -1224,6 +1223,35 @@ class DBUtenti
         }
 
     }
+
+    //Rimuovi Risposta
+    public function rimuoviRisposta($codice_risposta)
+    {
+        $tabella = $this->tabelleDB[5]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  " DELETE FROM risposta WHERE ID = $codice_risposta"
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+        if ($this->visualizzaRisposta($codice_risposta) == null) {
+            ////Controllo se esiste, non restituiva error nel caso in cui si passava un codice non esistente nel db.
+            //Potrebbe anche essere eliminato il controllo perchè dovrebbe essere impossibibile passare un codice non esistente dall' app.
+            return null;
+        } else {
+            $stmt = $this->connection->prepare($query);
+            $stmt->bind_param("i", $codice_risposta);
+            $result = $stmt->execute();
+            $stmt->store_result();
+
+            return $result;
+        }
+    }
+
+
 }
 
 ?>
