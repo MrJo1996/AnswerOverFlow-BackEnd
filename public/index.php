@@ -540,9 +540,10 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
+
+    $titolo = $requestData['titolo'];
     $dataeora = $requestData['dataeora'];
     $timer = $requestData['timer'];
-    $titolo = $requestData['titolo'];
     $descrizione = $requestData['descrizione'];
     $cod_utente = $requestData['cod_utente'];
     $cod_categoria = $requestData['cod_categoria'];
@@ -551,7 +552,7 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
     $responseData = array(); //La risposta e' un array di informazioni da compilare
 
 
-    $result = $db->inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+    $result = $db->inserisciDomanda($titolo, $dataeora, $timer,  $descrizione, $cod_utente, $cod_categoria);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($result) {
         $responseData['error'] = false; //Campo errore = false
@@ -696,6 +697,30 @@ $app->post('/ricercaSondaggio', function (Request $request, Response $response){
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Sondaggi trovati"=>$responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+//endpoint: /ricercaDomanda non aperta
+$app->post('/ricercaDomanda', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $categoria = $requestData['categoria'];
+    $titoloDomanda = $requestData['titolo'];
+
+        $responseData['data'] = $db->ricercaDomanda($categoria,$titoloDomanda);
+
+    if($responseData['data'] != null){
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Domande trovate"=>$responseData)));
         $newResponse = $response->withHeader('Content-type', 'application/json');
         return $newResponse;
     }else{

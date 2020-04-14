@@ -41,10 +41,18 @@ class DBUtenti
             "titolo"
         ],
         "domanda" => [
-            "codice_domanda",
+            /*"codice_domanda",
             "dataeora",
             "timer",
             "titolo",
+            "descrizione",
+            "cod_utente",
+            "cod_categoria"*/
+
+            "codice_domanda",
+            "titolo",
+            "dataeora",
+            "timer",
             "descrizione",
             "cod_utente",
             "cod_categoria"
@@ -730,7 +738,7 @@ class DBUtenti
             $sondaggioTab . " " .
             "WHERE" .
             $campiDomanda[2] > 0 .
-            "AND" . "(" . $campiDomanda[6] = " = ? " . "OR" . titolo . "LIKE" % " = ? " % ")";
+            "AND" . "(" . $campiDomanda[6] . " = ? " . "OR" . $titoloSondaggio . "LIKE" % " = ? " % ")";
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute();
@@ -1043,10 +1051,22 @@ class DBUtenti
         $DomandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
 
-        /* "codice_domanda",
+        /*
+        STRUTTURA TABELLA DISCORDANTE DA QUELLA ATTUALE
+        "codice_domanda",
             "dataeora",
             "timer",
             "titolo",
+            "descrizione",
+            "cod_utente",
+            "cod_categoria"*/
+
+       /*
+       STRUTTURA TABELLA CONCORDE CON QUELLA NEL DATABASE ATTUALE
+       "codice_domanda",
+            "titolo",
+            "dataeora",
+            "timer",
             "descrizione",
             "cod_utente",
             "cod_categoria"*/
@@ -1065,7 +1085,7 @@ class DBUtenti
             " ? , ? , ? , ? , ? , ?  ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisssi", $dataeora, $timer, $titolo, $descrizione,$cod_utente,$cod_categoria);
+        $stmt->bind_param("siissi", $titolo,  $dataeora, $timer, $descrizione,$cod_utente,$cod_categoria);
         return $stmt->execute();
     }
 
@@ -1107,7 +1127,6 @@ class DBUtenti
     {
         $chatTab = $this->tabelleDB[8];
         $campiChat = $this->campiTabelleDB[$chatTab];
-
 
        /* "SELECT " .
         "* " .
