@@ -407,7 +407,7 @@ $app->post('/modificaProfilo', function (Request $request, Response $response){
     return $response->withJson($responseData);
 });
 
-// endpoint: /visualizzaDomanda
+// endpoint: /visualizzaDomanda OK
 $app->post('/visualizzadomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();

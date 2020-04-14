@@ -850,7 +850,7 @@ class DBUtenti
     public function visualizzaDomanda($id_domanda)
     {
 
-        $domandaTab = $this->tabelleDB[7];
+        $domandaTab = $this->tabelleDB[4];
         $campi = $this->campiTabelleDB[$domandaTab];
 
         //Query = select *from 'domanda' where id_domanda = 'value'
