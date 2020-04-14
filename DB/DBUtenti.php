@@ -835,8 +835,15 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria)
+    public function modificaSondaggio($dataeora, $titolo, $timer, $cod_categoria, $codice_sondaggio)
     {
+
+        /*  "codice_sondaggio",
+            "dataeora",
+            "titolo",
+            "timer",
+            "cod_utente",
+            "cod_categoria"*/
 
         $Sondaggiotabella = $this->tabelleDB[6];
 
@@ -848,16 +855,17 @@ class DBUtenti
             "UPDATE" .
             $Sondaggiotabella . " " .
             "SET" .
-            $campi[1] . " = ? " .
-            $campi[2] . " = ? " .
-            $campi[4] . " = ? " .
+            $campi[1] . " = ? ," .
+            $campi[2] . " = ? ," .
+            $campi[3] . " = ? ," .
+            $campi[5] . " = ? " .
             "WHERE" .
             $campi[0] . " = ? "
         );
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("issi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+        $stmt->bind_param("sssii",    $dataeora, $titolo, $timer, $cod_categoria, $codice_sondaggio);
         return $stmt->execute();
     }
 
@@ -959,7 +967,7 @@ class DBUtenti
     }
 
     // Rierca domanda NON aperta
-    public function ricercaDomanda($categoria/*, $titoloDomanda*/)
+    public function ricercaDomanda($id_categoria/*, $titoloDomanda*/)
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
@@ -981,7 +989,7 @@ class DBUtenti
             $campiDomanda[6] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $categoria/*, $titoloDomanda*/);
+        $stmt->bind_param("i", $id_categoria/*, $titoloDomanda*/);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
