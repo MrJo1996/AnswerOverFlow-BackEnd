@@ -406,12 +406,11 @@ class DBUtenti
         return $result;
     }
 
-    // Funzione registrazione
+    //Registrazione
     public function registrazione($email, $username, $password, $nome, $cognome, $bio)
     {
         $tabella = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$tabella];
-
         $attivo = 0;
 
         $query = (
@@ -427,18 +426,20 @@ class DBUtenti
 
             "VALUES (?,?,?,?,?,?,?)"
         );
+
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ssssssi", $email, $username, $password, $nome, $cognome, $bio, $attivo);
         $result = ($stmt->execute());
+
         return $result;
     }
 
-    //Visualizza sondaggio
+    //Visualizza Sondaggio
     public function visualizzaSondaggio($codice_sondaggio)
     {
         $sondaggioTab = $this->tabelleDB[6];
         $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
-        //QUERY: SELECT * FROM `sondaggio` WHERE ID = 'value'
+
         $query = (
             "SELECT " .
             "* " .
@@ -447,10 +448,12 @@ class DBUtenti
             "WHERE " .
             $campiSondaggio[0] . " = ?"
         );
+
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $codice_sondaggio);
         $stmt->execute();
         $stmt->store_result();
+
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $codice_utente, $codice_categoria);
             $sondaggio = array();

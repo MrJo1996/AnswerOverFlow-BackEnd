@@ -432,12 +432,11 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
 
 });
 
-// endpoint: /registrazione     OK
+// endpoint: /registrazione
 $app->post('/registrazione', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
-
-    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $requestData = $request->getParsedBody();
 
     $email = $requestData['email'];
     $username = $requestData['username'];
@@ -446,32 +445,30 @@ $app->post('/registrazione', function (Request $request, Response $response) {
     $cognome = $requestData['cognome'];
     $bio = $requestData['bio'];
 
-
-    //Risposta del servizio REST
-    $responseData = array(); //La risposta e' un array di informazioni da compilare
-
-    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData = array();
     $responseDB = $db->registrazione($email, $username, $password, $nome, $cognome, $bio);
-    if ($responseDB == 1) { //Se la registrazione è andata a buon fine
-        $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Registrazione avvenuta con successo'; //Messaggio di esito positivo
-    } else if ($responseDB == 2) { //Se l'email è già presente nel DB
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Account già  esistente!'; //Messaggio di esito negativo
+
+    if ($responseDB == 1) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Registrazione avvenuta con successo';
+    } else if ($responseDB == 2) {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Account già  esistente!';
     }
 
-    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
-
+    return $response->withJson($responseData);
 });
 
 //endpoint: /visualizzaSondaggio
 $app->post('/visualizzaSondaggio', function (Request $request, Response $response){
-    $db = new DBUtenti();
 
+    $db = new DBUtenti();
     $requestData = $request->getParsedBody();
+
     $codice_sondaggio = $requestData['codice_sondaggio'];
 
     $responseData['data'] = $db->visualizzaSondaggio($codice_sondaggio);
+
     if($responseData['data'] != null){
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
