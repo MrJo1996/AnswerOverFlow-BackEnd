@@ -681,6 +681,29 @@ $app->post('/inserisciVotazione', function (Request $request, Response $response
 });
 
 
+//endpoint: /ricercaSondaggio non aperto
+$app->post('/ricercaSondaggio', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $categoria = $requestData['categoria'];
+    $titoloSondaggio = $requestData['titolo'];
+
+    $responseData['data'] = $db->ricercaSondaggio($categoria,$titoloSondaggio);
+
+    if($responseData['data'] != null){
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Sondaggi trovati"=>$responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 
 
 
