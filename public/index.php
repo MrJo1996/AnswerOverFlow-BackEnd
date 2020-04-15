@@ -285,7 +285,7 @@ $app->post('/insertStats', function (Request $request, Response $response)
     }
 });*/
 
-// endpoint: /modificaVotazione
+// endpoint: /modificaVotazione : numero 5
 $app->post('/modificavalutazione', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -311,7 +311,7 @@ $app->post('/modificavalutazione', function (Request $request, Response $respons
 });
 
 
-// endpoint: /modificaRisposta
+// endpoint: /modificaRisposta :numero 8
 $app->post('/modificaRisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -334,7 +334,7 @@ $app->post('/modificaRisposta', function (Request $request, Response $response) 
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-//endpoint: / visualizza sondaggio per categoria
+//endpoint: / visualizza sondaggio per categoria :non in elenco
 
 $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Response $response) {
     $db = new DBUtenti();

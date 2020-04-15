@@ -467,7 +467,7 @@ class DBUtenti
         }
     }
 
-    //Modifica valutazione per id risposta
+    //Modifica valutazione per id risposta :query numero 5
     public function modificaValutazione($codice_risposta, $valutazione)
     {
         $tabella = $this->tabelleDB[5];
@@ -494,7 +494,7 @@ class DBUtenti
         return $result;
     }
 
-    //Modifica risposta (Mariano Buttino)
+    //Modifica risposta (Mariano Buttino) :query numero 8
     public function modificaRisposta($codice_risposta, $descrizione)
     {
 
@@ -549,7 +549,7 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Visualizza sondaggio per categoria (Mariano Buttino)
+    //Visualizza sondaggio per categoria (Mariano Buttino) :non in elenco
     public function visualizzaSondaggioPerCategoria($codice_categoria)
     {
 
@@ -567,8 +567,6 @@ class DBUtenti
             "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . " = ?"
         );
 
-        echo $query . "ciao";
-
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $codice_categoria);
         $stmt->execute();
@@ -585,7 +583,7 @@ class DBUtenti
                 $temp[$campiSondaggio[3]] = $timer;
                 array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
             }
-            return $sondaggio; //ritorno array $sondaggio riempito con i risultati della query effettuata.
+            return $sondaggio;//ritorno array $sondaggio riempito con i risultati della query effettuata.
         } else {
             return null;
         }
