@@ -835,15 +835,12 @@ class DBUtenti
 
     public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria)
     {
-
         $Sondaggiotabella = $this->tabelleDB[6];
-
         $campi = $this->campiTabelleDB[$Sondaggiotabella];
         //query:  UPDATE sondaggio
         //SET  DataeOra=$valore Titolo=$titolo_inserito cod_utente=$valore cod_categoria=$valore
         //WHERE codice_sondaggio=$valore
         $query = (
-
             "UPDATE " .
             $Sondaggiotabella . " " .
             "SET " .
@@ -852,9 +849,7 @@ class DBUtenti
             $Sondaggiotabella . "." . $campi[4] . "= ?" .
             "WHERE " .
             $Sondaggiotabella . "." . $campi[0] . "= ?"
-
         );
-
         //invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("iisi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
@@ -1232,4 +1227,4 @@ class DBUtenti
 
 }
 
-?>
+?>l
