@@ -467,7 +467,7 @@ class DBUtenti
         }
     }
 
-    //Modifica valutazione per id risposta
+    //Modifica valutazione per id risposta :query numero 5
     public function modificaValutazione($codice_risposta, $valutazione)
     {
         $tabella = $this->tabelleDB[5];
@@ -494,7 +494,7 @@ class DBUtenti
         return $result;
     }
 
-    //Modifica risposta (Mariano Buttino)
+    //Modifica risposta (Mariano Buttino) :query numero 8
     public function modificaRisposta($codice_risposta, $descrizione)
     {
 
@@ -549,7 +549,7 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Visualizza sondaggio per categoria (Mariano Buttino)
+    //Visualizza sondaggio per categoria (Mariano Buttino) :non in elenco
     public function visualizzaSondaggioPerCategoria($codice_categoria)
     {
 
@@ -567,8 +567,6 @@ class DBUtenti
             "WHERE " . $sondaggioTab . "." . $campiSondaggio[5] . " = ?"
         );
 
-        echo $query . "ciao";
-
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $codice_categoria);
         $stmt->execute();
@@ -585,7 +583,7 @@ class DBUtenti
                 $temp[$campiSondaggio[3]] = $timer;
                 array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
             }
-            return $sondaggio; //ritorno array $sondaggio riempito con i risultati della query effettuata.
+            return $sondaggio;//ritorno array $sondaggio riempito con i risultati della query effettuata.
         } else {
             return null;
         }
@@ -835,15 +833,8 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    public function modificaSondaggio($dataeora, $titolo, $timer, $cod_categoria, $codice_sondaggio)
+    public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria)
     {
-
-        /*  "codice_sondaggio",
-            "dataeora",
-            "titolo",
-            "timer",
-            "cod_utente",
-            "cod_categoria"*/
 
         $Sondaggiotabella = $this->tabelleDB[6];
 
@@ -852,21 +843,23 @@ class DBUtenti
         //SET  DataeOra=$valore Titolo=$titolo_inserito cod_utente=$valore cod_categoria=$valore
         //WHERE codice_sondaggio=$valore
         $query = (
-            "UPDATE" .
+
+            "UPDATE " .
             $Sondaggiotabella . " " .
-            "SET" .
-            $campi[1] . " = ? ," .
-            $campi[2] . " = ? ," .
-            $campi[3] . " = ? ," .
-            $campi[5] . " = ? " .
-            "WHERE" .
-            $campi[0] . " = ? "
+            "SET " .
+            $Sondaggiotabella . "." . $campi[1] . "= ?," .
+            $Sondaggiotabella . "." . $campi[2] . "= ?," .
+            $Sondaggiotabella . "." . $campi[4] . "= ?" .
+            "WHERE " .
+            $Sondaggiotabella . "." . $campi[0] . "= ?"
+
         );
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sssii",    $dataeora, $titolo, $timer, $cod_categoria, $codice_sondaggio);
-        return $stmt->execute();
+        $stmt->bind_param("iisi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+        $result = $stmt->execute();
+        return $result;
     }
 
     //Visualizzo una domanda tramite il suo codice(ID)
@@ -926,12 +919,9 @@ class DBUtenti
         // query = delete from 'utente' where e-mail= 'utente_selezionato' .00
 
         $query = (
-            "DELETE " .
-            "* " .
-            "FROM " .
-            $utenteTab . " " .
-            "WHERE " .
-            $campi[0] . " = ?"
+            "DELETE FROM " .
+            $utenteTab . " WHERE " .
+            $campi[0] . " = ? "
         );
 
         //invio la query
@@ -967,7 +957,7 @@ class DBUtenti
     }
 
     // Rierca domanda NON aperta
-    public function ricercaDomanda($id_categoria/*, $titoloDomanda*/)
+    public function ricercaDomanda($categoria/*, $titoloDomanda*/)
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
@@ -989,7 +979,7 @@ class DBUtenti
             $campiDomanda[6] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $id_categoria/*, $titoloDomanda*/);
+        $stmt->bind_param("i", $categoria/*, $titoloDomanda*/);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
