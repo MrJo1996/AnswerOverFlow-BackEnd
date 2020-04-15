@@ -895,7 +895,7 @@ $app->post('/ricercaSondaggioAperto', function (Request $request, Response $resp
     $categoria = $requestData['categoria'];
     $titoloSondaggio = $requestData['titolo'];
 
-    $responseData['data'] = $db->ricercaDomandaAperta($categoria, $titoloSondaggio);
+    $responseData['data'] = $db->ricercaSondaggioAperto($categoria, $titoloSondaggio);
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false;
