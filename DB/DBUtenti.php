@@ -568,7 +568,7 @@ class DBUtenti
         );
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $codice_categoria);
+        $stmt->bind_param("i", $cod_categoria);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
@@ -695,7 +695,7 @@ class DBUtenti
             $domandaTab . " " .
             "WHERE" .
             $campiDomanda[2] > 0 .
-            "AND" . "(" . $campiDomanda[6] = " = ? " . "OR" . titolo . "LIKE" % " = ? " % ")";
+            "AND" . "(" . $campiDomanda[6] = " = ? " . "OR" . $campiDomanda[3] . "LIKE" % " = ? " % ")";
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute();
@@ -1018,7 +1018,7 @@ class DBUtenti
             "FROM " .
             $sondaggioTab . " " .
             "WHERE" .
-            "(" . $campiSondaggio[6] = " = ? " . "OR" . titolo . "LIKE" % " = ? " % ")");
+            "(" . $campiSondaggio[6] = " = ? " . "OR" . $campiSondaggio[2]  . "LIKE" % " = ? " % ")");
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute();

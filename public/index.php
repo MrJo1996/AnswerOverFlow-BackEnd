@@ -861,6 +861,54 @@ $app->post('/modificaDomanda', function (Request $request, Response $response) {
     return $response->withJson($responseData);
 
 });
+
+//endpoint: /ricercaDomandaAperta
+$app->post('/ricercaDomandaAperta', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $categoria = $requestData['categoria'];
+    $titoloDomanda = $requestData['titolo'];
+
+    $responseData['data'] = $db->ricercaDomandaAperta($categoria, $titoloDomanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Domande trovate" => $responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+//endpoint: /ricercaSondaggioAperto
+$app->post('/ricercaSondaggioAperto', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $categoria = $requestData['categoria'];
+    $titoloSondaggio = $requestData['titolo'];
+
+    $responseData['data'] = $db->ricercaDomandaAperta($categoria, $titoloSondaggio);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Sondaggi trovati" => $responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 /**** ENDPOINT ****/
 
 
