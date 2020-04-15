@@ -780,8 +780,28 @@ return $response->withJson($responseData);
 });
 
 
+//endpoint: /cancellaSondaggio OK
+$app->delete('/cancellaSondaggio/{codice_sondaggio}', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $codice = $request->getAttribute("codice_sondaggio");
 
 
+    $responseData = array();
+
+    $responseDB = $db->cancellaSondaggio($codice);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Sondaggio rimosso con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, sondaggio non rimosso'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+});
 
 
 

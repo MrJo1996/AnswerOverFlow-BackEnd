@@ -845,20 +845,23 @@ class DBUtenti
         //SET  DataeOra=$valore Titolo=$titolo_inserito cod_utente=$valore cod_categoria=$valore
         //WHERE codice_sondaggio=$valore
         $query = (
-            "UPDATE" .
+
+            "UPDATE " .
             $Sondaggiotabella . " " .
-            "SET" .
-            $campi[1] . " = ? " .
-            $campi[2] . " = ? " .
-            $campi[4] . " = ? " .
-            "WHERE" .
-            $campi[0] . " = ? "
+            "SET " .
+            $Sondaggiotabella . "." . $campi[1] . "= ?," .
+            $Sondaggiotabella . "." . $campi[2] . "= ?," .
+            $Sondaggiotabella . "." . $campi[4] . "= ?" .
+            "WHERE " .
+            $Sondaggiotabella . "." . $campi[0] . "= ?"
+
         );
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("issi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
-        return $stmt->execute();
+        $stmt->bind_param("iisi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+        $result = $stmt->execute();
+        return $result;
     }
 
     //Visualizzo una domanda tramite il suo codice(ID)
