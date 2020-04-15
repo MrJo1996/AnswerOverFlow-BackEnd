@@ -607,10 +607,10 @@ $app->post('/inviamessaggio', function (Request $request, Response $response) {
     $responseData = array();
 
     $responseDB = $db->inviaMessaggio($testo, $cod_utente0, $cod_utente1, $dataeora, $visualizzato);
+
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Messaggio inviato con successo';
-
 
 
     } else {
@@ -759,26 +759,26 @@ $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, R
 //endpoint: /rimuoviProfilo  OK
 $app->delete('/eliminaProfilo/{email}', function (Request $request, Response $response) {
 
-$db = new DBUtenti();
+    $db = new DBUtenti();
 
-$email = $request->getAttribute("email");
+    $email = $request->getAttribute("email");
 
 //Stampa codice passed
-echo "\n\n email passata: " . $email;
+    echo "\n\n email passata: " . $email;
 
-$responseData = array();
+    $responseData = array();
 
-$responseDB = $db->eliminaProfilo($email);
-if ($responseDB) {
-    $responseData['error'] = false;
-    $responseData['message'] = 'Profilo rimosso con successo'; //Messaggio di esito positivo
+    $responseDB = $db->eliminaProfilo($email);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Profilo rimosso con successo'; //Messaggio di esito positivo
 
-} else {
-    $responseData['error'] = true;
-    $responseData['message'] = 'Errore, utente non rimosso'; //Messaggio di esito negativo
-}
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, utente non rimosso'; //Messaggio di esito negativo
+    }
 
-return $response->withJson($responseData);
+    return $response->withJson($responseData);
 
 });
 
@@ -806,20 +806,35 @@ $app->delete('/cancellaSondaggio/{codice_sondaggio}', function (Request $request
     return $response->withJson($responseData);
 });
 
+$app->post('/inseriscimessaggio', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
 
+    $dataeora = $requestData['dataeora'];
+    $testo = $requestData['testo'];
+    $visualizzato = $requestData['visualizzato'];
+    $cod_chat = $requestData['cod_chat'];
 
 
+    $responseData = array();
 
 
+    $responseDB = $db->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Messaggio inserito con successo'; //Messaggio di esito positivo
 
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Messaggio non inserito'; //Messaggio di esito negativo
+    }
 
+    return $response->withJson($responseData);
 
-
-
-
-
-
+});
 
 
 /**** ENDPOINT ****/

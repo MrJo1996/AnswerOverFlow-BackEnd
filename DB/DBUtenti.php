@@ -1170,15 +1170,6 @@ class DBUtenti
         $messaggioTab = $this->tabelleDB[9];
         $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
 
-        //QUERY: INSERT into messaggio(messaggio.Testo, ‘$query_result’)
-        //VALUES($testo, $cod_chat)
-
-        /*"codice_messaggio",
-            "dataeora",
-            "testo",
-            "visualizzato",
-            "cod_chat"*/
-
         $query = (
             "INSERT INTO" . " " .
             $messaggioTab . " ( " .
@@ -1204,16 +1195,11 @@ class DBUtenti
 
         if (!$cod_chat) {                         //se la query non rest ituisce risultato, creo una nuova chate inserisco il nuovo messaggio
             $this->creaChat($cod_utente0, $cod_utente1);
-            $cod_chat = $this->trovaCodChat($cod_utente0, $cod_utente1);
-            $this->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
-
-
-        } else {
-            //chat già esistente, quindi inserisco messaggio nella tabella Messaggio
-            $this->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
+            $cod_chat =$this->trovaCodChat($cod_utente0, $cod_utente1);
 
         }
 
+        $this->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
     }
 
     //Rimuovi Risposta
