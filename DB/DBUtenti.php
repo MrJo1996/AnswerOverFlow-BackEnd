@@ -1056,26 +1056,6 @@ class DBUtenti
         $DomandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
 
-        /*
-        STRUTTURA TABELLA DISCORDANTE DA QUELLA ATTUALE
-        "codice_domanda",
-            "dataeora",
-            "timer",
-            "titolo",
-            "descrizione",
-            "cod_utente",
-            "cod_categoria"*/
-
-        /*
-        STRUTTURA TABELLA CONCORDE CON QUELLA NEL DATABASE ATTUALE
-        "codice_domanda",
-             "titolo",
-             "dataeora",
-             "timer",
-             "descrizione",
-             "cod_utente",
-             "cod_categoria"*/
-
         $query = (
             "INSERT INTO" . " " .
             $DomandaTab . " ( " .
@@ -1094,7 +1074,8 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Inserisci sondaggio
+    //n.11(Team Cassetta) Inserisci sondaggio
+
     public function inserisciSondaggio($dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
     {
         $SondaggioTab = $this->tabelleDB[6];
@@ -1102,13 +1083,6 @@ class DBUtenti
 
         //QUERY: INSERT INTO sondaggio( dataeora, timer, titolo, cod_utente, cod_categoria) VALUES($dataeora, $titolo, $timer, $cod_utente, $cod_categoria)
 
-
-        /*    "codice_sondaggio",
-            "dataeora",
-            "titolo",
-            "timer",
-            "cod_utente",
-            "cod_categoria"*/
         $query = (
             "INSERT INTO" . " " .
             $SondaggioTab . " ( " .
@@ -1121,7 +1095,7 @@ class DBUtenti
             " ? , ? , ? , ? ,? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("isisi", $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
+        $stmt->bind_param("ssssi", $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
         return $stmt->execute();
     }
 
@@ -1133,40 +1107,41 @@ class DBUtenti
         $chatTab = $this->tabelleDB[8];
         $campiChat = $this->campiTabelleDB[$chatTab];
 
-        /* "SELECT " .
-         "* " .
-         "FROM " .
-         $domandaTab . " " .
-         "WHERE " .
-         $campi[0] . " = ?"*/
-
         //QUERY:  SELECT id FROM chat WHERE FK_Utente0 = $cod_utente0 AND FK_Utente1=        $cod_utente1
         //               					OR           	        FK_Utente1 = $cod_utente0
-        //                                                        AND FK_Utente0 = $cod_utente1
+        //                                                      AND FK_Utente0 = $cod_utente1
         $query = (
             "SELECT " .
             $campiChat[0] .
+            "  " .
             "FROM " .
-            $chatTab . " " .
+            $chatTab . "  " .
             "WHERE " .
-            $campiChat[1] . " = ?" . "AND " . $campiChat[2] . " = ?"
-            . "OR " .
-            $campiChat[2] . " = ?" . "AND " . $campiChat[1] . " = ? ");
+            "  " .
+            $campiChat[1] . " = ? " . "  " . " AND " . "  " . $campiChat[2] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
         $stmt->execute();
         $stmt->store_result();
+
+        $cod_chat_array = array();
+
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($cod_chat);
-            return $cod_chat; //ritorno $idChat
-        } else {
-            return null;
+            $stmt->bind_result($codice_chat);
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiChat[0]] = $codice_chat;
+                array_push($cod_chat_array, $temp);
+            }
         }
+
+        return $cod_chat_array;
     }
 
     //Crea Chat
-    public function creaChat($utente0, $utente1)
+    public function creaChat($cod_utente0, $cod_utente1)
     {
         $chatTab = $this->tabelleDB[8];
         $campiChat = $this->campiTabelleDB[$chatTab];
@@ -1179,9 +1154,9 @@ class DBUtenti
             "INSERT INTO" . " " .
             $chatTab . " ( " .
             $campiChat[1] . " , " .
-            $campiChat[2] . " , " .
+            $campiChat[2] . " ) " .
             "VALUES" . " ( " .
-            " ? , ? , ? , ? ) "
+            " ? , ? ) "
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
@@ -1189,44 +1164,53 @@ class DBUtenti
     }
 
     //Inserisci messaggio
-    public function inserisciMessaggio($testo_messaggio, $cod_chat)
+    public function inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat)
     {
-        $messaggioTab = $this->tabelleDB[4];
+
+        $messaggioTab = $this->tabelleDB[9];
         $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
 
         //QUERY: INSERT into messaggio(messaggio.Testo, ‘$query_result’)
         //VALUES($testo, $cod_chat)
 
+        /*"codice_messaggio",
+            "dataeora",
+            "testo",
+            "visualizzato",
+            "cod_chat"*/
+
         $query = (
             "INSERT INTO" . " " .
             $messaggioTab . " ( " .
             $campiMessaggio[1] . " , " .
+            $campiMessaggio[2] . " , " .
+            $campiMessaggio[3] . " , " .
             $campiMessaggio[4] . " ) " .
             "VALUES" . " ( " .
-            " ? , ?  ) "
+            " ? , ? , ?, ? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("si", $testo_messaggio, $cod_chat);
+        $stmt->bind_param("ssii", $dataeora, $testo, $visualizzato, $cod_chat);
         return $stmt->execute();
     }
 
 
-    //Invia Messaggio
+    //n3(team cassetta)Invia Messaggio
 
-    public function inviaMessaggio($testo_messaggio, $cod_utente0, $cod_utente1)
+    public function inviaMessaggio($testo, $cod_utente0, $cod_utente1, $dataeora, $visualizzato)
     {
 
-        $idChat = $this->trovaCodChat($cod_utente0, $cod_utente1);
+        $cod_chat = $this->trovaCodChat($cod_utente0, $cod_utente1);
 
-        if (!$idChat) {                         //se la query non restituisce risultato, creo una nuova chat e inserisco il nuovo messaggio
+        if (!$cod_chat) {                         //se la query non rest ituisce risultato, creo una nuova chate inserisco il nuovo messaggio
             $this->creaChat($cod_utente0, $cod_utente1);
-            $nuovoIdChat = $this->trovaCodChat($cod_utente0, $cod_utente1);
-            $this->inserisciMessaggio($testo_messaggio, $nuovoIdChat);
+            $cod_chat = $this->trovaCodChat($cod_utente0, $cod_utente1);
+            $this->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
 
 
         } else {
             //chat già esistente, quindi inserisco messaggio nella tabella Messaggio
-            $this->inserisciMessaggio($testo_messaggio, $idChat);
+            $this->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
 
         }
 

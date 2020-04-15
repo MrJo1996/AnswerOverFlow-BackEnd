@@ -559,7 +559,7 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 });
 
 
-// endpoint: /inserisciSondaggio  CASSETTA  OK
+//n11(TEAM cassetta) endpoint: /inserisciSondaggio  CASSETTA  OK
 $app->post('/inseriscisondaggio', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -598,17 +598,20 @@ $app->post('/inviamessaggio', function (Request $request, Response $response) {
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
-    $testo_messaggio = $requestData['testo_messaggio'];
+    $testo = $requestData['testo'];
     $cod_utente0 = $requestData['cod_utente0'];
     $cod_utente1 = $requestData['cod_utente1'];
+    $dataeora = $requestData['dataeora'];
+    $visualizzato = $requestData['visualizzato'];
 
     $responseData = array();
 
-
-    $responseDB = $db->inviaMessaggio($testo_messaggio, $cod_utente0, $cod_utente1);
+    $responseDB = $db->inviaMessaggio($testo, $cod_utente0, $cod_utente1, $dataeora, $visualizzato);
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Messaggio inviato con successo';
+
+
 
     } else {
         $responseData['error'] = true;
