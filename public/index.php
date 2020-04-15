@@ -339,9 +339,9 @@ $app->post('/modificaRisposta', function (Request $request, Response $response) 
 $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
-    $codice_categoria = $requestData['cod_categoria'];
+    $cod_categoria = $requestData['cod_categoria'];
 //Controllo la risposta dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->visualizzaSondaggioPerCategoria($codice_categoria);
+    $responseData['data'] = $db->visualizzaSondaggioPerCategoria($cod_categoria);
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false

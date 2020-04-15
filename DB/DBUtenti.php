@@ -550,7 +550,7 @@ class DBUtenti
     }
 
     //Visualizza sondaggio per categoria (Mariano Buttino) :non in elenco
-    public function visualizzaSondaggioPerCategoria($codice_categoria)
+    public function visualizzaSondaggioPerCategoria($cod_categoria)
     {
 
         $sondaggioTab = $this->tabelleDB[6];
@@ -804,6 +804,7 @@ class DBUtenti
             $campi[0] . " = ? "
         );
 
+        echo $query . "CIAOOOOOOOO";
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda_selezionata);
@@ -929,7 +930,7 @@ class DBUtenti
     }
 
     //Cancella risposta
-    public function cancellaRisposta($id_risposta_selezionata)
+    /*public function cancellaRisposta($id_risposta_selezionata)
     {
         $tabella = $this->tabelleDB[5]; //Tabella per la query
         $campi = $this->campiTabelleDB[$tabella];
@@ -949,7 +950,7 @@ class DBUtenti
         $stmt->store_result();
 
         return $result;
-    }
+    }*/
 
     // Rierca domanda NON aperta
     public function ricercaDomanda($categoria/*, $titoloDomanda*/)
