@@ -836,7 +836,31 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
 
 });
 
+$app->post('/modificaDomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
 
+    $requestData = $request->getParsedBody();
+
+    $codice_domanda = $requestData['codice_domanda'];
+    $dataeora = $requestData['dataeora'];
+    $timer = $requestData['timer'];
+    $titolo = $requestData['titolo'];
+    $descrizione = $requestData['descrizione'];
+    $cod_categoria = $requestData['cod_categoria'];
+
+    $responseData = array();
+    $responseDB = $db->modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria);
+
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Modifica effettuata con successo';
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Impossibile effettuare la modifica';
+    }
+    return $response->withJson($responseData);
+
+});
 /**** ENDPOINT ****/
 
 

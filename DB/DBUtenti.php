@@ -527,7 +527,7 @@ class DBUtenti
 
         $campi = $this->campiTabelleDB[$tabella];
         //query:  UPDATE Domanda
-        //                        SET titolo=$titolo_inserito,dataeora=$valore,timer=$valore,  descrizione = $descrizione_inserita,           cod_categoria=$valore.
+        //                        SET titolo=$titolo_inserito,dataeora=$valore,timer=$valore,  descrizione = $descrizione_inserita,     cod_categoria=$valore.
         //
         //                        WHERE = $Id_domanda_selezionata
         $query = (
