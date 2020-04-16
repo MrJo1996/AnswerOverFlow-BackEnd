@@ -673,9 +673,39 @@ class DBUtenti
 
     }
 
+    public function ricercaScelteDelSondaggio ($codice_sondaggio){
+        $sceltaTab = $this->tabelleDB[7];
+        $campi = $this->campiTabelleDB[$sceltaTab];
+
+        $query = //SELECT * FROM `scelta` WHERE cod_sondaggio = ?
+         "SELECT *" . " " .
+         "FROM" . " " .
+         $sceltaTab . " " .
+         "WHERE" . " " .
+         $campi[3] . " = ?";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_sondaggio);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_scelta, $descrizione, $num_favorevoli, $cod_sondaggio);
+            $scelte = array();
+            while ($stmt->fetch()) {
+                $temp = array();
+
+                $temp[$campi[0]] = $codice_scelta;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $num_favorevoli;
+                $temp[$campi[3]] = $cod_sondaggio;
+                array_push($scelte, $temp);
+            }
+            return $scelte;
+        } else {
+            return null;
+        }
+    }
 
 //Ricerca domanda aperta num11 PARTE 1
-
     public function ricercaDomandaAperta($categoria, $titoloDomanda)
     {
         $domandaTab = $this->tabelleDB[4];
