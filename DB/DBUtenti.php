@@ -68,6 +68,7 @@ class DBUtenti
         "scelta" => [
             "codice_scelta",
             "descrizione",
+            "num_favorevoli",
             "cod_sondaggio"
         ],
         "chat" => [
