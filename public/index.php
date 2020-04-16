@@ -910,8 +910,8 @@ $app->post('/ricercaSondaggioAperto', function (Request $request, Response $resp
     }
 });
 
-//ricercaUtentePerUserName
-$app->post('/ricercautenteperusername', function (Request $request, Response $response) {
+//ricercaprofiloperusername
+$app->post('/ricercaprofiloperusername', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -923,7 +923,7 @@ $app->post('/ricercautenteperusername', function (Request $request, Response $re
     if ($responseData['data'] != null) {
         $responseData['error'] = false;
         $responseData['message'] = 'Profilo visualizzato con successo';
-        $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
+        $response->getBody()->write(json_encode(array("Profilo" => $responseData)));
         $newResponse = $response->withHeader('Content-type', 'application/json');
         return $newResponse;
     } else {
