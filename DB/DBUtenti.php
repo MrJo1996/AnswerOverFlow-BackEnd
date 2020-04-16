@@ -804,7 +804,7 @@ class DBUtenti
             $campi[0] . " = ? "
         );
 
-        echo $query . "CIAOOOOOOOO";
+       // echo $query . "CIAOOOOOOOO";
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda_selezionata);

@@ -933,7 +933,28 @@ $app->post('/ricercaprofiloperusername', function (Request $request, Response $r
     }
 });
 
+//endpoint: /cancellaDomanda
+$app->delete('/cancellaDomanda/{codice_domanda}', function (Request $request, Response $response) {
 
+    $db = new DBUtenti();
+
+    $codice = $request->getAttribute("codice_domanda");
+
+
+    $responseData = array();
+
+    $responseDB = $db->cancellaDomanda($codice);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Domanda rimossa con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, domanda non rimossa'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+});
 
 
 /**** ENDPOINT ****/
