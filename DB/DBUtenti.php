@@ -807,7 +807,7 @@ class DBUtenti
         //query:  "  DELETE * FROM Sondaggi where ID = $Id_sondaggio_selezionato"
 
         $query = (
-            "DELETE * FROM". " " .
+            "DELETE FROM". " " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
@@ -830,7 +830,7 @@ class DBUtenti
         //query:  "  DELETE * FROM domanda where ID = $Id_domanda_selezionata"
 
         $query = (
-            "DELETE * FROM" . " " .
+            "DELETE FROM" . " " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
