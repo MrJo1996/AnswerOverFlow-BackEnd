@@ -1018,7 +1018,7 @@ class DBUtenti
             "FROM " .
             $sondaggioTab . " " .
             "WHERE" .
-            "(" . $campiSondaggio[6] = " = ? " . "OR" . $campiSondaggio[2]  . "LIKE" % " = ? " % ")");
+            "(" . $campiSondaggio[6] = " = ? " . "OR" . $campiSondaggio[2] . "LIKE" % " = ? " % ")");
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute();
@@ -1191,7 +1191,7 @@ class DBUtenti
 
         if (!$cod_chat) {                         //se la query non rest ituisce risultato, creo una nuova chate inserisco il nuovo messaggio
             $this->creaChat($cod_utente0, $cod_utente1);
-            $cod_chat =$this->trovaCodChat($cod_utente0, $cod_utente1);
+            $cod_chat = $this->trovaCodChat($cod_utente0, $cod_utente1);
 
         }
 
@@ -1226,6 +1226,53 @@ class DBUtenti
     }
 
 
-}
+//Visualizza Sondaggio
+    public function ricercaProfiloPerUsername($username)
+    {
+        $utenteTab = $this->tabelleDB[0];
+        $campiUtente = $this->campiTabelleDB[$utenteTab];
 
-?>l
+        $query = (
+            "SELECT " .
+            "  " .
+            $campiUtente[0].
+            "  ,".
+            $campiUtente[1].
+            "  ,".
+            $campiUtente[3].
+            "  ,".
+            $campiUtente[4].
+            "  ,".
+            $campiUtente[5].
+            "   ".
+            "FROM  " .
+            $utenteTab . "  " .
+            "WHERE  " .
+            $campiUtente[1] . " = ? "
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($email, $username, $nome, $cognome, $bio);
+            $utente = array();
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiUtente[0]] = $email;
+                $temp[$campiUtente[1]] = $username;
+                $temp[$campiUtente[3]] = $nome;
+                $temp[$campiUtente[4]] = $cognome;
+                $temp[$campiUtente[5]] = $bio;
+                array_push($utente, $temp);
+            }
+            return $utente;
+        } else {
+            return null;
+        }
+    }
+
+
+}
+?>

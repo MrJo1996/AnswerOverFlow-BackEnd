@@ -909,6 +909,33 @@ $app->post('/ricercaSondaggioAperto', function (Request $request, Response $resp
         return $response->withJson($responseData);
     }
 });
+
+//ricercaUtentePerUserName
+$app->post('/ricercautenteperusername', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+
+    $username = $requestData['username'];
+
+    $responseData['data'] = $db->ricercaProfiloPerUsername($username);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Profilo visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
+        $newResponse = $response->withHeader('Content-type', 'application/json');
+        return $newResponse;
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+
+
+
 /**** ENDPOINT ****/
 
 
