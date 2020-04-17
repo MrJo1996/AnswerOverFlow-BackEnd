@@ -315,7 +315,7 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$statsTab];
         //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
         $query = (
-            "INSERT INTO " .
+            "INSERT INTO" . " " .
             $statsTab . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
@@ -409,7 +409,7 @@ class DBUtenti
         $attivo = 0;
 
         $query = (
-            "INSERT INTO " .
+            "INSERT INTO" . " " .
             $tabella . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
@@ -807,7 +807,7 @@ class DBUtenti
         //query:  "  DELETE * FROM Sondaggi where ID = $Id_sondaggio_selezionato"
 
         $query = (
-            "DELETE FROM " .
+            "DELETE FROM". " " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
@@ -816,7 +816,7 @@ class DBUtenti
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_sondaggio_selezionato);
         $result = $stmt->execute();
-        $stmt->store_result();
+
 
         return $result;
     }
@@ -830,17 +830,16 @@ class DBUtenti
         //query:  "  DELETE * FROM domanda where ID = $Id_domanda_selezionata"
 
         $query = (
-            "DELETE FROM " .
+            "DELETE FROM" . " " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
 
-       // echo $query . "CIAOOOOOOOO";
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda_selezionata);
         $result = $stmt->execute();
-        $stmt->store_result();
+
 
         return $result;
     }
@@ -854,7 +853,7 @@ class DBUtenti
         ////VALUES ($valore_valutazione);
         ////WHERE   ID = $Id_risposta_selezionata
         $query = (
-            "INSERT INTO " .
+            "INSERT INTO" . " " .
             $RispostaTab . " (" .
             $campi[2] . ") " .
             "VALUES " . "(" .
@@ -946,7 +945,7 @@ class DBUtenti
         // query = delete from 'utente' where e-mail= 'utente_selezionato' .00
 
         $query = (
-            "DELETE FROM " .
+            "DELETE FROM" . " " .
             $utenteTab . " WHERE " .
             $campi[0] . " = ? "
         );
@@ -1237,7 +1236,7 @@ class DBUtenti
         //query:  " DELETE FROM risposta WHERE ID = $codice_risposta"
 
         $query = (
-            "DELETE FROM " .
+            "DELETE FROM" . " " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
