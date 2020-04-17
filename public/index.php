@@ -79,10 +79,7 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse; //Invio la risposta del servizio REST al client
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Errore imprevisto';
@@ -101,8 +98,7 @@ $app->post('/controlloEmail', function (Request $request, Response $response) {
         $responseData['error'] = false;
         $responseData['message'] = "L'email è presente nel DB";
         $response->getBody()->write(json_encode(array("Esito esistenza email" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'La mail non è presente nel DB';
@@ -160,8 +156,7 @@ $app->post('/aChiAppartieniRisposta', function (Request $request, Response $resp
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
         $response->getBody()->write(json_encode(array("Domanda della risposta" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'La risposta inserita non esiste nel DB';
@@ -180,11 +175,29 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
         $response->getBody()->write(json_encode(array("Categoria della domanda" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'La domanda inserita non esiste nel DB';
+        return $response->withJson($responseData);
+    }
+});
+
+// endpoint: /ricercaScelteDelSondaggio OK
+$app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_sondaggio = $requestData['codice_sondaggio'];
+    $responseData['data'] = $db->ricercaScelteDelSondaggio($codice_sondaggio);
+
+    if ($responseData['data']) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Statistiche" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Le scelte del sondaggio non sono presenti nel DB';
         return $response->withJson($responseData);
     }
 });
@@ -201,8 +214,7 @@ $app->post('/controlloStats', function (Request $request, Response $response) {
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
         $response->getBody()->write(json_encode(array("Statistiche" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
