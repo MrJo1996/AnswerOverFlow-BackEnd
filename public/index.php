@@ -361,8 +361,7 @@ $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Respo
         $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
         //metto in un json e lo inserisco nella risposta del servizio REST
         //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse; //Invio la risposta del servizio REST al client
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = false
         $responseData['message'] = 'Errore imprevisto';
@@ -382,8 +381,7 @@ $app->post('/visualizzaProfilo', function (Request $request, Response $response)
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Profilo" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -431,8 +429,7 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
         //Metto in un json e lo inserisco nella risposta del servizio REST
         //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse; //Invio la risposta del servizio REST al client
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Errore imprevisto';
@@ -483,8 +480,7 @@ $app->post('/visualizzaSondaggio', function (Request $request, Response $respons
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -509,7 +505,6 @@ $app->post('/login', function (Request $request, Response $response) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Accesso effettuato'; //Messaggio di esiso positivo
 
-
     } else { //Se le credenziali non sono corrette
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Credenziali errate'; //Messaggio di esito negativo
@@ -529,8 +524,7 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Messaggi" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -703,8 +697,7 @@ $app->post('/ricercaSondaggio', function (Request $request, Response $response) 
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Sondaggi trovati" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -727,8 +720,7 @@ $app->post('/ricercaDomanda', function (Request $request, Response $response) {
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Domande trovate" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -889,8 +881,7 @@ $app->post('/ricercaDomandaAperta', function (Request $request, Response $respon
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Domande trovate" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -913,8 +904,7 @@ $app->post('/ricercaSondaggioAperto', function (Request $request, Response $resp
         $responseData['error'] = false;
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Sondaggi trovati" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
@@ -936,8 +926,7 @@ $app->post('/ricercaprofiloperusername', function (Request $request, Response $r
         $responseData['error'] = false;
         $responseData['message'] = 'Profilo visualizzato con successo';
         $response->getBody()->write(json_encode(array("Profilo" => $responseData)));
-        $newResponse = $response->withHeader('Content-type', 'application/json');
-        return $newResponse;
+        return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
