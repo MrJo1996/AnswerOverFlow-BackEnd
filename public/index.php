@@ -728,6 +728,44 @@ $app->post('/ricercaDomanda', function (Request $request, Response $response) {
     }
 });
 
+//endpoint: /rimuove i sondaggi che hanno il timer scaduto
+$app->delete('/timerScadutoSondaggi', function (Request $request, Response $response){
+    $db = new DBUtenti();
+
+    $responseData = array();
+
+    $responseData['data'] = $db->visualizzaSondaggi();
+    $cancellazioni = true;
+    $responseData['eliminati'] = array();
+
+    if ($responseData['data']){
+        $now = strtotime("now");
+        for ($i = 0; $i < count($responseData['data']); $i++){
+            $timerSondaggio = strtotime($responseData['data'][$i]['timer']) - strtotime("TODAY");
+            $fineSondaggio = strtotime($responseData['data'][$i]['dataeora']) + $timerSondaggio;
+            if ($fineSondaggio < $now){
+                $format = 'd/m/Y H:i:s';
+                echo "\nVecchio sondaggio scaduto il " . date($format, $fineSondaggio);
+                $cod_oldSondaggio = $responseData['data'][$i]['codice_sondaggio'];
+                if (!$responseDB = $db->cancellaSondaggio($cod_oldSondaggio))
+                    $cancellazioni = false;
+                array_push($responseData['eliminati'], $cod_oldSondaggio);
+            }
+        }
+        if ($cancellazioni){
+            $responseData['error'] = false;
+            $responseData['message'] = "Le eliminazioni necessarie sono state effettuate";
+        }else{
+            $responseData['error'] = true;
+            $responseData['message'] = "La cancellazione non è andata a buon fine";
+        }
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = "Non è possibile comunicare con il server";
+    }
+    return $response->withJson($responseData);
+});
+
 //endpoint: /rimuoviRisposta
 $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, Response $response) {
 

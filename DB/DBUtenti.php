@@ -468,6 +468,42 @@ class DBUtenti
         }
     }
 
+    //Visualizza tutti i sondaggi
+    public function visualizzaSondaggi()
+    {
+        $sondaggioTab = $this->tabelleDB[6];
+        $campiSondaggio = $this->campiTabelleDB[$sondaggioTab];
+
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $sondaggioTab
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $codice_utente, $codice_categoria);
+            $sondaggi = array();
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiSondaggio[0]] = $codice_sondaggio;
+                $temp[$campiSondaggio[1]] = $dataeora;
+                $temp[$campiSondaggio[2]] = $titolo;
+                $temp[$campiSondaggio[3]] = $timer;
+                $temp[$campiSondaggio[4]] = $codice_utente;
+                $temp[$campiSondaggio[5]] = $codice_categoria;
+                array_push($sondaggi, $temp);
+            }
+            return $sondaggi;
+        } else {
+            return null;
+        }
+    }
+
     //Modifica valutazione per id risposta :query numero 5
     public function modificaValutazione($codice_risposta, $valutazione)
     {
@@ -1256,7 +1292,7 @@ class DBUtenti
     }
 
 
-//Visualizza Sondaggio
+//Visualizza profilo utente
     public function ricercaProfiloPerUsername($username)
     {
         $utenteTab = $this->tabelleDB[0];
