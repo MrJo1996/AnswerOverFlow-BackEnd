@@ -47,13 +47,14 @@ class DBUtenti
             "titolo",
             "descrizione",
             "cod_utente",
-            "cod_categoria"
-
+            "cod_categoria",
+            "cod_preferita"
         ],
         "risposta" => [
             "codice_risposta",
             "descrizione",
-            "valutazione",
+            "num_like",
+            "num_dislike",
             "cod_utente",
             "cod_domanda"
         ],
