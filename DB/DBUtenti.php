@@ -505,8 +505,90 @@ class DBUtenti
         }
     }
 
+    //Visualizzo il numero di like di una risposta tramite il suo codice(ID)
+    public function visualizzaNumLikeRisposta($codice_risposta)
+    {
+
+        $rispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$rispostaTab];
+
+        //Query = select num_like from 'risposta' where codice_risposta = 'value'
+
+        $query = (
+            "SELECT " .
+            " $campi[2] " .
+            "FROM " .
+            $rispostaTab . " " .
+            "WHERE " .
+            $campi[0] . " = ?"
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_risposta);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_like);
+            $risposta = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[2]] = $num_like;
+                array_push($risposta, $temp);
+
+            }
+            return $risposta;
+        } else {
+            return null;
+        }
+
+    }
+
+    //Visualizzo il numero di dislike di una risposta tramite il suo codice(ID)
+    public function visualizzaNumDislikeRisposta($codice_risposta)
+    {
+
+        $rispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$rispostaTab];
+
+        //Query = select num_like from 'risposta' where codice_risposta = 'value'
+
+        $query = (
+            "SELECT " .
+            " $campi[3] " .
+            "FROM " .
+            $rispostaTab . " " .
+            "WHERE " .
+            $campi[0] . " = ?"
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_risposta);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_dislike);
+            $risposta = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[2]] = $num_dislike;
+                array_push($risposta, $temp);
+
+            }
+            return $risposta;
+        } else {
+            return null;
+        }
+
+    }
+
     //Modifica num_like per id risposta :query numero 5
-    public function modificaNumLike($codice_risposta, $like)
+    public function modificaNumLike($codice_risposta)
     {
         $tabella = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$tabella];
@@ -515,7 +597,7 @@ class DBUtenti
             "UPDATE " .
             $tabella . " " .
             "SET " .
-            $campi[2] . "= ? " .
+            $campi[2] . " = ".$campi[2]." +1 ".
             "WHERE " .
             $campi[0] . "= ?"
         );
@@ -524,7 +606,7 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $like, $codice_risposta);
+        $stmt->bind_param("i",$codice_risposta);
 
         $result = $stmt->execute();
 
@@ -533,7 +615,7 @@ class DBUtenti
     }
 
     //Modifica num_dislike per id risposta :query numero 5
-    public function modificaNumDisLike($codice_risposta, $dis_like)
+    public function modificaNumDisLike($codice_risposta)
     {
         $tabella = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$tabella];
@@ -542,7 +624,7 @@ class DBUtenti
             "UPDATE " .
             $tabella . " " .
             "SET " .
-            $campi[3] . "= ? " .
+            $campi[3] . " = ".$campi[3]." +1 " .
             "WHERE " .
             $campi[0] . "= ?"
         );

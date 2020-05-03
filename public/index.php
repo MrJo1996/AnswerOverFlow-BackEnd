@@ -297,19 +297,57 @@ $app->post('/insertStats', function (Request $request, Response $response)
     }
 });*/
 
+// endpoint: /visualizzaNumLikeRisposta
+$app->post('/visualizza_num_like', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_risposta = $requestData['codice_risposta'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaNumLikeRisposta($codice_risposta);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+// endpoint: /visualizzaNumDislikeRisposta
+$app->post('/visualizza_num_dislike', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_risposta = $requestData['codice_risposta'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaNumDislikeRisposta($codice_risposta);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 // endpoint: /modificaNumLike : numero 5
 $app->post('/modifica_num_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
-    $like = $requestData['num_like'];
     echo "PARAMS:";
     echo $codice_risposta . "     ";
-    echo $like . "     ";
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->modificaNumLike($codice_risposta, $like);
+    $responseDB = $db->modificaNumLike($codice_risposta);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
@@ -331,10 +369,9 @@ $app->post('/modifica_num_dislike', function (Request $request, Response $respon
     $dislike = $requestData['num_dislike'];
     echo "PARAMS:";
     echo $codice_risposta . "     ";
-    echo $dislike . "     ";
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->modificaNumDisLike($codice_risposta, $dislike);
+    $responseDB = $db->modificaNumDisLike($codice_risposta);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
