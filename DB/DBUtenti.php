@@ -13,7 +13,8 @@ class DBUtenti
         "sondaggio",
         "scelta",
         "chat",
-        "messaggio"
+        "messaggio",
+        "valutazione"
     ];
     private $campiTabelleDB = [ //Campi delle tabelle (array bidimensionale indicizzato con key)
         "utente" => [
@@ -83,6 +84,11 @@ class DBUtenti
             "testo",
             "visualizzato",
             "cod_chat"
+        ],
+        "valutazione" => [
+            "cod_risposta",
+            "cod_utente",
+            "tipo_like"
         ]
     ];
 
@@ -962,23 +968,53 @@ class DBUtenti
         return $result;
     }
 
-    //inserisci votazione num6
-    public function inserisciVotazione($valutazione)
+    //inserisci valutazione num6
+    public function inserisciValutazione($cod_risposta, $cod_utente, $tipo_like)
+    {
+        $ValutazioneTab = $this->tabelleDB[10];
+        $campi = $this->campiTabelleDB[$ValutazioneTab];
+        //QUERY: //INSERT INTO valutazione (codice_risposta, codice_utente, tipo_like)
+        ////VALUES ($codice_risposta, $codice_utente, $tipo_like);
+
+        $query = (
+            "INSERT INTO" . " " .
+            $ValutazioneTab . " ( " .
+            $campi[0] . " , " .
+            $campi[1] . " , " .
+            $campi[2] . " ) " .
+            "VALUES" . " ( " .
+            " ? , ? , ? ) "
+        );
+
+        echo $query;
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("isi", $cod_risposta, $cod_utente, $tipo_like);
+        return $stmt->execute();
+    }
+
+    //inserisci valutazione num6
+    public function inserisciRisposta($descrizione, $cod_utente, $cod_domanda)
     {
         $RispostaTab = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$RispostaTab];
-        //QUERY: //INSERT INTO  risposta (valutazione)
-        ////VALUES ($valore_valutazione);
-        ////WHERE   ID = $Id_risposta_selezionata
+        //QUERY: //INSERT INTO risposta (descrizione, cod_utente, cod_domanda)
+        ////VALUES ($descrizione, $cod_utente, $cod_domanda);
+
         $query = (
-            "INSERT INTO " .
-            $RispostaTab . " (" .
-            $campi[2] . ") " .
-            "VALUES " . "(" .
-            "? )"
+            "INSERT INTO" . " " .
+            $RispostaTab . " ( " .
+            $campi[1] . " , " .
+            $campi[4] . " , " .
+            $campi[5] . " ) " .
+            "VALUES" . " ( " .
+            " ? , ? , ? ) "
         );
+
+        echo $query;
+
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $valutazione);
+        $stmt->bind_param("ssi", $descrizione, $cod_utente, $cod_domanda);
         return $stmt->execute();
     }
 

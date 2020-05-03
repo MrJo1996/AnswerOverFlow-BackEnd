@@ -717,26 +717,56 @@ $app->post('/modificaSondaggio', function (Request $request, Response $response)
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-// endpoint: /inserisicVotazione
-$app->post('/inserisciVotazione', function (Request $request, Response $response) {
+// endpoint: /inserisicValutazione
+$app->post('/inserisci_valutazione', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
-    $valutazione = $requestData['valutazione'];
+    $cod_risposta = $requestData['cod_risposta'];
+    $cod_utente = $requestData['cod_utente'];
+    $tipo_like = $requestData['tipo_like'];
 
     $responseData = array();
 
 
-    $responseDB = $db->inserisciVotazione($valutazione);
+    $responseDB = $db->inserisciValutazione($cod_risposta, $cod_utente, $tipo_like);
     if ($responseDB) {
         $responseData['error'] = false;
-        $responseData['message'] = 'Votazione inserita con successo'; //Messaggio di esito positivo
+        $responseData['message'] = 'Valutazione inserita con successo'; //Messaggio di esito positivo
 
     } else {
         $responseData['error'] = true;
-        $responseData['message'] = 'Votazione non inserita'; //Messaggio di esito negativo
+        $responseData['message'] = 'Valutazione non inserita'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+});
+
+// endpoint: /inserisicRisposta
+$app->post('/inserisci_risposta', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $descrizione = $requestData['descrizione'];
+    $cod_utente = $requestData['cod_utente'];
+    $cod_domanda = $requestData['cod_domanda'];
+
+    $responseData = array();
+
+
+    $responseDB = $db->inserisciRisposta($descrizione, $cod_utente, $cod_domanda);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Risposta inserita con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Risposta non inserita'; //Messaggio di esito negativo
     }
 
     return $response->withJson($responseData);
