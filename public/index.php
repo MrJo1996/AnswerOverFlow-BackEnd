@@ -297,19 +297,44 @@ $app->post('/insertStats', function (Request $request, Response $response)
     }
 });*/
 
-// endpoint: /modificaVotazione : numero 5
-$app->post('/modificavalutazione', function (Request $request, Response $response) {
+// endpoint: /modificaNumLike : numero 5
+$app->post('/modifica_num_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
-    $valutazione = $requestData['valutazione'];
+    $like = $requestData['num_like'];
     echo "PARAMS:";
     echo $codice_risposta . "     ";
-    echo $valutazione . "     ";
+    echo $like . "     ";
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->modificaValutazione($codice_risposta, $valutazione);
+    $responseDB = $db->modificaNumLike($codice_risposta, $like);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+// endpoint: /modificaNumDisLike : numero 5
+$app->post('/modifica_num_dislike', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_risposta = $requestData['codice_risposta'];
+    $dislike = $requestData['num_dislike'];
+    echo "PARAMS:";
+    echo $codice_risposta . "     ";
+    echo $dislike . "     ";
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->modificaNumDisLike($codice_risposta, $dislike);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
