@@ -142,7 +142,7 @@ class DBUtenti
     }
 
     //Seleziono tutto il contenuto di una risposta secondo un determinato ID
-    public function visualizzaRisposta($id_risposta)
+    public function visualizzaRisposta($codice_risposta)
     {
         $rispostaTab = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$rispostaTab];
@@ -157,7 +157,7 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $id_risposta);
+        $stmt->bind_param("i", $codice_risposta);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
@@ -316,7 +316,7 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$statsTab];
         //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
         $query = (
-            "INSERT INTO" . " " .
+            "INSERT INTO " .
             $statsTab . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
@@ -410,7 +410,7 @@ class DBUtenti
         $attivo = 0;
 
         $query = (
-            "INSERT INTO" . " " .
+            "INSERT INTO " .
             $tabella . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
@@ -505,12 +505,12 @@ class DBUtenti
         }
     }
 
-    //Modifica valutazione per id risposta :query numero 5
-    public function modificaValutazione($codice_risposta, $valutazione)
+    //Modifica num_like per id risposta :query numero 5
+    public function modificaNumLike($codice_risposta, $like)
     {
         $tabella = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$tabella];
-        //query:  "UPDATE risposta SET valutazione = ? WHERE  codice_risposta = ?"
+        //query:  "UPDATE risposta SET num_like = ? WHERE  codice_risposta = ?"
         $query = (
             "UPDATE " .
             $tabella . " " .
@@ -524,7 +524,34 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $valutazione, $codice_risposta);
+        $stmt->bind_param("ii", $like, $codice_risposta);
+
+        $result = $stmt->execute();
+
+        //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
+    }
+
+    //Modifica num_dislike per id risposta :query numero 5
+    public function modificaNumDisLike($codice_risposta, $dis_like)
+    {
+        $tabella = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE risposta SET num_dis_like = ? WHERE  codice_risposta = ?"
+        $query = (
+            "UPDATE " .
+            $tabella . " " .
+            "SET " .
+            $campi[3] . "= ? " .
+            "WHERE " .
+            $campi[0] . "= ?"
+        );
+
+        echo "QUERY: " . $query;
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $dis_like, $codice_risposta);
 
         $result = $stmt->execute();
 
@@ -710,46 +737,16 @@ class DBUtenti
 
     }
 
-    public function ricercaScelteDelSondaggio ($codice_sondaggio){
-        $sceltaTab = $this->tabelleDB[7];
-        $campi = $this->campiTabelleDB[$sceltaTab];
-
-        $query = //SELECT * FROM `scelta` WHERE cod_sondaggio = ?
-         "SELECT *" . " " .
-         "FROM" . " " .
-         $sceltaTab . " " .
-         "WHERE" . " " .
-         $campi[3] . " = ?";
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $codice_sondaggio);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_scelta, $descrizione, $num_favorevoli, $cod_sondaggio);
-            $scelte = array();
-            while ($stmt->fetch()) {
-                $temp = array();
-
-                $temp[$campi[0]] = $codice_scelta;
-                $temp[$campi[1]] = $descrizione;
-                $temp[$campi[2]] = $num_favorevoli;
-                $temp[$campi[3]] = $cod_sondaggio;
-                array_push($scelte, $temp);
-            }
-            return $scelte;
-        } else {
-            return null;
-        }
-    }
 
 //Ricerca domanda aperta num11 PARTE 1
+
     public function ricercaDomandaAperta($categoria, $titoloDomanda)
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
 
 
-        $query = //QUERY: SELECT * FROM domanda WHERE timer > 0  AND categoria = $value OR titolo LIKE %$value%
+        $query = (//QUERY: SELECT * FROM domanda WHERE timer > 0  AND categoria = $value OR titolo LIKE %$value%
             "SELECT " .
             $campiDomanda[0] . ", " .
             $campiDomanda[1] . " " .
@@ -763,7 +760,8 @@ class DBUtenti
             $domandaTab . " " .
             "WHERE" .
             $campiDomanda[2] > 0 .
-            "AND" . "(" . $campiDomanda[6] = " = ? " . "OR" . $campiDomanda[3] . "LIKE" % " = ? " % ")";
+            "AND" . "(" . $campiDomanda[6] = " = ? " . "OR" . $campiDomanda[3] . "LIKE" % " = ? " % ")"
+        );
 
         $stmt = $this->connection->prepare($query);
         $stmt->execute();
@@ -844,7 +842,7 @@ class DBUtenti
         //query:  "  DELETE * FROM Sondaggi where ID = $Id_sondaggio_selezionato"
 
         $query = (
-            "DELETE FROM". " " .
+            "DELETE FROM " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
@@ -853,7 +851,7 @@ class DBUtenti
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_sondaggio_selezionato);
         $result = $stmt->execute();
-
+        $stmt->store_result();
 
         return $result;
     }
@@ -867,16 +865,17 @@ class DBUtenti
         //query:  "  DELETE * FROM domanda where ID = $Id_domanda_selezionata"
 
         $query = (
-            "DELETE FROM" . " " .
+            "DELETE FROM " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );
 
+       // echo $query . "CIAOOOOOOOO";
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda_selezionata);
         $result = $stmt->execute();
-
+        $stmt->store_result();
 
         return $result;
     }
@@ -890,7 +889,7 @@ class DBUtenti
         ////VALUES ($valore_valutazione);
         ////WHERE   ID = $Id_risposta_selezionata
         $query = (
-            "INSERT INTO" . " " .
+            "INSERT INTO " .
             $RispostaTab . " (" .
             $campi[2] . ") " .
             "VALUES " . "(" .
@@ -982,7 +981,7 @@ class DBUtenti
         // query = delete from 'utente' where e-mail= 'utente_selezionato' .00
 
         $query = (
-            "DELETE FROM" . " " .
+            "DELETE FROM " .
             $utenteTab . " WHERE " .
             $campi[0] . " = ? "
         );
@@ -1273,7 +1272,7 @@ class DBUtenti
         //query:  " DELETE FROM risposta WHERE ID = $codice_risposta"
 
         $query = (
-            "DELETE FROM" . " " .
+            "DELETE FROM " .
             $tabella . " WHERE " .
             $campi[0] . " = ? "
         );

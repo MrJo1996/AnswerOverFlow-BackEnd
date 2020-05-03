@@ -274,7 +274,7 @@ $app->post('/aggiornaStats1', function (Request $request, Response $response)
     }
 }); */
 
-/* endpoint per testare insertStats
+/* //endpoint per testare insertStats
 $app->post('/insertStats', function (Request $request, Response $response)
 {
     $db = new DBUtenti();
