@@ -308,7 +308,7 @@ $app->post('/visualizza_num_like', function (Request $request, Response $respons
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        $response->getBody()->write(json_encode(array("Numero like" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -328,7 +328,7 @@ $app->post('/visualizza_num_dislike', function (Request $request, Response $resp
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        $response->getBody()->write(json_encode(array("Numero dislike" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -336,6 +336,28 @@ $app->post('/visualizza_num_dislike', function (Request $request, Response $resp
         return $response->withJson($responseData);
     }
 });
+
+// endpoint: /checkIfUserHasAlreadyEvaluatedResponse ( controlla se un utente ha gia valutato una risposta )
+$app->post('/check_if_user_has_already_evaluated_response', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_risposta = $requestData['cod_risposta'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->checkIfUserHasAlreadyEvaluatedResponse($cod_risposta);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Valutazioni" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+
 
 // endpoint: /modificaNumLike : numero 5
 $app->post('/modifica_num_like', function (Request $request, Response $response) {
@@ -382,6 +404,66 @@ $app->post('/modifica_num_dislike', function (Request $request, Response $respon
         $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
     }
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+// endpoint: /modificaTipo_like : numero 5
+$app->post('/modifica_tipo_like', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $cod_risposta = $requestData['cod_risposta'];
+    $cod_utente = $requestData['cod_utente'];
+    $tipo_like = $requestData['tipo_like'];
+    echo "PARAMS:";
+    echo $cod_risposta . "     ";
+    echo $cod_utente . "     ";
+    echo $tipo_like . "     ";
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->modificaTipo_like($tipo_like, $cod_risposta, $cod_utente);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+//endpoint: /cancella valutazione
+$app->delete('/cancella_valutazione/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $cod_risposta = $request->getAttribute("cod_risposta");
+    $cod_utente = $request->getAttribute("cod_utente");
+
+    //Stampa codice passed
+    echo "\n\n Codice risposta passato: " . $cod_risposta;
+    echo "\n\n Codice utente passato: " . $cod_utente;
+
+    $responseData = array();
+
+    $responseDB = $db->cancellaValutazione($cod_risposta, $cod_utente);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Valutazione rimossa con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, valutazione non rimossa'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+    /*Per il testing in Postman:
+       -selezionare come method DELETE
+       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
+       -send
+    */
 });
 
 

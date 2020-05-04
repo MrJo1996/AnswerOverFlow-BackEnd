@@ -593,7 +593,48 @@ class DBUtenti
 
     }
 
-    //Modifica num_like per id risposta :query numero 5
+    //Controllo se un utente ha gia valutato una risposta
+    public function checkIfUserHasAlreadyEvaluatedResponse($cod_risposta)
+    {
+
+        $valutazioneTab = $this->tabelleDB[10];
+        $campi = $this->campiTabelleDB[$valutazioneTab];
+
+        //Query = select cod_utente from 'valutazione' where cod_risposta = 'value'
+
+        $query = (
+            "SELECT " .
+            " $campi[1] " .
+            "FROM " .
+            $valutazioneTab . " " .
+            "WHERE " .
+            $campi[0] . " = ?"
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $cod_risposta);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($cod_utente);
+            $valutazione = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[1]] = $cod_utente;
+                array_push($valutazione, $temp);
+
+            }
+            return $valutazione;
+        } else {
+            return null;
+        }
+
+    }
+
+    //Modifica num_like per id risposta
     public function modificaNumLike($codice_risposta)
     {
         $tabella = $this->tabelleDB[5];
@@ -620,7 +661,7 @@ class DBUtenti
         return $result;
     }
 
-    //Modifica num_dislike per id risposta :query numero 5
+    //Modifica num_dislike per id risposta
     public function modificaNumDisLike($codice_risposta)
     {
         $tabella = $this->tabelleDB[5];
@@ -644,6 +685,57 @@ class DBUtenti
         $result = $stmt->execute();
 
         //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
+    }
+
+    //Modifica tipo_like per id risposta e id utente
+    public function modificaTipo_like($tipo_like, $cod_risposta, $cod_utente)
+    {
+        $tabella = $this->tabelleDB[10];
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE valutazione SET tipo_like = ? WHERE  cod_risposta = ? AND cod_utente = ?"
+        $query = (
+            "UPDATE " .
+            $tabella . " " .
+            "SET " .
+            $campi[2] . " = ? " .
+            "WHERE " .
+            $campi[0] . " = ? AND " . $campi[1] . " = ? "
+        );
+
+        echo "QUERY: " . $query;
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("iis", $tipo_like, $cod_risposta, $cod_utente);
+
+        $result = $stmt->execute();
+
+        //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
+    }
+
+    // cancella valutazione per id riposta e id utente
+    public function cancellaValutazione($cod_risposta, $cod_utente)
+    {
+        $tabella = $this->tabelleDB[10]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "  DELETE * FROM valutazione where cod_risposta = ? AND cod_utente = ?"
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? AND " .
+            $campi[1] . " = ?"
+        );
+
+        // echo $query . "CIAOOOOOOOO";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("is", $cod_risposta, $cod_utente);
+        $result = $stmt->execute();
+        $stmt->store_result();
+
         return $result;
     }
 
