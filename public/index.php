@@ -779,14 +779,13 @@ $app->post('/modificaSondaggio', function (Request $request, Response $response)
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
-    $codice_sondaggio = $requestData['codice_sondaggio'];
-    $dataeora = $requestData['dataeota'];
     $titolo = $requestData['titolo'];
-    $cod_categoria = $requestData['cod_categoria'];
+    $timer = $requestData['timer'];
+    $codice_sondaggio = $requestData['codice_sondaggio'];
 
 //Risposta del servizio REST
     $responseData = array();
-    $responseDB = $db->modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+    $responseDB = $db->modificaSondaggio($titolo, $timer, $codice_sondaggio);
 
     if ($responseDB) {
         $responseData['error'] = false;

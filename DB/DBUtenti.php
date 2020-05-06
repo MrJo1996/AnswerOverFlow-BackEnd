@@ -1110,26 +1110,27 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    public function modificaSondaggio($codice_sondaggio, $dataeora, $titolo, $cod_categoria)
+    public function modificaSondaggio($titolo, $timer, $codice_sondaggio)
     {
         $Sondaggiotabella = $this->tabelleDB[6];
         $campi = $this->campiTabelleDB[$Sondaggiotabella];
         //query:  UPDATE sondaggio
-        //SET  DataeOra=$valore Titolo=$titolo_inserito cod_utente=$valore cod_categoria=$valore
+        //SET   Titolo=$titolo_inserito Timer=$timer
         //WHERE codice_sondaggio=$valore
         $query = (
             "UPDATE " .
             $Sondaggiotabella . " " .
             "SET " .
-            $Sondaggiotabella . "." . $campi[1] . "= ?," .
-            $Sondaggiotabella . "." . $campi[2] . "= ?," .
-            $Sondaggiotabella . "." . $campi[4] . "= ?" .
+            $Sondaggiotabella . "." . $campi[2] . " = ?," .
+            $Sondaggiotabella . "." . $campi[3] . " = ? " .
             "WHERE " .
-            $Sondaggiotabella . "." . $campi[0] . "= ?"
+            $Sondaggiotabella . "." . $campi[0] . " = ?"
         );
+
+        echo $query . "Query";
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisi", $codice_sondaggio, $dataeora, $titolo, $cod_categoria);
+        $stmt->bind_param("ssi", $titolo, $timer, $codice_sondaggio);
         $result = $stmt->execute();
         return $result;
     }
