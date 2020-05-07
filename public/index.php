@@ -87,6 +87,28 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
     }
 });
 
+
+// endpoint: /visualizzaRisposta OK
+$app->post('/visualizzaRisposteUtente', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['email'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaRisposteUtente($email);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+
 // endpoint: /controlloEmail OK
 $app->post('/controlloEmail', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -219,6 +241,27 @@ $app->post('/controlloStats', function (Request $request, Response $response) {
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
+        return $response->withJson($responseData);
+    }
+});
+
+// endpoint: /contaValutazioni OK
+// Da utilizzare in AggiornaStats
+$app->post('/contaRisposteValutate', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['email'];
+    $codice_categoria = $requestData['codice_categoria'];
+    $responseData['data'] = $db->contaRisposteValutate($email, $codice_categoria);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Statistiche" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Non è stato possibile trovare le risposte dell"utente o della categoria ricercata';
         return $response->withJson($responseData);
     }
 });

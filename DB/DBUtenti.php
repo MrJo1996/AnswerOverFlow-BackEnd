@@ -187,6 +187,84 @@ class DBUtenti
         }
     }
 
+    //Seleziono tutto il contenuto di una risposta secondo una determinata mail
+    public function visualizzaRisposteUtente($email)
+    {
+        $rispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$rispostaTab];
+        //QUERY: "SELECT * FROM `risposta` WHERE ID = 'value'"
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $rispostaTab . " " .
+            "WHERE " .
+            $campi[4] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($email, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
+            $risposte = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $email;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $num_like;
+                $temp[$campi[3]] = $num_dislike;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_domanda;
+                array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
+    //Seleziono tutto il contenuto di una risposta secondo una determinata mail
+    public function contaRisposteValutate($email, $cod_categoria)
+    {
+        $domandaTab = $this->tabelleDB[4];
+        $rispostaTab = $this->tabelleDB[5];
+        $campiDomanda = $this->campiTabelleDB[$domandaTab];
+        $campiRisposta = $this->campiTabelleDB[$rispostaTab];
+        //QUERY:
+        // "SELECT COUNT("codice_risposta")
+        //	FROM risposta JOIN domanda
+        //	WHERE risposta.cod_domanda = domanda.codice_domanda
+        //	AND (num_like > 0 OR num_dislike > 0)
+        //	AND domanda.cod_categoria = "valore codice categoria" (1)
+        //	AND risposta.cod_utente = "valore email" (pippo.cocainasd.com)
+        $query = (
+                "SELECT COUNT(" . $campiRisposta[0] . ")" .
+                " FROM " . $rispostaTab . " JOIN " . $domandaTab .
+                " WHERE " . $rispostaTab . "." . $campiRisposta[5] . " = " . $domandaTab . "." . $campiDomanda[0] .
+                " AND (" .  $campiRisposta[2] . " > 0 OR " . $campiRisposta[3] . " > 0)" .
+                " AND " .  $domandaTab . "." . $campiDomanda[6] . " = ?" .
+                " AND " . $rispostaTab . "." . $campiRisposta[4] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("is", $cod_categoria, $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($Nrisposte_valutate);
+            $risposteTrovate = array();
+            if ($stmt->fetch()){
+                $risposteTrovate["valutazioni_ricevute"] = $Nrisposte_valutate;
+            }
+            return $risposteTrovate; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
     //Prendo la domanda alla quale una risposta fa riferimento
     public function aChiAppartieniRisposta($id_risposta)
     {
