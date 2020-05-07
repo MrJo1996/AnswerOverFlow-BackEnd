@@ -29,8 +29,9 @@ class DBUtenti
         "stats" => [
             "cod_utente",
             "cod_categoria",
-            "sommatoria_valutazioni",
-            "numero_valutazioni"
+            "sommatoria_like",
+            "sommatoria_dislike",
+            "risposte_valutate"
         ],
         "categoria" => [
             "codice_categoria",
@@ -167,16 +168,17 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_risposta, $descrizione, $valutazione, $cod_utente, $cod_domanda);
+            $stmt->bind_result($codice_risposta, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
             $risposte = array();
             while ($stmt->fetch()) { //Scansiono la risposta della query
                 $temp = array();
                 //Indicizzo con key i dati nell'array
                 $temp[$campi[0]] = $codice_risposta;
                 $temp[$campi[1]] = $descrizione;
-                $temp[$campi[2]] = $valutazione;
-                $temp[$campi[3]] = $cod_utente;
-                $temp[$campi[4]] = $cod_domanda;
+                $temp[$campi[2]] = $num_like;
+                $temp[$campi[3]] = $num_dislike;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_domanda;
                 array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
             }
             return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
@@ -193,7 +195,7 @@ class DBUtenti
         //QUERY: SELECT cod_domanda FROM `risposta` WHERE ID = 'value'
         $query = (
             "SELECT " .
-            $campi[4] . " " .
+            $campi[5] . " " .
             "FROM " .
             $rispostaTab . " " .
             "WHERE " .
@@ -210,7 +212,7 @@ class DBUtenti
             while ($stmt->fetch()) { //Vado a prendermi la risposta della query
                 $temp = array();
                 //Indicizzo con key i dati nell'array
-                $temp[$campi[4]] = $cod_domanda;
+                $temp[$campi[5]] = $cod_domanda;
                 array_push($domanda, $temp); //Inserisco l'array $temp all'ultimo posto
             }
             return $domanda;
@@ -276,15 +278,16 @@ class DBUtenti
         //Ricevo la risposta del DB
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($cod_utente, $cod_categoria, $voti, $n_risposte);
+            $stmt->bind_result($cod_utente, $cod_categoria, $likes, $dislikes, $n_risposte);
             $statistiche = array();
 
             while ($stmt->fetch()) {
                 $temp = array();
                 $temp[$campi[0]] = $cod_utente;
                 $temp[$campi[1]] = $cod_categoria;
-                $temp[$campi[2]] = $voti;
-                $temp[$campi[3]] = $n_risposte;
+                $temp[$campi[2]] = $likes;
+                $temp[$campi[3]] = $dislikes;
+                $temp[$campi[4]] = $n_risposte;
                 array_push($statistiche, $temp);
             }
             return $statistiche;
@@ -292,7 +295,7 @@ class DBUtenti
     }
 
     //Se la riga relativa alle statistiche utente per categoria è presente viene aggiornata
-    public function aggiornaStats($id_utente, $id_categoria, $valutazione, $n_val)
+    public function aggiornaStatsLike($id_utente, $id_categoria, $valutazione, $n_val)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
@@ -302,7 +305,30 @@ class DBUtenti
             $statsTab .
             " SET " .
             $campi[2] . " = ?, " .
-            $campi[3] . " = ? " .
+            $campi[4] . " = ? " .
+            "WHERE " .
+            $campi[0] . " = ? " .
+            "AND " .
+            $campi[1] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("iisi", $valutazione, $n_val, $id_utente, $id_categoria);
+        //Termina con la bool true se la sessione è andata a buon fine
+        return $stmt->execute();
+    }
+
+    public function aggiornaStatsDislike($id_utente, $id_categoria, $valutazione, $n_val)
+    {
+        $statsTab = $this->tabelleDB[1];
+        $campi = $this->campiTabelleDB[$statsTab];
+        //QUERY: UPDATE `stats` SET `sommatoria_valutazioni` = '$valutazione', `numero_valutazioni` = '$n_val' WHERE `cod_utente` = '$id_utente' AND cod_categoria` = $id_categoria
+        $query = (
+            "UPDATE " .
+            $statsTab .
+            " SET " .
+            $campi[3] . " = ?, " .
+            $campi[4] . " = ? " .
             "WHERE " .
             $campi[0] . " = ? " .
             "AND " .
@@ -316,7 +342,7 @@ class DBUtenti
     }
 
     //Visto che non è ancora presente in DB, la si crea
-    public function insertStats($id_utente, $id_categoria, $valutazione)
+    public function insertStatsLike($id_utente, $id_categoria)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
@@ -327,15 +353,40 @@ class DBUtenti
             $campi[0] . ", " .
             $campi[1] . ", " .
             $campi[2] . ", " .
-            $campi[3] . ") " .
+            $campi[4] . ") " .
             "VALUES " . "( " .
             "? , " .
             "? , " .
-            "? , " .
+            "1 , " .
             "1 )"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sii", $id_utente, $id_categoria, $valutazione);
+        $stmt->bind_param("si", $id_utente, $id_categoria);
+        //Termina con la bool true se la sessione è andata a buon fine
+        return $stmt->execute();
+    }
+
+    //Visto che non è ancora presente in DB, la si crea
+    public function insertStatsDislike($id_utente, $id_categoria)
+    {
+        $statsTab = $this->tabelleDB[1];
+        $campi = $this->campiTabelleDB[$statsTab];
+        //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
+        $query = (
+            "INSERT INTO " .
+            $statsTab . " (" .
+            $campi[0] . ", " .
+            $campi[1] . ", " .
+            $campi[3] . ", " .
+            $campi[4] . ") " .
+            "VALUES " . "( " .
+            "? , " .
+            "? , " .
+            "1 , " .
+            "1 )"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("si", $id_utente, $id_categoria);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }

@@ -183,7 +183,8 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
     }
 });
 
-// endpoint: /ricercaScelteDelSondaggio OK
+// endpoint: /ricercaScelteDelSondaggio
+// Non ha più la chiamata al DB che la fa funzionare
 $app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -228,25 +229,50 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
-    $ultima_valutazione = $requestData['valutazione'];
-    $statistiche = $db->controlloStats($email, $codice_categoria);
-    if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
-        $nuova_valutazione = $statistiche[0]['sommatoria_valutazioni'] + $ultima_valutazione;
-        $nuovo_n_valutazioni = $statistiche[0]['numero_valutazioni'] + 1;
-        if ($db->aggiornaStats($email, $codice_categoria, $nuova_valutazione, $nuovo_n_valutazioni)) { //vengono aggiornate
-            $responseData['error'] = false;
-            $responseData['message'] = "Statistiche aggiornate";
-        } else { //non è stato possibile aggiornarle
-            $responseData['error'] = true;
-            $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
-        }
-    } elseif ($db->insertStats($email, $codice_categoria, $ultima_valutazione)) { //Altrimenti la si crea
-        $responseData['error'] = false;
-        $responseData['message'] = "Statistiche create";
-    } else { //non è stato possibile crearle
+    $tipo = $requestData['tipo_valutazione'];
+    if ($tipo !== "like" && $tipo !== "dislike"){
         $responseData['error'] = true;
-        $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+        $responseData['message'] = "Il tipo inserito non è riconosciuto";
+        return $response->withJson($responseData);
     }
+    $statistiche = $db->controlloStats($email, $codice_categoria);
+    if ($tipo == "like"){
+        if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
+            $nuovi_likes = $statistiche[0]['sommatoria_like'] + 1;
+            $nuovo_n_valutazioni = $statistiche[0]['risposte_valutate'] + 1;
+            if ($db->aggiornaStatsLike($email, $codice_categoria, $nuovi_likes, $nuovo_n_valutazioni)) { //vengono aggiornate
+                $responseData['error'] = false;
+                $responseData['message'] = "Like aggiornati";
+            } else { //non è stato possibile aggiornarle
+                $responseData['error'] = true;
+                $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
+            }
+        } elseif ($db->insertStatsLike($email, $codice_categoria)) { //Altrimenti la si crea
+            $responseData['error'] = false;
+            $responseData['message'] = "Statistiche create e like inserito";
+        } else { //non è stato possibile crearle
+            $responseData['error'] = true;
+            $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+        }
+        } else {
+            if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
+                $nuovi_dislikes = $statistiche[0]['sommatoria_dislike'] + 1;
+                $nuovo_n_valutazioni = $statistiche[0]['risposte_valutate'] + 1;
+                if ($db->aggiornaStatsDislike($email, $codice_categoria, $nuovi_dislikes, $nuovo_n_valutazioni)) { //vengono aggiornate
+                    $responseData['error'] = false;
+                    $responseData['message'] = "Dislike aggiornati";
+                } else { //non è stato possibile aggiornarle
+                    $responseData['error'] = true;
+                    $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
+                }
+            } elseif ($db->insertStatsDislike($email, $codice_categoria)) { //Altrimenti la si crea
+                $responseData['error'] = false;
+                $responseData['message'] = "Statistiche create e dislike inserito";
+            } else { //non è stato possibile crearle
+                $responseData['error'] = true;
+                $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+            }
+        }
     return $response->withJson($responseData);
 });
 
