@@ -262,19 +262,65 @@ $app->post('/controlloStats', function (Request $request, Response $response) {
     }
 });
 
-// endpoint: /contaValutazioni OK
+// endpoint: /selezionaRisposteValutate OK
+// Seleziona i codici delle risposte che hanno ricevuto almeno una valutazione
+// Da utilizzare in AggiornaStats
+$app->post('/selezionaRisposteValutate', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['email'];
+    $codice_categoria = $requestData['codice_categoria'];
+    $responseData['data'] = $db->selezionaRisposteValutate($email, $codice_categoria);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Codici" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Non è stato possibile trovare le risposte dell"utente o della categoria ricercata';
+        return $response->withJson($responseData);
+    }
+});
+
+// endpoint: /contaRisposteValutate OK
+// Conta il numero di risposte che hanno ricevuto una valutazione
 // Da utilizzare in AggiornaStats
 $app->post('/contaRisposteValutate', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
-    $responseData['data'] = $db->contaRisposteValutate($email, $codice_categoria);
+    $responseData['data'] = count($db->selezionaRisposteValutate($email, $codice_categoria));
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
-        $response->getBody()->write(json_encode(array("Statistiche" => $responseData)));
+        $response->getBody()->write(json_encode(array("Numero risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Non è stato possibile trovare le risposte dell"utente o della categoria ricercata';
+        return $response->withJson($responseData);
+    }
+});
+
+// endpoint: /contaValutazioni OK
+// Conta il numero di like e dislike ricevuti
+// Da utilizzare in AggiornaStats
+$app->post('/contaValutazioni', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['email'];
+    $codice_categoria = $requestData['codice_categoria'];
+    $cods = $db->selezionaRisposteValutate($email, $codice_categoria);
+    if ($cods != null) $responseData['data'] = $db->contaValutazioni($cods);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Numero risposte" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -289,50 +335,36 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
-    $tipo = $requestData['tipo_valutazione'];
-    if ($tipo !== "like" && $tipo !== "dislike"){
-        $responseData['error'] = true;
-        $responseData['message'] = "Il tipo inserito non è riconosciuto";
-        return $response->withJson($responseData);
-    }
     $statistiche = $db->controlloStats($email, $codice_categoria);
-    if ($tipo == "like"){
-        if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
-            $nuovi_likes = $statistiche[0]['sommatoria_like'] + 1;
-            $nuovo_n_valutazioni = $statistiche[0]['risposte_valutate'] + 1;
-            if ($db->aggiornaStatsLike($email, $codice_categoria, $nuovi_likes, $nuovo_n_valutazioni)) { //vengono aggiornate
-                $responseData['error'] = false;
-                $responseData['message'] = "Like aggiornati";
-            } else { //non è stato possibile aggiornarle
-                $responseData['error'] = true;
-                $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
-            }
-        } elseif ($db->insertStatsLike($email, $codice_categoria)) { //Altrimenti la si crea
+    $cods = $db->selezionaRisposteValutate($email, $codice_categoria);
+    $valutazioni = 0;
+    if ($cods != null) {
+        $valutazioni = $db->contaValutazioni($cods);
+        $nValutazioni = count($cods);
+        $nLike = $valutazioni ["num_like"];
+        $nDislike = $valutazioni ["num_dislike"];
+    } else {
+        $nValutazioni = 0;
+        $nLike = 0;
+        $nDislike = 0;
+    }
+//    echo $valutazioni ["num_like"];
+
+    if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
+        if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //vengono aggiornate
             $responseData['error'] = false;
-            $responseData['message'] = "Statistiche create e like inserito";
-        } else { //non è stato possibile crearle
+            $responseData['message'] = "Stats aggiornate correttamente";
+        } else { //non è stato possibile aggiornarle
             $responseData['error'] = true;
-            $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+            $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
         }
-        } else {
-            if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
-                $nuovi_dislikes = $statistiche[0]['sommatoria_dislike'] + 1;
-                $nuovo_n_valutazioni = $statistiche[0]['risposte_valutate'] + 1;
-                if ($db->aggiornaStatsDislike($email, $codice_categoria, $nuovi_dislikes, $nuovo_n_valutazioni)) { //vengono aggiornate
-                    $responseData['error'] = false;
-                    $responseData['message'] = "Dislike aggiornati";
-                } else { //non è stato possibile aggiornarle
-                    $responseData['error'] = true;
-                    $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
-                }
-            } elseif ($db->insertStatsDislike($email, $codice_categoria)) { //Altrimenti la si crea
-                $responseData['error'] = false;
-                $responseData['message'] = "Statistiche create e dislike inserito";
-            } else { //non è stato possibile crearle
-                $responseData['error'] = true;
-                $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
-            }
-        }
+    } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //Altrimenti la si crea
+        $responseData['error'] = false;
+        $responseData['message'] = "Statistiche create e like inserito";
+    } else { //non è stato possibile crearle
+        $responseData['error'] = true;
+        $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+    }
     return $response->withJson($responseData);
 });
 
@@ -1148,9 +1180,10 @@ $app->post('/modificaDomanda', function (Request $request, Response $response) {
     $titolo = $requestData['titolo'];
     $descrizione = $requestData['descrizione'];
     $cod_categoria = $requestData['cod_categoria'];
+    $cod_preferita = $requestData['cod_preferita'];
 
     $responseData = array();
-    $responseDB = $db->modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria);
+    $responseDB = $db->modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita);
 
     if ($responseDB) {
         $responseData['error'] = false;

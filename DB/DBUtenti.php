@@ -226,27 +226,27 @@ class DBUtenti
         }
     }
 
-    //Seleziono tutto il contenuto di una risposta secondo una determinata mail
-    public function contaRisposteValutate($email, $cod_categoria)
+    //Seleziono tutte le risposte valutate secondo una categoria e una mail
+    public function selezionaRisposteValutate($email, $cod_categoria)
     {
         $domandaTab = $this->tabelleDB[4];
         $rispostaTab = $this->tabelleDB[5];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
         $campiRisposta = $this->campiTabelleDB[$rispostaTab];
         //QUERY:
-        // "SELECT COUNT("codice_risposta")
-        //	FROM risposta JOIN domanda
-        //	WHERE risposta.cod_domanda = domanda.codice_domanda
-        //	AND (num_like > 0 OR num_dislike > 0)
-        //	AND domanda.cod_categoria = "valore codice categoria" (1)
-        //	AND risposta.cod_utente = "valore email" (pippo.cocainasd.com)
+        //SELECT codice_risposta
+        //FROM risposta LEFT JOIN domanda
+        //ON risposta.cod_domanda = domanda.codice_domanda
+        //WHERE (num_like > 0 OR num_dislike > 0)
+        // AND risposta.cod_utente = "pippo.cocainasd.com"
+        // AND domanda.cod_categoria = "1"
         $query = (
-                "SELECT COUNT(" . $campiRisposta[0] . ")" .
-                " FROM " . $rispostaTab . " JOIN " . $domandaTab .
-                " WHERE " . $rispostaTab . "." . $campiRisposta[5] . " = " . $domandaTab . "." . $campiDomanda[0] .
-                " AND (" .  $campiRisposta[2] . " > 0 OR " . $campiRisposta[3] . " > 0)" .
-                " AND " .  $domandaTab . "." . $campiDomanda[6] . " = ?" .
-                " AND " . $rispostaTab . "." . $campiRisposta[4] . " = ?"
+                "SELECT " . $campiRisposta[0] .
+                " FROM " . $rispostaTab . " ris LEFT JOIN " . $domandaTab . " dom " .
+                " ON ris." . $campiRisposta[5] . " = dom." . $campiDomanda[0] .
+                " WHERE (" .  $campiRisposta[2] . " > 0 OR " . $campiRisposta[3] . " > 0)" .
+                " AND dom." . $campiDomanda[6] . " = ?" .
+                " AND ris." . $campiRisposta[4] . " = ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
@@ -256,10 +256,55 @@ class DBUtenti
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($Nrisposte_valutate);
             $risposteTrovate = array();
-            if ($stmt->fetch()){
-                $risposteTrovate["valutazioni_ricevute"] = $Nrisposte_valutate;
+            while ($stmt->fetch()) { //Vado a prendermi la risposta della query
+                //Indicizzo con key i dati nell'array
+                $temp = $Nrisposte_valutate;
+                array_push($risposteTrovate, $temp); //Inserisco l'array $temp all'ultimo posto
             }
             return $risposteTrovate; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
+    //Seleziono tutto il contenuto di una risposta secondo una determinata mail
+    public function contaValutazioni($cods)
+    {
+        $rispostaTab = $this->tabelleDB[5];
+        $campiRisposta = $this->campiTabelleDB[$rispostaTab];
+        $in = str_repeat('?,', count($cods) - 1) . '?'; // placeholders
+        //QUERY:
+        //  SELECT SUM(num_like) as num_like,
+        //	SUM(num_dislike) as num_dislike
+        //	FROM risposta
+        //	WHERE codice_risposta IN
+        //	(valori della query precedente)
+        $query = (
+            " SELECT SUM(" . $campiRisposta[2] . ") as num_like," .
+            " SUM(" . $campiRisposta[3] . ") as num_dislike" .
+            " FROM " . $rispostaTab .
+            " WHERE " .  $campiRisposta[0] . " IN ($in)"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $types = str_repeat('i', count($cods));
+//        echo $in . "\n";
+//        echo $types . "\n";
+//        foreach ($cods as $cod){
+//            echo $cod . " ";
+//        }
+        $stmt->bind_param($types, ...$cods);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($nLikes, $nDislikes);
+            $valutazioniTrovate = array();
+            if ($stmt->fetch()) { //Vado a prendermi la risposta della query=
+                //Indicizzo con key i dati nell'array
+                $valutazioniTrovate[$campiRisposta[2]] = $nLikes;
+                $valutazioniTrovate[$campiRisposta[3]] = $nDislikes;
+            }
+            return $valutazioniTrovate; //ritorno array $risposte riempito con i risultati della query effettuata
         } else {
             return null;
         }
@@ -373,7 +418,7 @@ class DBUtenti
     }
 
     //Se la riga relativa alle statistiche utente per categoria è presente viene aggiornata
-    public function aggiornaStatsLike($id_utente, $id_categoria, $valutazione, $n_val)
+    public function aggiornaStats($id_utente, $id_categoria, $nLike, $nDislike, $n_ris)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
@@ -383,28 +428,6 @@ class DBUtenti
             $statsTab .
             " SET " .
             $campi[2] . " = ?, " .
-            $campi[4] . " = ? " .
-            "WHERE " .
-            $campi[0] . " = ? " .
-            "AND " .
-            $campi[1] . " = ?"
-        );
-        //Invio la query
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisi", $valutazione, $n_val, $id_utente, $id_categoria);
-        //Termina con la bool true se la sessione è andata a buon fine
-        return $stmt->execute();
-    }
-
-    public function aggiornaStatsDislike($id_utente, $id_categoria, $valutazione, $n_val)
-    {
-        $statsTab = $this->tabelleDB[1];
-        $campi = $this->campiTabelleDB[$statsTab];
-        //QUERY: UPDATE `stats` SET `sommatoria_valutazioni` = '$valutazione', `numero_valutazioni` = '$n_val' WHERE `cod_utente` = '$id_utente' AND cod_categoria` = $id_categoria
-        $query = (
-            "UPDATE " .
-            $statsTab .
-            " SET " .
             $campi[3] . " = ?, " .
             $campi[4] . " = ? " .
             "WHERE " .
@@ -414,57 +437,34 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisi", $valutazione, $n_val, $id_utente, $id_categoria);
+        $stmt->bind_param("iiisi", $nLike, $nDislike, $n_ris, $id_utente, $id_categoria);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
 
     //Visto che non è ancora presente in DB, la si crea
-    public function insertStatsLike($id_utente, $id_categoria)
+    public function insertStats($id_utente, $id_categoria, $nLike, $nDislike, $n_ris)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
         //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
         $query = (
-            "INSERT INTO " .
+            "INSERT INTO" . " " .
             $statsTab . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
             $campi[2] . ", " .
-            $campi[4] . ") " .
-            "VALUES " . "( " .
-            "? , " .
-            "? , " .
-            "1 , " .
-            "1 )"
-        );
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("si", $id_utente, $id_categoria);
-        //Termina con la bool true se la sessione è andata a buon fine
-        return $stmt->execute();
-    }
-
-    //Visto che non è ancora presente in DB, la si crea
-    public function insertStatsDislike($id_utente, $id_categoria)
-    {
-        $statsTab = $this->tabelleDB[1];
-        $campi = $this->campiTabelleDB[$statsTab];
-        //QUERY: INSERT INTO `stats` (`cod_utente`, `cod_categoria`, `sommatoria_valutazioni`, `numero_valutazioni`) VALUES ('$id_utente', '$id_categoria', '$valutazione', '1');
-        $query = (
-            "INSERT INTO " .
-            $statsTab . " (" .
-            $campi[0] . ", " .
-            $campi[1] . ", " .
             $campi[3] . ", " .
             $campi[4] . ") " .
             "VALUES " . "( " .
             "? , " .
             "? , " .
-            "1 , " .
-            "1 )"
+            "? , " .
+            "? , " .
+            "? )"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("si", $id_utente, $id_categoria);
+        $stmt->bind_param("siiii", $id_utente, $id_categoria, $nLike, $nDislike, $n_ris);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
@@ -894,7 +894,7 @@ class DBUtenti
     }
 
 //Modifica domanda num10 PARTE 2
-    public function modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria)
+    public function  modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita)
     {
 
         $tabella = $this->tabelleDB[4];
@@ -905,21 +905,22 @@ class DBUtenti
         //
         //                        WHERE = $Id_domanda_selezionata
         $query = (
-            "UPDATE" .
+            "UPDATE " .
             $tabella . " " .
-            "SET" .
-            $campi[1] . " = ? " .
-            $campi[2] . " = ? " .
-            $campi[3] . " = ? " .
-            $campi[4] . " = ? " .
-            $campi[6] . " = ? " .
-            "WHERE" .
+            "SET " .
+            $campi[1] . " = ? ," .
+            $campi[2] . " = ? ," .
+            $campi[3] . " = ? ," .
+            $campi[4] . " = ? ," .
+            $campi[6] . " = ? ," .
+            $campi[7] . " = ? " .
+            " WHERE " .
             $campi[0] . " = ? "
         );
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("isissi", $codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria);
+        $stmt->bind_param("ssssiii",  $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita, $codice_domanda);
         return $stmt->execute();
     }
 
@@ -1289,7 +1290,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
             $domande = array(); //controlla
             while ($stmt->fetch()) {
                 $temp = array(); //
@@ -1301,6 +1302,7 @@ class DBUtenti
                 $temp[$campi[4]] = $descrizione;
                 $temp[$campi[5]] = $cod_utente;
                 $temp[$campi[6]] = $cod_categoria;
+                $temp[$campi[7]] = $cod_preferita;
                 array_push($domande, $temp);
 
             }
