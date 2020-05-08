@@ -1194,6 +1194,36 @@ $app->delete('/cancellaDomanda/{codice_domanda}', function (Request $request, Re
     return $response->withJson($responseData);
 });
 
+//endpoint: /rimuoviSondaggio
+$app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $codice = $request->getAttribute("codice_sondaggio");
+
+    //Stampa codice passed
+    echo "\n\n Codice passato: " . $codice;
+
+    $responseData = array();
+
+    $responseDB = $db->rimuoviSondaggio($codice);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Sondaggio rimosso con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, sondaggio non rimosso'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+
+    /*Per il testing in Postman:
+       -selezionare come method DELETE
+       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
+       -send
+    */
+});
 
 /**** ENDPOINT ****/
 

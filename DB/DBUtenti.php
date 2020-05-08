@@ -1601,6 +1601,32 @@ class DBUtenti
         }
     }
 
+//Rimuovi sondaggio per id
+    public function rimuoviSondaggio($codice_sondaggio)
+    {
+        $tabella = $this->tabelleDB[6]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  " DELETE FROM sondaggio WHERE ID = $codice_risposta"
+
+        $query = (
+            "DELETE FROM " .
+            $tabella . " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+        if ($this->visualizzaSondaggio($codice_sondaggio) == null) {
+            ////Controllo se esiste, non restituiva error nel caso in cui si passava un codice non esistente nel db.
+            //Potrebbe anche essere eliminato il controllo perchè dovrebbe essere impossibibile passare un codice non esistente dall' app.
+            return null;
+        } else {
+            $stmt = $this->connection->prepare($query);
+            $stmt->bind_param("i", $codice_sondaggio);
+            $result = $stmt->execute();
+            $stmt->store_result();
+
+            return $result;
+        }
+    }
 
 }
 ?>
