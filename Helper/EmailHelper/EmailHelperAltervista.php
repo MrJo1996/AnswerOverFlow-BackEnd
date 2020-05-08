@@ -28,6 +28,24 @@ class EmailHelperAltervista
 
     }
 
+    function sendPropostaCategoriaEmail($selezione, $proposta){
+        $messaggio = "Abbiamo ricevuto una nuova proposta per una categoria o sottocategoria!";
+
+        $emailTo = "francesco.iafi@gmail.com";
+        $subject = "AnsweroOverFlow - Nuova proposta per categoria o sottocategoria";
+        $message = '<html><body><h1>AnswerOverFLow</h1><div>';
+        $message .= $messaggio . '<br><br>Categoria selezionata: ' . $selezione . '<br>Nuova proposta: ' . $proposta . '</div></body></html>';
+        $headers = "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+
+        try{
+            mail($emailTo, $subject, $message, $headers);
+            return true;
+        } catch(Exception $e){
+            return false;
+        }
+    }
+
     //Funzione per inviare un'email di conferma dell'account
     function sendConfermaAccount($email, $link){
 

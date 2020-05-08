@@ -128,6 +128,23 @@ $app->post('/controlloEmail', function (Request $request, Response $response) {
     }
 });
 
+$app->post('/proponi_cat_o_sottocat', function (Request $request, Response $response){
+    $requestData = $request->getParsedBody();
+    $selezione = $requestData['selezione'];
+    $proposta = $requestData['proposta'];
+    $emailSender = new EmailHelperAltervista();
+    $responseData = array();
+
+    if($emailSender->sendPropostaCategoriaEmail($selezione, $proposta)){
+        $responseData['error'] = false;
+        $responseData['message'] = "Proposta inviata con successo";
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = "Impossibile inviare la proposta";
+    }
+    return $response->withJson($responseData);
+});
+
 //endpoint /recupero password/modifica password
 //ci sono da apportare modifiche alla funzione EmailSender
 $app->post('/recupero', function (Request $request, Response $response) {
