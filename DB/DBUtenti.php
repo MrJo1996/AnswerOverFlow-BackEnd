@@ -1706,5 +1706,28 @@ class DBUtenti
         }
     }
 
+
+    //Modifica profilo utente
+    public function modificaPasssword($password, $email)
+    {
+        $utenteTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$utenteTab];
+        //QUERY: UPDATE `utente` SET `Password`=[value-2], WHERE Email = “email_utente_corrente”
+        $query = (
+            "UPDATE " .
+            $utenteTab . " " .
+            "SET " .
+            $utenteTab . "." . $campi[2] . "= ?," .
+            "WHERE " .
+            $utenteTab . "." . $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $password, $email);
+        $result = $stmt->execute();
+        return $result;
+    }
+
+
 }
 ?>

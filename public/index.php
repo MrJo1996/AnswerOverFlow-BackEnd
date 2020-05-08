@@ -1285,6 +1285,30 @@ $app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request,
     */
 });
 
+//endpoint: /modificaPassword...OK
+$app->post('/modificaPassword', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+
+    $password = $requestData['password'];
+    $email = $requestData['email'];
+
+    $responseData = array();
+    $responseDB = $db->modificaPasssword($password,  $email);
+
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Modifica effettuata con successo';
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Impossibile effettuare la modifica';
+    }
+    return $response->withJson($responseData);
+});
+
+
 /**** ENDPOINT ****/
 
 
