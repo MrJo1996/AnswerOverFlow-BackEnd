@@ -319,6 +319,37 @@ class DBUtenti
         }
     }
 
+    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
+    public function ricercaCategorie()
+    {
+        $categoriaTab = $this->tabelleDB[2];
+        $campi = $this->campiTabelleDB[$categoriaTab];
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $categoriaTab
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_categoria, $titolo);
+            $categorie = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_categoria;
+                $temp[$campi[1]] = $titolo;
+                array_push($categorie, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $categorie; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
     //Seleziono tutte le risposte valutate secondo una categoria e una mail
     public function selezionaRisposteValutate($email, $cod_categoria)
     {

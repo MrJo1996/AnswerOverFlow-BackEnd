@@ -279,7 +279,23 @@ $app->post('/inserisciScelteSondaggio', function (Request $request, Response $re
     }
 });
 
+// endpoint: /ricercaCategorie
+$app->post('/ricercaCategorie', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $responseData['data'] = $db->ricercaCategorie();
 
+    if ($responseData['data']) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Categorie" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Non è stato possibile comunicare col DB o non sono presenti Categorie';
+        return $response->withJson($responseData);
+    }
+});
 
 // endpoint: /controlloStats OK
 $app->post('/controlloStats', function (Request $request, Response $response) {
