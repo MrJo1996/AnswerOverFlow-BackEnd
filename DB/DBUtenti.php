@@ -1754,9 +1754,9 @@ class DBUtenti
             "UPDATE " .
             $utenteTab . " " .
             "SET " .
-            $utenteTab . "." . $campi[2] . "= ?," .
+            $campi[2] . " = ? " .
             "WHERE " .
-            $utenteTab . "." . $campi[0] . "= ?"
+            $campi[0] . " = ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
