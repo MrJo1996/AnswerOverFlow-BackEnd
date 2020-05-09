@@ -108,6 +108,24 @@ $app->post('/visualizzaRisposteUtente', function (Request $request, Response $re
     }
 });
 
+$app->post('/visualizzaChats', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['codice_utente'];
+
+    $responseData['data'] = $db->visualizzaChats($cod_utente);
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Chats" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 
 // endpoint: /controlloEmail OK
 $app->post('/controlloEmail', function (Request $request, Response $response) {

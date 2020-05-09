@@ -226,6 +226,43 @@ class DBUtenti
         }
     }
 
+    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
+    public function visualizzaChats($codice_utente)
+    {
+        $chatTab = $this->tabelleDB[8];
+        $campi = $this->campiTabelleDB[$chatTab];
+        //QUERY: SELECT * FROM chat WHERE (cod_utente0 = "gmailverificata" OR cod_utente1 = "gmailverificata")
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $chatTab . " " .
+            "WHERE (" .
+            $campi[1] . " = ? OR " .
+            $campi[2] . " = ?)"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $codice_utente, $codice_utente);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_chat, $cod_utente0, $cod_utente1);
+            $chats = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_chat;
+                $temp[$campi[1]] = $cod_utente0;
+                $temp[$campi[2]] = $cod_utente1;
+                array_push($chats, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $chats; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
     //Seleziono tutte le risposte valutate secondo una categoria e una mail
     public function selezionaRisposteValutate($email, $cod_categoria)
     {
@@ -545,7 +582,7 @@ class DBUtenti
         $attivo = 0;
 
         $query = (
-            "INSERT INTO " .
+            "INSERT INTO" . " " .
             $tabella . " (" .
             $campi[0] . ", " .
             $campi[1] . ", " .
@@ -1043,8 +1080,6 @@ class DBUtenti
         } else {
             return null;
         }
-
-
     }
 
 
