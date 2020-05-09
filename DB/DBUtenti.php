@@ -1800,12 +1800,12 @@ class DBUtenti
     }
 
 
-    //Modifica profilo utente
+
     public function modificaPasssword($password, $email)
     {
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
-        //QUERY: UPDATE `utente` SET `Password`=[value-2], WHERE Email = “email_utente_corrente”
+
         $query = (
             "UPDATE " .
             $utenteTab . " " .
