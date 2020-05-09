@@ -241,8 +241,7 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
 });
 
 // endpoint: /ricercaScelteDelSondaggio
-// Non ha più la chiamata al DB che la fa funzionare
-$app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $response) {
+$app->post('/ricercaScelteSondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
     $codice_sondaggio = $requestData['codice_sondaggio'];
@@ -260,7 +259,25 @@ $app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $r
     }
 });
 
+// endpoint: /inserisciScelteDelSondaggio
+$app->post('/inserisciScelteSondaggio', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_sondaggio = $requestData['codice_sondaggio'];
+    $descrizione = $requestData['descrizione'];
+    $responseData['data'] = $db->insertScelte($descrizione, $codice_sondaggio);
 
+    if ($responseData['data']) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Scelte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Le scelte del sondaggio non sono state inserite';
+        return $response->withJson($responseData);
+    }
+});
 
 
 

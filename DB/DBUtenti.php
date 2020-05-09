@@ -162,6 +162,27 @@ class DBUtenti
         }
     }
 
+    //Visto che non è ancora presente in DB, la si crea
+    public function insertScelte($descrizione, $cod_sondaggio)
+    {
+        $scelteTab = $this->tabelleDB[7];
+        $campi = $this->campiTabelleDB[$scelteTab];
+        //QUERY: INSERT INTO `scelta` () VALUES ();
+        $query = (
+            "INSERT INTO" . " " .
+            $scelteTab . " (" .
+            $campi[1] . ", " .
+            $campi[3] . ") " .
+            "VALUES " . "( " .
+            "? , " .
+            "? )"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("si", $descrizione, $cod_sondaggio);
+        //Termina con la bool true se la sessione è andata a buon fine
+        return $stmt->execute();
+    }
+
     //Una volta che l'utente mi ha confermato la mail inviata cambio la password
     public function recuperaPassword($email, $password)
     {
