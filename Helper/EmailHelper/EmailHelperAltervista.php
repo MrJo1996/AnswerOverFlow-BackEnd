@@ -32,7 +32,7 @@ class EmailHelperAltervista
         $messaggio = "Abbiamo ricevuto una nuova proposta per una categoria o sottocategoria!";
 
         $emailTo = "francesco.iafi@gmail.com";
-        $subject = "AnsweroOverFlow - Nuova proposta per categoria o sottocategoria";
+        $subject = "AnswerOverFlow - Nuova proposta per categoria o sottocategoria";
         $message = '<html><body><h1>AnswerOverFLow</h1><div>';
         $message .= $messaggio . '<br><br>Categoria selezionata: ' . $selezione . '<br>Nuova proposta: ' . $proposta . '</div></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
