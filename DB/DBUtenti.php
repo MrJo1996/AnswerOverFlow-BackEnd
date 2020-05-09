@@ -127,6 +127,41 @@ class DBUtenti
         return $stmt->num_rows > 0;
     }
 
+    public function ricercaScelteDelSondaggio($codice_sondaggio)
+    {
+        $sceltaTab = $this->tabelleDB[7]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$sceltaTab]; //Campi per la query
+        $query = (
+            "SELECT * " .
+            "FROM " .
+            $sceltaTab . " " .
+            "WHERE " .
+            $campi[3] . " = ? "
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_sondaggio);
+        $stmt->execute();
+        //Ricevo la risposta del DB
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_scelta, $descrizione, $num_favorevoli, $cod_sondaggio);
+            $scelte = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_scelta;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $num_favorevoli;
+                $temp[$campi[3]] = $cod_sondaggio;
+                array_push($scelte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $scelte; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
     //Una volta che l'utente mi ha confermato la mail inviata cambio la password
     public function recuperaPassword($email, $password)
     {

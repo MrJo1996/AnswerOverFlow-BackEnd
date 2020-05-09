@@ -251,7 +251,7 @@ $app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $r
     if ($responseData['data']) {
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
-        $response->getBody()->write(json_encode(array("Statistiche" => $responseData)));
+        $response->getBody()->write(json_encode(array("Scelte" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -259,6 +259,10 @@ $app->post('/ricercaScelteDelSondaggio', function (Request $request, Response $r
         return $response->withJson($responseData);
     }
 });
+
+
+
+
 
 // endpoint: /controlloStats OK
 $app->post('/controlloStats', function (Request $request, Response $response) {
