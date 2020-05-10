@@ -87,6 +87,26 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
     }
 });
 
+//endpoint: visualizzaRispostePerDomanda
+$app->post('/visualizzarisposteperdomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_domanda = $requestData['cod_domanda'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaRispostePerDomanda($cod_domanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 
 // endpoint: /visualizzaRisposta OK
 $app->post('/visualizzaRisposteUtente', function (Request $request, Response $response) {
@@ -241,6 +261,28 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
 });
 
 // endpoint: /ricercaScelteDelSondaggio
+
+
+/*$app->post('/visualizzadomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_domanda = $requestData['codice_domanda'];
+    //Controllo la domanda dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaDomanda($codice_domanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+*/
 $app->post('/ricercaScelteSondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();

@@ -365,12 +365,12 @@ class DBUtenti
         // AND risposta.cod_utente = "pippo.cocainasd.com"
         // AND domanda.cod_categoria = "1"
         $query = (
-                "SELECT " . $campiRisposta[0] .
-                " FROM " . $rispostaTab . " ris LEFT JOIN " . $domandaTab . " dom " .
-                " ON ris." . $campiRisposta[5] . " = dom." . $campiDomanda[0] .
-                " WHERE (" .  $campiRisposta[2] . " > 0 OR " . $campiRisposta[3] . " > 0)" .
-                " AND dom." . $campiDomanda[6] . " = ?" .
-                " AND ris." . $campiRisposta[4] . " = ?"
+            "SELECT " . $campiRisposta[0] .
+            " FROM " . $rispostaTab . " ris LEFT JOIN " . $domandaTab . " dom " .
+            " ON ris." . $campiRisposta[5] . " = dom." . $campiDomanda[0] .
+            " WHERE (" . $campiRisposta[2] . " > 0 OR " . $campiRisposta[3] . " > 0)" .
+            " AND dom." . $campiDomanda[6] . " = ?" .
+            " AND ris." . $campiRisposta[4] . " = ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
@@ -407,7 +407,7 @@ class DBUtenti
             " SELECT SUM(" . $campiRisposta[2] . ") as num_like," .
             " SUM(" . $campiRisposta[3] . ") as num_dislike" .
             " FROM " . $rispostaTab .
-            " WHERE " .  $campiRisposta[0] . " IN ($in)"
+            " WHERE " . $campiRisposta[0] . " IN ($in)"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
@@ -897,7 +897,7 @@ class DBUtenti
             "UPDATE " .
             $tabella . " " .
             "SET " .
-            $campi[2] . " = ".$campi[2]." +1 ".
+            $campi[2] . " = " . $campi[2] . " +1 " .
             "WHERE " .
             $campi[0] . "= ?"
         );
@@ -906,7 +906,7 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i",$codice_risposta);
+        $stmt->bind_param("i", $codice_risposta);
 
         $result = $stmt->execute();
 
@@ -924,7 +924,7 @@ class DBUtenti
             "UPDATE " .
             $tabella . " " .
             "SET " .
-            $campi[3] . " = ".$campi[3]." +1 " .
+            $campi[3] . " = " . $campi[3] . " +1 " .
             "WHERE " .
             $campi[0] . "= ?"
         );
@@ -1018,7 +1018,7 @@ class DBUtenti
     }
 
 //Modifica domanda num10 PARTE 2
-    public function  modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita)
+    public function modificaDomanda($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita)
     {
 
         $tabella = $this->tabelleDB[4];
@@ -1044,7 +1044,7 @@ class DBUtenti
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ssssiii",  $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita, $codice_domanda);
+        $stmt->bind_param("ssssiii", $dataeora, $timer, $titolo, $descrizione, $cod_categoria, $cod_preferita, $codice_domanda);
         return $stmt->execute();
     }
 
@@ -1153,6 +1153,7 @@ class DBUtenti
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat);
             $messaggio = array();
+
             while ($stmt->fetch()) {
                 $temp = array();
 
@@ -1302,7 +1303,7 @@ class DBUtenti
             $campi[0] . " = ? "
         );
 
-       // echo $query . "CIAOOOOOOOO";
+        // echo $query . "CIAOOOOOOOO";
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("i", $id_domanda_selezionata);
@@ -1765,16 +1766,16 @@ class DBUtenti
         $query = (
             "SELECT " .
             "  " .
-            $campiUtente[0].
-            "  ,".
-            $campiUtente[1].
-            "  ,".
-            $campiUtente[3].
-            "  ,".
-            $campiUtente[4].
-            "  ,".
-            $campiUtente[5].
-            "   ".
+            $campiUtente[0] .
+            "  ," .
+            $campiUtente[1] .
+            "  ," .
+            $campiUtente[3] .
+            "  ," .
+            $campiUtente[4] .
+            "  ," .
+            $campiUtente[5] .
+            "   " .
             "FROM  " .
             $utenteTab . "  " .
             "WHERE  " .
@@ -1852,6 +1853,56 @@ class DBUtenti
         return $result;
     }
 
+    public function visualizzaRispostePerDomanda($cod_domanda)
+    {
+        $rispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$rispostaTab];
+
+        /* "risposta" => [
+            "codice_risposta",
+            "descrizione",
+            "num_like",
+            "num_dislike",
+            "cod_utente",
+            "cod_domanda"
+        ],*/
+
+
+        //QUERY: "SELECT * FROM `risposta` WHERE ID = 'value'"
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $rispostaTab . " " .
+            "WHERE " .
+            $campi[5] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $cod_domanda);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_risposta, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
+            $risposte = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_risposta;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $num_like;
+                $temp[$campi[3]] = $num_dislike;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_domanda;
+                array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
 
 }
+
 ?>
