@@ -432,36 +432,36 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
-    $statistiche = $db->controlloStats($email, $codice_categoria);
     $cods = $db->selezionaRisposteValutate($email, $codice_categoria);
-    $valutazioni = 0;
     if ($cods != null) {
         $valutazioni = $db->contaValutazioni($cods);
-        $nValutazioni = count($cods);
         $nLike = $valutazioni ["num_like"];
         $nDislike = $valutazioni ["num_dislike"];
+        $nValutazioni = count($cods);
+        $statistiche = $db->controlloStats($email, $codice_categoria);
+
+        if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
+            if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //vengono aggiornate
+                $responseData['error'] = false;
+                $responseData['message'] = "Stats aggiornate correttamente";
+            } else { //non è stato possibile aggiornarle
+                $responseData['error'] = true;
+                $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
+            }
+        } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //Altrimenti la si crea
+            $responseData['error'] = false;
+            $responseData['message'] = "Statistiche create e like inserito";
+        } else { //non è stato possibile crearle
+            $responseData['error'] = true;
+            $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
+        }
     } else {
-        $nValutazioni = 0;
-        $nLike = 0;
-        $nDislike = 0;
+        $responseData['error'] = true;
+        $responseData['message'] = "Non ha senso aggiornare le statistiche perchè l'utente non
+        esiste o non ha risposto a domande nelle categoria immessa";
     }
 //    echo $valutazioni ["num_like"];
 
-    if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
-        if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //vengono aggiornate
-            $responseData['error'] = false;
-            $responseData['message'] = "Stats aggiornate correttamente";
-        } else { //non è stato possibile aggiornarle
-            $responseData['error'] = true;
-            $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
-        }
-    } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //Altrimenti la si crea
-        $responseData['error'] = false;
-        $responseData['message'] = "Statistiche create e like inserito";
-    } else { //non è stato possibile crearle
-        $responseData['error'] = true;
-        $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
-    }
     return $response->withJson($responseData);
 });
 
@@ -942,6 +942,7 @@ $app->post('/inseriscisondaggio', function (Request $request, Response $response
 
     $responseDB = $db->inserisciSondaggio($dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
     if ($responseDB) {
+        $responseData['data'] = $db->prendiCodiceSondaggio($cod_utente);
         $responseData['error'] = false;
         $responseData['message'] = 'Sondaggio inserito con successo'; //Messaggio di esito positivo
 

@@ -1626,6 +1626,41 @@ class DBUtenti
         return $stmt->execute();
     }
 
+    //Prende l'ultimo codice del sondaggio inserito dall'utente
+    public function prendiCodiceSondaggio($cod_utente)
+    {
+        $SondaggioTab = $this->tabelleDB[6];
+        $campiSondaggio = $this->campiTabelleDB[$SondaggioTab];
+
+        //QUERY: SELECT codice_sondaggio
+        //	    FROM sondaggio
+        //	    WHERE cod_utente="gmailverificata"
+        //	    ORDER BY codice_sondaggio DESC LIMIT 1
+
+        $query = (
+            "SELECT" . " " .
+            $campiSondaggio[0] . " " .
+            "FROM" . " " .
+            $SondaggioTab . " " .
+            "WHERE" . " " .
+            $campiSondaggio[4] . " = ? " .
+            "ORDER BY " . $campiSondaggio[0] . " DESC LIMIT 1"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s",$cod_utente);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio);
+
+            if ($stmt->fetch()) {
+                $temp[$campiSondaggio[0]] = $codice_sondaggio;
+            }
+        return $temp;
+        } else return null;
+    }
+
 
     // trovaCodChat
 
@@ -1663,7 +1698,6 @@ class DBUtenti
                 array_push($cod_chat_array, $temp);
             }
         }
-
         return $cod_chat_array;
     }
 
