@@ -1439,6 +1439,28 @@ $app->post('/modificaPassword', function (Request $request, Response $response) 
     return $response->withJson($responseData);
 });
 
+// endpoint che serve per visualizzare le domande nella home
+$app->post('/visualizzadomandehome', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    //Controllo la domanda dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaDomandeHome();
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Domande visualizzate con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+
+
+});
 
 /**** ENDPOINT ****/
 

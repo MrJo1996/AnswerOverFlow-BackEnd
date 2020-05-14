@@ -1436,6 +1436,66 @@ class DBUtenti
 
     }
 
+    public function visualizzaDomandeHome()
+    {
+
+
+        $domandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$domandaTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+        /*
+         *
+         *          codice_domanda",
+                    "dataeora",
+                    "timer",
+                    "titolo",
+                    "descrizione",
+                    "cod_utente",
+                    "cod_categoria",
+                    "cod_preferita"*/
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE " .
+            $campi[2] . " > '00:00:00' " .
+            " " .
+            "ORDER by " .
+            $campi[1] .
+            " " .
+            "DESC"
+        );
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
+            $domande = array();
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_domanda;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $timer;
+                $temp[$campi[3]] = $titolo;
+                $temp[$campi[4]] = $descrizione;
+                $temp[$campi[5]] = $cod_utente;
+                $temp[$campi[6]] = $cod_categoria;
+                $temp[$campi[7]] = $cod_preferita;
+                array_push($domande, $temp);
+
+            }
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+
 
     public function eliminaProfilo($email)
     {
@@ -1647,7 +1707,7 @@ class DBUtenti
             "ORDER BY " . $campiSondaggio[0] . " DESC LIMIT 1"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("s",$cod_utente);
+        $stmt->bind_param("s", $cod_utente);
         $stmt->execute();
         $stmt->store_result();
 
@@ -1657,7 +1717,7 @@ class DBUtenti
             if ($stmt->fetch()) {
                 $temp[$campiSondaggio[0]] = $codice_sondaggio;
             }
-        return $temp;
+            return $temp;
         } else return null;
     }
 
@@ -1864,7 +1924,6 @@ class DBUtenti
             return $result;
         }
     }
-
 
 
     public function modificaPasssword($password, $email)
