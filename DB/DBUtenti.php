@@ -2090,6 +2090,44 @@ class DBUtenti
 
     }
 
+    public function visualizzaCategoria($codice_categoria)
+    {
+        $categoriaTab = $this->tabelleDB[2];
+        $campi = $this->campiTabelleDB[$categoriaTab];
+        //QUERY: SELECT email, username, nome, cognome, bio FROM `utente` WHERE Email = 'value'
+        /*   "categoria" => [
+            "codice_categoria",
+            "titolo"
+        ],*/
+        $query = (
+            "SELECT *" .
+            "FROM " .
+            $categoriaTab . " " .
+            "WHERE " .
+            $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_categoria);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_categoria, $titolo);
+            $categorie = array();
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campi[0]] = $codice_categoria;
+                $temp[$campi[1]] = titolo;
+                array_push($categorie, $temp);
+            }
+            return $categorie;
+        } else {
+            return null;
+        }
+    }
+
 }
 
 ?>
