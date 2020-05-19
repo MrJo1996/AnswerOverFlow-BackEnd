@@ -663,7 +663,7 @@ $app->post('/modifica_tipo_like', function (Request $request, Response $response
         $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
 
     } else { //Se c'è stato un errore imprevisto
-        $responseData['error'] = true; //Campo errore = true
+        $responseData['error'] = true; //Campo errore = truev
         $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
     }
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
