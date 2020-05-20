@@ -1604,12 +1604,13 @@ $app->post('/votasondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_scelta = $requestData['codice_scelta'];
     $cod_sondaggio = $requestData['cod_sondaggio'];
 
 
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
-    $responseDB = $db->votaSondaggio($cod_sondaggio);
+    $responseDB = $db->votaSondaggio($codice_scelta, $cod_sondaggio);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
