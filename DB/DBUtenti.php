@@ -2135,9 +2135,8 @@ class DBUtenti
         $DomandaTab = $this->tabelleDB[4];
         $campi = $this->campiTabelleDB[$DomandaTab];
 
-        /*SELECT COUNT(*) AS num_risposte, cod_categoria FROM risposta ris JOIN domanda dom
-        WHERE ris.cod_domanda = dom.codice_domanda AND ris.cod_utente = "gmailverificata"
-        GROUP BY dom.cod_categoria ORDER BY dom.cod_categoria
+        /*SELECT COUNT(*) AS num_domande, cod_categoria FROM domanda WHERE cod_utente ="gmailverificata"
+        GROUP BY cod_categoria ORDER BY cod_categoria
          "codice_domanda",
                 "dataeora",
                 "timer",
@@ -2146,14 +2145,10 @@ class DBUtenti
                 "cod_utente",
                 "cod_categoria",
                 "cod_preferita"
-
-
-
-
         */
         $query = (
             "SELECT " .
-            "  COUNT(*) AS num_domande, " .
+            "  COUNT(*) AS num_risposte, " .
             $campi[6] . " " .
             "FROM " .
             $DomandaTab . " " .
@@ -2188,6 +2183,157 @@ class DBUtenti
         }
 
     }
+
+
+
+
+    public function visualizzaStatisticherisposta($cod_utente)
+    {
+
+        $RispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$RispostaTab];
+        $DomandaTab = $this->tabelleDB[4];
+        $campiD = $this->campiTabelleDB[$DomandaTab];
+
+        /*SELECT COUNT(*) AS num_risposte, cod_categoria FROM risposta ris JOIN domanda dom
+        WHERE ris.cod_domanda = dom.codice_domanda AND ris.cod_utente = "gmailverificata"
+        GROUP BY dom.cod_categoria ORDER BY dom.cod_categoria LIMIT 3
+
+         "codice_domanda",
+                "dataeora",
+                "timer",
+                "titolo",
+                "descrizione",
+                "cod_utente",
+                "cod_categoria",
+                "cod_preferita"
+
+
+        "risposta" => [
+            "codice_risposta",
+            "descrizione",
+            "num_like",
+            "num_dislike",
+            "cod_utente",
+            "cod_domanda"
+        ],
+        */
+        $query = (
+            "SELECT " .
+            "  COUNT(*) AS num_domande, " .
+            $campiD[6] . " " .
+            "FROM " .
+            $RispostaTab . " " .
+            "JOIN " .
+            $DomandaTab . " " .
+            "WHERE " .
+            $campi[5]=$campiD[0] . " " .
+            $campi[5] . " = ? " .
+            " GROUP BY " . $campiD[6] . " " .
+            " ORDER BY " . $campiD[6] . " " .
+            "LIMIT 3"
+
+
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_risposte, $cod_categoria);
+            $risposte = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp["num_risposte"] = $num_risposte;
+                $temp[$campiD[6]] = $cod_categoria;
+                array_push($risposte, $temp);
+
+            }
+            return $risposte;
+        } else {
+            return null;
+        }
+
+    }
+
+
+
+    public function visualizzaStatisticheTOTrisposta($cod_utente)
+    {
+
+        $RispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$RispostaTab];
+        $DomandaTab = $this->tabelleDB[4];
+        $campiD = $this->campiTabelleDB[$DomandaTab];
+
+        /*SELECT COUNT(*) AS num_risposte, cod_categoria FROM risposta ris JOIN domanda dom
+        WHERE ris.cod_domanda = dom.codice_domanda AND ris.cod_utente = "gmailverificata"
+        GROUP BY dom.cod_categoria ORDER BY dom.cod_categoria
+
+         "codice_domanda",
+                "dataeora",
+                "timer",
+                "titolo",
+                "descrizione",
+                "cod_utente",
+                "cod_categoria",
+                "cod_preferita"
+
+
+        "risposta" => [
+            "codice_risposta",
+            "descrizione",
+            "num_like",
+            "num_dislike",
+            "cod_utente",
+            "cod_domanda"
+        ],
+        */
+        $query = (
+            "SELECT " .
+            "  COUNT(*) AS num_domande, " .
+            $campiD[6] . " " .
+            "FROM " .
+            $RispostaTab . " " .
+            "JOIN " .
+            $DomandaTab . " " .
+            "WHERE " .
+            $campi[5]=$campiD[0] . " " .
+                $campi[5] . " = ? " .
+                " GROUP BY " . $campiD[6] . " " .
+                " ORDER BY " . $campiD[6] . " "
+
+
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_risposte, $cod_categoria);
+            $risposte = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp["num_risposte"] = $num_risposte;
+                $temp[$campiD[6]] = $cod_categoria;
+                array_push($risposte, $temp);
+
+            }
+            return $risposte;
+        } else {
+            return null;
+        }
+
+    }
+
 
 }
 ?>

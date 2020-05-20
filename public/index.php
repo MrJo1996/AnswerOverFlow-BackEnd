@@ -1530,16 +1530,39 @@ $app->post('/visualizzacategoria', function (Request $request, Response $respons
 
 
 $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Response $response) {
+        $db = new DBUtenti();
+        $requestData = $request->getParsedBody();
+        $cod_utente = $requestData['cod_utente'];
+        //Controllo la domanda dal DB e compilo i campi della risposta
+        $responseData['data'] = $db->visualizzaStatisticheDomanda($cod_utente);
+
+        if ($responseData['data'] != null) {
+            $responseData['error'] = false; //Campo errore = false
+            $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+            $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+            //Metto in un json e lo inserisco nella risposta del servizio REST
+            //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+            return $response->withHeader('Content-type', 'application/json');
+        } else {
+            $responseData['error'] = true; //Campo errore = true
+            $responseData['message'] = 'Errore imprevisto';
+            return $response->withJson($responseData);
+        }
+
+
+});
+
+$app->post('/visualizzaStatisticherisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
-    //Controllo la domanda dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->visualizzaStatisticheDomanda($cod_utente);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaStatisticherisposta($cod_utente);
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
         //Metto in un json e lo inserisco nella risposta del servizio REST
         //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
         return $response->withHeader('Content-type', 'application/json');
@@ -1551,6 +1574,32 @@ $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Respo
 
 
 });
+
+
+$app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaStatisticherisposta($cod_utente);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+
+
+});
+
+
 
 
 /**** ENDPOINT ****/
