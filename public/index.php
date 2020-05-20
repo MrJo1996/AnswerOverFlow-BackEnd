@@ -1599,6 +1599,29 @@ $app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Resp
 
 });
 
+// endpoint: /votaSondaggio
+$app->post('/votasondaggio', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $cod_sondaggio = $requestData['cod_sondaggio'];
+
+
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->votaSondaggio($cod_sondaggio);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Sondaggio votato con successo'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile votare"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
 
 
 

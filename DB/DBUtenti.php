@@ -2334,6 +2334,26 @@ class DBUtenti
 
     }
 
+    public function votaSondaggio($cod_sondaggio)
+    {
+        $sceltaTab = $this->tabelleDB[7];
+        $campiScelta = $this->campiTabelleDB[$sceltaTab];
+
+        $query = (
+            "UPDATE " .
+            $sceltaTab . " " .
+            "SET " .
+            $campiScelta[2] . " = " . $campiScelta[2] . " +1 " .
+            "WHERE " .
+            $campiScelta[3] . "= ?"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $num_favorevoli, $cod_sondaggio);
+
+        $result = $stmt->execute();
+        return $result;
+    }
+
 
 }
 ?>
