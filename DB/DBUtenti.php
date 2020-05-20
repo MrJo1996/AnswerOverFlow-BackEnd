@@ -243,6 +243,45 @@ class DBUtenti
         }
     }
 
+    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
+    public function risposte($codice_risposta)
+    {
+        $rispostaTab = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$rispostaTab];
+        //QUERY: "SELECT * FROM `risposta` WHERE ID = 'value'"
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $rispostaTab . " " .
+            "WHERE " .
+            $campi[5] . " = ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_risposta);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_risposta, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
+            $risposte = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_risposta;
+                $temp[$campi[1]] = $descrizione;
+                $temp[$campi[2]] = $num_like;
+                $temp[$campi[3]] = $num_dislike;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_domanda;
+                array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
+            }
+            return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
+        } else {
+            return null;
+        }
+    }
+
     //Seleziono tutto il contenuto di una risposta secondo una determinata mail
     public function visualizzaRisposteUtente($email)
     {
@@ -1995,7 +2034,160 @@ class DBUtenti
         }
     }
 
+
+    public function visualizzaStatisticheDomanda($cod_utente)
+    {
+
+        $domandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$domandaTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+        /* "domanda" => [
+                    "codice_domanda",
+                    "dataeora",
+                    "timer",
+                    "titolo",
+                    "descrizione",
+                    "cod_utente",
+                    "cod_categoria",
+                    "cod_preferita"
+                ],*/
+        $query = (
+            "SELECT " .
+            "  COUNT(*) AS num_domande, " .
+            $campi[6] . " " .
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE " .
+            $campi[5] . " = ? " .
+            " GROUP BY " . $campi[6] . " " .
+            " ORDER BY " . $campi[6] . " " .
+            "LIMIT 3"
+
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_domande, $cod_categoria);
+            $domande = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp["num_domande"] = $num_domande;
+                $temp[$campi[6]] = $cod_categoria;
+                array_push($domande, $temp);
+
+            }
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+
+    public function visualizzaCategoria($codice_categoria)
+    {
+        $categoriaTab = $this->tabelleDB[2];
+        $campi = $this->campiTabelleDB[$categoriaTab];
+        //QUERY: SELECT email, username, nome, cognome, bio FROM `utente` WHERE Email = 'value'
+        /*   "categoria" => [
+            "codice_categoria",
+            "titolo"
+        ],*/
+        $query = (
+            "SELECT *" .
+            "FROM " .
+            $categoriaTab . " " .
+            "WHERE " .
+            $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_categoria);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_categoria, $titolo);
+            $categorie = array();
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campi[0]] = $codice_categoria;
+                $temp[$campi[1]] = $titolo;
+                array_push($categorie, $temp);
+            }
+            return $categorie;
+        } else {
+            return null;
+        }
+    }
+
+
+    public function visualizzaTOTStatisticheDomanda($cod_utente)
+    {
+
+        $DomandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$DomandaTab];
+
+        /*SELECT COUNT(*) AS num_risposte, cod_categoria FROM risposta ris JOIN domanda dom
+        WHERE ris.cod_domanda = dom.codice_domanda AND ris.cod_utente = "gmailverificata"
+        GROUP BY dom.cod_categoria ORDER BY dom.cod_categoria
+         "codice_domanda",
+                "dataeora",
+                "timer",
+                "titolo",
+                "descrizione",
+                "cod_utente",
+                "cod_categoria",
+                "cod_preferita"
+
+
+
+
+        */
+        $query = (
+            "SELECT " .
+            "  COUNT(*) AS num_domande, " .
+            $campi[6] . " " .
+            "FROM " .
+            $DomandaTab . " " .
+            "WHERE " .
+            $campi[5] . " = ? " .
+            " GROUP BY " . $campi[6] . " " .
+            " ORDER BY " . $campi[6] . " "
+
+
+        );
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($num_domande, $cod_categoria);
+            $domande = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp["num_domande"] = $num_domande;
+                $temp[$campi[6]] = $cod_categoria;
+                array_push($domande, $temp);
+
+            }
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+
 }
-
-
 ?>
