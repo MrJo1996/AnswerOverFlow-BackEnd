@@ -2345,12 +2345,12 @@ class DBUtenti
             "SET " .
             $campiScelta[2] . " = " . $campiScelta[2] . " +1 " .
             "WHERE " .
-            $campiScelta[0] . "= ? " .
+            $campiScelta[0] . "= ? " . " ".
               "AND " .
-              $campiScelta[3] . "= ?"
+              $campiScelta[3] . "= ?  "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iii",   $num_favorevoli, $codice_scelta, $cod_sondaggio);
+        $stmt->bind_param("ii",   $codice_scelta, $cod_sondaggio);
 
         $result = $stmt->execute();
         return $result;
