@@ -2227,8 +2227,8 @@ class DBUtenti
             "JOIN " .
             $DomandaTab . " " .
             "WHERE " .
-            $campi[5]=$campiD[0] . " " .
-            $campi[5] . " = ? " .
+            $campi[5].  " = " . $campiD[0] . " AND  " .
+            $campi[5] . " = ? " . " " . 
             " GROUP BY " . $campiD[6] . " " .
             " ORDER BY " . $campiD[6] . " " .
             "LIMIT 3"
