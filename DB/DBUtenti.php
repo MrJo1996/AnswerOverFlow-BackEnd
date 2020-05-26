@@ -84,7 +84,8 @@ class DBUtenti
             "dataeora",
             "testo",
             "visualizzato",
-            "cod_chat"
+            "cod_chat",
+            "msg_utente_id"
         ],
         "valutazione" => [
             "cod_risposta",
@@ -1209,6 +1210,42 @@ class DBUtenti
         }
     }
 
+    public function visualizzaLastMessaggio($cod_chat)
+    {
+        $messaggioTab = $this->tabelleDB[9];
+        $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
+
+        $query = (//SELECT * FROM messaggio WHERE cod_chat=? ORDER BY codice_messaggio DESC LIMIT 1
+            "SELECT "
+            . "* " .
+            "FROM " .
+            $messaggioTab . " " .
+            " WHERE " .
+            $campiMessaggio[4] . " = ? " .
+            "ORDER BY " . $campiMessaggio[0] . " DESC LIMIT 1"
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $cod_chat);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat, $idUtente);
+            $messaggio = array();
+
+            if ($stmt->fetch()) {
+                $messaggio[$campiMessaggio[0]] = $codice_messaggio;
+                $messaggio[$campiMessaggio[1]] = $dataeora;
+                $messaggio[$campiMessaggio[2]] = $testo;
+                $messaggio[$campiMessaggio[3]] = $visualizzato;
+                $messaggio[$campiMessaggio[4]] = $cod_chat;
+                $messaggio[$campiMessaggio[5]] = $idUtente;
+            }
+            return $messaggio;
+        } else {
+            return null;
+        }
+    }
 
 //Ricerca domanda aperta num11 PARTE 1
 

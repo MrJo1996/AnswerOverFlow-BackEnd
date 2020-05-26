@@ -912,6 +912,25 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
     }
 });
 
+$app->post('/visualizzaUltimoMessaggio', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $cod_chat = $requestData['cod_chat'];
+
+    $responseData['data'] = $db->visualizzaLastMessaggio($cod_chat);
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Messaggi" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 
 //endpoint inserisci domanda: OK
 $app->post('/inserisciDomanda', function (Request $request, Response $response) {
