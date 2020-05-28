@@ -221,7 +221,7 @@ $app->post('/recupero', function (Request $request, Response $response) {
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($db->controlloEmail($email)) {
 
-        $nuovaPassword = $randomizerPassword->generatePassword(6);
+        $nuovaPassword = $randomizerPassword->generatePassword(9);
 
         if ($db->recuperaPassword($email, $nuovaPassword)) {
             if ($emailSender->sendResetPasswordEmail($email, $nuovaPassword)) {

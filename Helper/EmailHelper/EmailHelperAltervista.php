@@ -12,7 +12,7 @@ class EmailHelperAltervista
         $messaggio = "Usa questa password temporanea";
 
         $linkLogin = 'https://www.unimolshare.it/login.php';
-        $emailTo = "chrispeluso98@gmail.com"; //$email
+        $emailTo = $email;
         $subject = "AnswerOverFLow - Recupero Password";
         $message   = '<html><body><h1>AnswerOverFLow</h1><div>';
         $message   .= $messaggio.':<br/><br/><b>'.$password.'</div><br/><div>Avvia la tua app /*'.$linkLogin.'*/ ed accedi con la nuova password.</div></body></html>';
