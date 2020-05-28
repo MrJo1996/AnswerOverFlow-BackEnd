@@ -13,9 +13,8 @@ class EmailHelperAltervista
 
         $linkLogin = 'https://www.unimolshare.it/login.php';
         $emailTo = $email;
-        $subject = "AnswerOverFLow - Recupero Password";
-        $message   = '<html><body><h1>AnswerOverFLow</h1><div>';
-        $message   .= $messaggio.':<br/><br/><b>'.$password.'</body></html>';
+        $subject = "AnswerOverflow - Recupero Password";
+        $message   = '<html><body><h1>AnswerOverflow</h1><div>Usa questa password temporanea:</div><b>' . $password . '</b></b><br><br></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
