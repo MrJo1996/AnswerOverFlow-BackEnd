@@ -2418,10 +2418,10 @@ class DBUtenti
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $codice_domanda, $cod_preferita, );
+        $stmt->bind_param("ii", $cod_preferita, $codice_domanda  );
         return $stmt->execute();
     }
-    
 
+    
 }
 ?>
