@@ -2418,7 +2418,7 @@ class DBUtenti
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $dataeora, $codice_domanda, $cod_preferita, );
+        $stmt->bind_param("ii", $codice_domanda, $cod_preferita, );
         return $stmt->execute();
     }
     
