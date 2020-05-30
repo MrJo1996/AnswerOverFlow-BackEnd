@@ -2044,7 +2044,8 @@ class DBUtenti
             "FROM " .
             $rispostaTab . " " .
             "WHERE " .
-            $campi[5] . " = ?"
+            $campi[5] . " = ?" .
+             "ORDER BY " . $campi[0] . " DESC "
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
@@ -2422,6 +2423,6 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    
+
 }
 ?>
