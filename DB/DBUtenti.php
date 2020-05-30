@@ -2258,21 +2258,25 @@ class DBUtenti
         $query = (
             "SELECT " .
             "  COUNT(*) AS num_domande, " .
-            $campiD[6] . " " .
+            $DomandaTab . "." .  $campiD[6] . " " .
             "FROM " .
             $RispostaTab . " " .
             "JOIN " .
             $DomandaTab . " " .
             "WHERE " .
-            $campi[5].  " = " . $campiD[0] . " AND  " .
-            $campi[4] . " = ? " . " " .
-            " GROUP BY " . $campiD[6] . " " .
-            " ORDER BY " . $campiD[6] . " " .
+            $RispostaTab . "." .  $campi[5].  " = " . $DomandaTab . "." . $campiD[0] . " AND  " .
+            $RispostaTab . "." . $campi[4] . " = ? " . " " .
+            " GROUP BY " . $DomandaTab . "." . $campiD[6] . " " .
+            " ORDER BY " . $DomandaTab . "." . $campiD[6] . " " .
             "LIMIT 3"
-
-
         );
 
+      /*  $sondaggioTab . "." . $campiSondaggio[0] . ", " .
+        $sondaggioTab . "." . $campiSondaggio[1] . ", " .
+        $sondaggioTab . "." . $campiSondaggio[2] . ", " .
+        $sondaggioTab . "." . $campiSondaggio[3] . " " .
+
+        */
         //Invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("s", $cod_utente);
@@ -2393,6 +2397,31 @@ class DBUtenti
         return $result;
     }
 
+    public function scegliRispostaPreferita($codice_domanda, $cod_preferita)
+    {
+
+        $tabella = $this->tabelleDB[4];
+
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  UPDATE Domanda
+        //                        SET titolo=$titolo_inserito,dataeora=$valore,timer=$valore,  descrizione = $descrizione_inserita,     cod_categoria=$valore.
+        //
+        //                        WHERE = $Id_domanda_selezionata
+        $query = (
+            "UPDATE " .
+            $tabella . " " .
+            "SET " .
+            $campi[7] . " = ? " .
+            " WHERE " .
+            $campi[0] . " = ? "
+        );
+
+        //invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ii", $dataeora, $codice_domanda, $cod_preferita, );
+        return $stmt->execute();
+    }
+    
 
 }
 ?>

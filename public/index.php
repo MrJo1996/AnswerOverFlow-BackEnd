@@ -1642,6 +1642,29 @@ $app->post('/votasondaggio', function (Request $request, Response $response) {
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
+$app->post('/sceglirispostapreferita', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $codice_domanda = $requestData['codice_domanda'];
+    $cod_preferita = $requestData['cod_preferita'];
+
+    $responseData = array();
+    $responseDB = $db->scegliRispostaPreferita($codice_domanda, $cod_preferita);
+
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Risposta preferita scelta con successo';
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Impossibile scegliere la risposta';
+    }
+    return $response->withJson($responseData);
+
+});
+
+
 
 
 
