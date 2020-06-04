@@ -1685,6 +1685,26 @@ $app->post('/inserisciVotante', function (Request $request, Response $response) 
 });
 
 
+$app->post('/controllogiavotato', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+    $cod_sondaggio = $requestData['cod_sondaggio'];
+    $responseData['data'] = $db->controlloGiaVotato($cod_utente, $cod_sondaggio);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = "L'cod_utente è presente nel DB";
+        $response->getBody()->write(json_encode(array("Esito esistenza cod_utente" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'La mail non è presente nel DB';
+        return $response->withJson($responseData);
+    }
+});
+
+
 
 
 

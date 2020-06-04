@@ -2453,5 +2453,32 @@ class DBUtenti
     }
 
 
+    public function controlloGiaVotato($cod_utente, $cod_sondaggio)
+    {
+        $votanteTab = $this->tabelleDB[11]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$votanteTab]; //Campi per la query
+        //QUERY: "SELECT email FROM utente WHERE email = ?
+        $query = (
+            "SELECT *" .
+              " " .
+            "FROM " .
+            $votanteTab . " " .
+            "WHERE " .
+            $campi[1] . " = ? " .
+            "AND " .  " " .
+            $campi[2] . " = ? "
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("si", $cod_utente, $cod_sondaggio);
+        $stmt->execute();
+        //Ricevo la risposta del DB
+        $stmt->store_result();
+        //Se ha trovato un match tra la mail inserita e la tab utente, restituisce una bool TRUE
+        return $stmt->num_rows > 0;
+    }
+
+
+
 }
 ?>
