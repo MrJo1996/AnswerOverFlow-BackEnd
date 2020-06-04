@@ -2443,6 +2443,7 @@ class DBUtenti
             $campiVotanti[2] . ") " .
             "VALUES " . "( " .
             "? , " .
+            "? , " .
             "? )"
         );
         $stmt = $this->connection->prepare($query);
