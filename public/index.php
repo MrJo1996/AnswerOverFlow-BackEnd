@@ -1664,6 +1664,25 @@ $app->post('/sceglirispostapreferita', function (Request $request, Response $res
 
 });
 
+$app->post('/inserisciVotante', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_scelta = $requestData['cod_scelta'];
+    $cod_utente = $requestData['cod_utente'];
+    $responseData['data'] = $db->inserisciNuovoVotante($cod_utente, $cod_scelta);
+
+    if ($responseData['data']) {
+        $responseData['error'] = false;
+        $responseData['message'] = "Operazione andata a buon fine";
+        $response->getBody()->write(json_encode(array("Inserimento votante" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Il votante non è stato inserito';
+        return $response->withJson($responseData);
+    }
+});
+
 
 
 

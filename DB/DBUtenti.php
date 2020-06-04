@@ -14,7 +14,8 @@ class DBUtenti
         "scelta",
         "chat",
         "messaggio",
-        "valutazione"
+        "valutazione",
+        "votanti"
     ];
     private $campiTabelleDB = [ //Campi delle tabelle (array bidimensionale indicizzato con key)
         "utente" => [
@@ -91,6 +92,10 @@ class DBUtenti
             "cod_risposta",
             "cod_utente",
             "tipo_like"
+        ],
+        "votanti" => [
+            "cod_scelta",
+            "cod_utente"
         ]
     ];
 
@@ -2420,6 +2425,27 @@ class DBUtenti
         //invio la query
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ii", $cod_preferita, $codice_domanda  );
+        return $stmt->execute();
+    }
+
+    //Visto che non è ancora presente in DB, la si crea
+    public function inserisciNuovoVotante($cod_scelta, $cod_utente)
+    {
+        $votantiTab = $this->tabelleDB[11];
+        $campiVotanti = $this->campiTabelleDB[$votantiTab];
+        //QUERY: INSERT INTO `scelta` () VALUES ();
+        $query = (
+            "INSERT INTO" . " " .
+            $votantiTab . " (" .
+            $campiVotanti[0] . ", " .
+            $campiVotanti[1] . ") " .
+            "VALUES " . "( " .
+            "? , " .
+            "? )"
+        );
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("is", $cod_scelta, $cod_utente);
+        //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }
 
