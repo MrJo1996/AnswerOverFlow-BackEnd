@@ -95,7 +95,8 @@ class DBUtenti
         ],
         "votanti" => [
             "cod_scelta",
-            "cod_utente"
+            "cod_utente",
+            "cod_sondaggio"
         ]
     ];
 
@@ -2429,7 +2430,7 @@ class DBUtenti
     }
 
     //Visto che non è ancora presente in DB, la si crea
-    public function inserisciNuovoVotante($cod_scelta, $cod_utente)
+    public function inserisciNuovoVotante($cod_scelta, $cod_utente, $cod_sondaggio)
     {
         $votantiTab = $this->tabelleDB[11];
         $campiVotanti = $this->campiTabelleDB[$votantiTab];
@@ -2438,13 +2439,14 @@ class DBUtenti
             "INSERT INTO" . " " .
             $votantiTab . " (" .
             $campiVotanti[0] . ", " .
-            $campiVotanti[1] . ") " .
+            $campiVotanti[1] . ", " .
+            $campiVotanti[2] . ") " .
             "VALUES " . "( " .
             "? , " .
             "? )"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("is", $cod_scelta, $cod_utente);
+        $stmt->bind_param("isi", $cod_scelta, $cod_utente, $cod_sondaggio);
         //Termina con la bool true se la sessione è andata a buon fine
         return $stmt->execute();
     }

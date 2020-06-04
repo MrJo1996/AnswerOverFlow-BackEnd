@@ -1669,7 +1669,8 @@ $app->post('/inserisciVotante', function (Request $request, Response $response) 
     $requestData = $request->getParsedBody();
     $cod_scelta = $requestData['cod_scelta'];
     $cod_utente = $requestData['cod_utente'];
-    $responseData['data'] = $db->inserisciNuovoVotante($cod_scelta, $cod_utente );
+    $cod_sondaggio = $requestData['cod_sondaggio'];
+    $responseData['data'] = $db->inserisciNuovoVotante($cod_scelta, $cod_utente, $cod_sondaggio );
 
     if ($responseData['data']) {
         $responseData['error'] = false;
