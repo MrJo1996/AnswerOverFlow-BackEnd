@@ -2453,16 +2453,16 @@ class DBUtenti
     }
 
 
-    public function controlloGiaVotato($cod_risposta, $cod_utente)
+    public function controlloGiaVotato($cod_utente, $cod_sondaggio)
     {
-        $valutazioneTab = $this->tabelleDB[10]; //Tabella per la query
-        $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
+        $votanteTab = $this->tabelleDB[11]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$votanteTab]; //Campi per la query
         //QUERY: "SELECT email FROM utente WHERE email = ?
         $query = (
             "SELECT *" .
-              " " .
+            " " .
             "FROM " .
-            $valutazioneTab . " " .
+            $votanteTab . " " .
             "WHERE " .
             $campi[1] . " = ? " .
             "AND " .  " " .
@@ -2482,8 +2482,8 @@ class DBUtenti
 
     public function controlloGiaValutatoRisposta($cod_utente, $cod_risposta)
     {
-        $votanteTab = $this->tabelleDB[11]; //Tabella per la query
-        $campi = $this->campiTabelleDB[$votanteTab]; //Campi per la query
+        $valutazioneTab = $this->tabelleDB[10]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
         //QUERY: "SELECT email FROM utente WHERE email = ?
 
         /*"valutazione" => [
@@ -2492,15 +2492,15 @@ class DBUtenti
             "tipo_like"
         ],*/
         $query = (
-            "SELECT *" .
+            "SELECT " .
             " " .
-            " $campi[1] " .
+            " $campi[2] " .
             "FROM " .
-            $votanteTab . " " .
+            $valutazioneTab . " " .
             "WHERE " .
-            $campi[0] . " = ? " .
+            $campi[1] . " = ? " .
             "AND " .  " " .
-            $campi[1] . " = ? "
+            $campi[0] . " = ? "
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("si", $cod_utente, $cod_risposta);
@@ -2512,7 +2512,7 @@ class DBUtenti
             $valutazione = array();
             while ($stmt->fetch()) {
                 $temp = array();
-                $temp[$campi[0]] = $tipo_like;
+                $temp[$campi[2]] = $tipo_like;
                 array_push($valutazione, $temp);
 
             }

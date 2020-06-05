@@ -1715,12 +1715,12 @@ $app->post('/controllogiavalutatorisposta', function (Request $request, Response
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $responseData['message'] = 'Gia hai votato '; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array($responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Errore imprevisto';
+        $responseData['message'] = 'Non hai votato';
         $response->getBody()->write(json_encode(array($responseData)));
         return $response->withHeader('Content-type', 'application/json');
     }
