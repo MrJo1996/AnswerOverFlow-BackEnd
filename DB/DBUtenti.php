@@ -2453,16 +2453,16 @@ class DBUtenti
     }
 
 
-    public function controlloGiaVotato($cod_utente, $cod_sondaggio)
+    public function controlloGiaVotato($cod_risposta, $cod_utente)
     {
-        $votanteTab = $this->tabelleDB[11]; //Tabella per la query
-        $campi = $this->campiTabelleDB[$votanteTab]; //Campi per la query
+        $valutazioneTab = $this->tabelleDB[11]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
         //QUERY: "SELECT email FROM utente WHERE email = ?
         $query = (
             "SELECT *" .
-            " " .
+              " " .
             "FROM " .
-            $votanteTab . " " .
+            $valutazioneTab . " " .
             "WHERE " .
             $campi[1] . " = ? " .
             "AND " .  " " .
@@ -2524,49 +2524,30 @@ class DBUtenti
 
 
 
-
-
-
-    /* //Controllo se un utente ha gia valutato una risposta
-    public function checkIfUserHasAlreadyEvaluatedResponse($cod_risposta)
+    public function eliminaValutazione($cod_risposta, $cod_utente)
     {
-
-        $valutazioneTab = $this->tabelleDB[10];
+        $valutazioneTab = $this->tabelleDB[10]; //Tabella per la query
         $campi = $this->campiTabelleDB[$valutazioneTab];
-
-        //Query = select cod_utente from 'valutazione' where cod_risposta = 'value'
+        //query:  "  DELETE * FROM Sondaggi where ID = $Id_sondaggio_selezionato"
 
         $query = (
-            "SELECT " .
-            " $campi[1] " .
-            "FROM " .
-            $valutazioneTab . " " .
-            "WHERE " .
-            $campi[0] . " = ?"
+            "DELETE FROM " .
+            $valutazioneTab . " WHERE " .
+            $campi[0] . " = ? ".
+            " AND ".
+            $campi[1] . " = ? "
         );
 
-        //Invio la query
+
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $cod_risposta);
-
-        $stmt->execute();
+        $stmt->bind_param("is", $cod_risposta, $cod_utente);
+        $result = $stmt->execute();
         $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($cod_utente);
-            $valutazione = array(); //controlla
-            while ($stmt->fetch()) {
-                $temp = array(); //
-                //indicizzo key con i dati nell'array
-                $temp[$campi[1]] = $cod_utente;
-                array_push($valutazione, $temp);
 
-            }
-            return $valutazione;
-        } else {
-            return null;
-        }
+        return $result;
+    }
 
-    }*/
+
 
 }
 ?>
