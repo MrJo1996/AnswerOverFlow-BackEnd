@@ -1705,6 +1705,27 @@ $app->post('/controllogiavotato', function (Request $request, Response $response
 });
 
 
+$app->post('/controllogiavalutatorisposta', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+    $cod_risposta = $requestData['cod_risposta'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->controlloGiaValutatoRisposta($cod_utente, $cod_risposta);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array($responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        $response->getBody()->write(json_encode(array($responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    }
+});
+
 
 
 
