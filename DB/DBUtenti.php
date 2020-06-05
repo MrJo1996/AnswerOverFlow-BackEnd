@@ -979,7 +979,7 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $dis_like, $codice_risposta);
+        $stmt->bind_param("i",  $codice_risposta);
 
         $result = $stmt->execute();
 
