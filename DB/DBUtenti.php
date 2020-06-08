@@ -2465,7 +2465,7 @@ class DBUtenti
     }
 
 
-    public function controlloGiaVotato($cod_risposta, $cod_utente)
+    public function controlloGiaVotato($cod_utente, $cod_sondaggio)
     {
         $valutazioneTab = $this->tabelleDB[11]; //Tabella per la query
         $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
@@ -2506,7 +2506,9 @@ class DBUtenti
         $query = (
             "SELECT " .
             " " .
-            " $campi[2] " .
+            " $campi[0] " .
+            ", " .
+            " $campi[3] " .
             "FROM " .
             $valutazioneTab . " " .
             "WHERE " .
@@ -2520,11 +2522,12 @@ class DBUtenti
 
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($tipo_like);
+            $stmt->bind_result($codice_valutazione,$tipo_like);
             $valutazione = array();
             while ($stmt->fetch()) {
                 $temp = array();
-                $temp[$campi[2]] = $tipo_like;
+                $temp[$campi[0]] = $codice_valutazione;
+                $temp[$campi[3]] = $tipo_like;
                 array_push($valutazione, $temp);
 
             }
