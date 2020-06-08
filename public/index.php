@@ -1730,16 +1730,15 @@ $app->post('/controllogiavalutatorisposta', function (Request $request, Response
 
 
 
-$app->delete('/eliminaVal/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
+$app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
-    $cod_risposta = $request->getAttribute("cod_risposta");
-    $cod_utente = $request->getAttribute("cod_utente");
+    $codice_valutazione = $request->getAttribute("codice_valutazione");
 
     $responseData = array();
 
-    $responseDB = $db->eliminaValutazione($cod_risposta, $cod_utente);
+    $responseDB = $db->eliminaValutazione($codice_valutazione);
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Valutazione rimossa con successo'; //Messaggio di esito positivo

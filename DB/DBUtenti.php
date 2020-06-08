@@ -90,6 +90,7 @@ class DBUtenti
             "msg_utente_id"
         ],
         "valutazione" => [
+            "codice_valutazione",
             "cod_risposta",
             "cod_utente",
             "tipo_like"
@@ -2535,7 +2536,7 @@ class DBUtenti
 
 
 
-    public function eliminaValutazione($cod_risposta, $cod_utente)
+    public function eliminaValutazione($codice_valutazione)
     {
         $valutazioneTab = $this->tabelleDB[10]; //Tabella per la query
         $campi = $this->campiTabelleDB[$valutazioneTab];
@@ -2544,14 +2545,12 @@ class DBUtenti
         $query = (
             "DELETE FROM " .
             $valutazioneTab . " WHERE " .
-            $campi[0] . " = ? ".
-            " AND ".
-            $campi[1] . " = ? "
+            $campi[0] . " = ? "
         );
 
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("is", $cod_risposta, $cod_utente);
+        $stmt->bind_param("i", $codice_valutazione);
         $result = $stmt->execute();
         $stmt->store_result();
 
