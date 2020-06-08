@@ -1418,9 +1418,9 @@ class DBUtenti
         $query = (
             "INSERT INTO" . " " .
             $ValutazioneTab . " ( " .
-            $campi[0] . " , " .
             $campi[1] . " , " .
-            $campi[2] . " ) " .
+            $campi[2] . " , " .
+            $campi[3] . " ) " .
             "VALUES" . " ( " .
             " ? , ? , ? ) "
         );
