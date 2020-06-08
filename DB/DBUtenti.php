@@ -652,7 +652,8 @@ class DBUtenti
             $utenteTab . "." . $campi[1] . "," .
             $utenteTab . "." . $campi[3] . "," .
             $utenteTab . "." . $campi[4] . "," .
-            $utenteTab . "." . $campi[5] . " " .
+            $utenteTab . "." . $campi[5] . "," .
+            $utenteTab . "." . $campi[7] . " " .
             "FROM " .
             $utenteTab . " " .
             "WHERE " .
@@ -665,7 +666,7 @@ class DBUtenti
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($email, $username, $nome, $cognome, $bio);
+            $stmt->bind_result($email, $username, $nome, $cognome, $bio, $avatar);
             $user = array();
 
             while ($stmt->fetch()) {
@@ -675,6 +676,7 @@ class DBUtenti
                 $temp[$campi[3]] = $nome;
                 $temp[$campi[4]] = $cognome;
                 $temp[$campi[5]] = $bio;
+                $temp[$campi[7]] = $avatar;
                 array_push($user, $temp);
             }
             return $user;
@@ -1145,7 +1147,10 @@ class DBUtenti
         $query = (
             "SELECT " .
             $campiLogin[0] . ", " .
-            $campiLogin[1] . " " .
+            $campiLogin[1] . ", " .
+            $campiLogin[3] . ", " .
+            $campiLogin[4] . ", " .
+            $campiLogin[7] . " " .
 
             "FROM " .
             $utenteTab . " " .
@@ -1161,7 +1166,7 @@ class DBUtenti
         //Ricevo la risposta del DB
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($email, $username);
+            $stmt->bind_result($email, $username, $nome, $cognome, $avatar);
 
             $utente = array();
 
@@ -1169,6 +1174,10 @@ class DBUtenti
                 $temp = array();
                 $temp[$campiLogin[0]] = $email;
                 $temp[$campiLogin[1]] = $username;
+                $temp[$campiLogin[3]] = $nome;
+                $temp[$campiLogin[4]] = $cognome;
+                $temp[$campiLogin[7]] = $avatar;
+
                 array_push($utente, $temp);
             }
 
