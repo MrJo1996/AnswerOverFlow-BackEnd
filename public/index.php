@@ -1753,6 +1753,53 @@ $app->delete('/eliminaVal/{cod_risposta},{cod_utente}', function (Request $reque
 });
 
 
+$app->post('/togli_like', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_risposta = $requestData['codice_risposta'];
+    echo "PARAMS:";
+    echo $codice_risposta . "     ";
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->togliLike($codice_risposta);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+
+$app->post('/togli_dislike', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $codice_risposta = $requestData['codice_risposta'];
+    $dislike = $requestData['num_dislike'];
+    echo "PARAMS:";
+    echo $codice_risposta . "     ";
+    //Risposta del servizio REST
+    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseDB = $db->togliDislike($codice_risposta);
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    if ($responseDB) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
+
+    } else { //Se c'è stato un errore imprevisto
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData); //Invio la risposta del servizio REST al client
+});
+
+
 
 
 /**** ENDPOINT ****/

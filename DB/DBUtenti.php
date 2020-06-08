@@ -2560,5 +2560,60 @@ class DBUtenti
 
 
 
+    public function togliLike($codice_risposta)
+    {
+        $tabella = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE risposta SET num_like = ? WHERE  codice_risposta = ?"
+        $query = (
+            "UPDATE " .
+            $tabella . " " .
+            "SET " .
+            $campi[2] . " = " . $campi[2] . " -1 " .
+            "WHERE " .
+            $campi[0] . "= ?"
+        );
+
+        echo "QUERY: " . $query;
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $codice_risposta);
+
+        $result = $stmt->execute();
+
+        //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
+    }
+
+
+    public function togliDislike($codice_risposta)
+    {
+        $tabella = $this->tabelleDB[5];
+        $campi = $this->campiTabelleDB[$tabella];
+        //query:  "UPDATE risposta SET num_dis_like = ? WHERE  codice_risposta = ?"
+        $query = (
+            "UPDATE " .
+            $tabella . " " .
+            "SET " .
+            $campi[3] . " = " . $campi[3] . " -1 " .
+            "WHERE " .
+            $campi[0] . "= ?"
+        );
+
+        echo "QUERY: " . $query;
+
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i",  $codice_risposta);
+
+        $result = $stmt->execute();
+
+        //Controllo se ha trovato matching tra dati inseriti e campi del db
+        return $result;
+    }
+
+
+
 }
 ?>
