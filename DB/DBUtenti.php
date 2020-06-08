@@ -2512,9 +2512,9 @@ class DBUtenti
             "FROM " .
             $valutazioneTab . " " .
             "WHERE " .
-            $campi[1] . " = ? " .
+            $campi[2] . " = ? " .
             "AND " .  " " .
-            $campi[0] . " = ? "
+            $campi[1] . " = ? "
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("si", $cod_utente, $cod_risposta);
