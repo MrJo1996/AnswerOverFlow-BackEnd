@@ -831,9 +831,10 @@ $app->post('/registrazione', function (Request $request, Response $response) {
     $nome = $requestData['nome'];
     $cognome = $requestData['cognome'];
     $bio = $requestData['bio'];
+    $avatar = $requestData['avatar'];
 
     $responseData = array();
-    $responseDB = $db->registrazione($email, $username, $password, $nome, $cognome, $bio);
+    $responseDB = $db->registrazione($email, $username, $password, $nome, $cognome, $bio, $avatar);
 
     if ($responseDB == 1) {
         $responseData['error'] = false;

@@ -25,7 +25,8 @@ class DBUtenti
             "nome",
             "cognome",
             "bio",
-            "attivo"
+            "attivo",
+            "avatar"
         ],
         "stats" => [
             "cod_utente",
@@ -708,7 +709,7 @@ class DBUtenti
     }
 
     //Registrazione
-    public function registrazione($email, $username, $password, $nome, $cognome, $bio)
+    public function registrazione($email, $username, $password, $nome, $cognome, $bio, $avatar)
     {
         $tabella = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$tabella];
@@ -723,13 +724,14 @@ class DBUtenti
             $campi[3] . ", " .
             $campi[4] . ", " .
             $campi[5] . ", " .
-            $campi[6] . ") " .              //mette in automatico attivo a 0
+            $campi[6] . ", " .              //mette in automatico attivo a 0
+            $campi[7] . ") " .
 
-            "VALUES (?,?,?,?,?,?,?)"
+            "VALUES (?,?,?,?,?,?,?,?)"
         );
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ssssssi", $email, $username, $password, $nome, $cognome, $bio, $attivo);
+        $stmt->bind_param("ssssssis", $email, $username, $password, $nome, $cognome, $bio, $attivo, $avatar);
         $result = ($stmt->execute());
 
         return $result;
