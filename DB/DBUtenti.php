@@ -687,7 +687,7 @@ class DBUtenti
     }
 
     //Modifica profilo utente
-    public function modificaProfilo($username, $password, $nome, $cognome, $bio, $email)
+    public function modificaProfilo($username, $password, $nome, $cognome, $bio, $email, $avatar)
     {
         $utenteTab = $this->tabelleDB[0];
         $campi = $this->campiTabelleDB[$utenteTab];
@@ -700,13 +700,39 @@ class DBUtenti
             $utenteTab . "." . $campi[2] . "= ?," .
             $utenteTab . "." . $campi[3] . "= ?," .
             $utenteTab . "." . $campi[4] . "= ?," .
-            $utenteTab . "." . $campi[5] . "= ? " .
+            $utenteTab . "." . $campi[5] . "= ?," .
+            $utenteTab . "." . $campi[7] . "= ? " .
             "WHERE " .
             $utenteTab . "." . $campi[0] . "= ?"
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ssssss", $username, $password, $nome, $cognome, $bio, $email);
+        $stmt->bind_param("sssssss", $username, $password, $nome, $cognome, $bio, $avatar, $email);
+        $result = $stmt->execute();
+        return $result;
+    }
+
+    //Modifica profilo utente
+    public function modificaParteProfilo($username, $nome, $cognome, $bio, $email, $avatar)
+    {
+        $utenteTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$utenteTab];
+        //QUERY: UPDATE `utente` SET `Username`=[value-1], `Password`=[value-2],`Nome`=[value-3],`Cognome`=[value-4],`Bio`=[value-5] WHERE Email = “email_utente_corrente”
+        $query = (
+            "UPDATE " .
+            $utenteTab . " " .
+            "SET " .
+            $utenteTab . "." . $campi[1] . "= ?," .
+            $utenteTab . "." . $campi[3] . "= ?," .
+            $utenteTab . "." . $campi[4] . "= ?," .
+            $utenteTab . "." . $campi[5] . "= ?," .
+            $utenteTab . "." . $campi[7] . "= ? " .
+            "WHERE " .
+            $utenteTab . "." . $campi[0] . "= ?"
+        );
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ssssss", $username,  $nome, $cognome, $bio, $avatar, $email);
         $result = $stmt->execute();
         return $result;
     }

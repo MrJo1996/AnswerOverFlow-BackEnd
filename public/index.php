@@ -781,9 +781,13 @@ $app->post('/modificaProfilo', function (Request $request, Response $response) {
     $cognome = $requestData['cognome'];
     $bio = $requestData['bio'];
     $email = $requestData['email'];
+    $avatar = $requestData['avatar'];
 
     $responseData = array();
-    $responseDB = $db->modificaProfilo($username, $password, $nome, $cognome, $bio, $email);
+    if (isset($requestData['password']))
+        $responseDB = $db->modificaProfilo($username, $password, $nome, $cognome, $bio, $email, $avatar);
+    else
+        $responseDB = $db->modificaParteProfilo($username, $nome, $cognome, $bio, $email, $avatar);
 
     if ($responseDB) {
         $responseData['error'] = false;
@@ -944,7 +948,9 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
     $dataeora = $requestData['dataeora'];
     $timer = $requestData['timer'];
     $descrizione = $requestData['descrizione'];
-    $cod_utente = $requestData['cod_utente'];
+    $cod_utente = $requestData['cod_
+    
+    '];
     $cod_categoria = $requestData['cod_categoria'];
 
     //Risposta del servizio REST
