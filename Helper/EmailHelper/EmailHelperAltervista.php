@@ -27,13 +27,13 @@ class EmailHelperAltervista
 
     }
 
-    function sendPropostaCategoriaEmail($selezione, $proposta){
-        $messaggio = "Abbiamo ricevuto una nuova proposta per una categoria o sottocategoria!";
+    function sendPropostaCategoriaEmail($proposta){
+        $messaggio = "Abbiamo ricevuto una nuova proposta per una categoria!";
 
         $emailTo = "francesco.iafi@gmail.com";
-        $subject = "AnswerOverFlow - Nuova proposta per categoria o sottocategoria";
-        $message = '<html><body><h1>AnswerOverFLow</h1><div>';
-        $message .= $messaggio . '<br><br>Categoria selezionata: ' . $selezione . '<br>Nuova proposta: ' . $proposta . '</div></body></html>';
+        $subject = "AnswerOverFlow - Nuova proposta per categoria";
+        $message = '<html><body><h1>AnswerOverflow</h1><div>';
+        $message .= $messaggio . '<br><br>Categoria proposta: ' . $proposta . '<br><br></div></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
