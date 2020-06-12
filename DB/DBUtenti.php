@@ -2524,17 +2524,15 @@ class DBUtenti
         $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
         //QUERY: "SELECT email FROM utente WHERE email = ?
 
-        /*"valutazione" => [
+        /* "valutazione" => [
+            "codice_valutazione",
             "cod_risposta",
             "cod_utente",
             "tipo_like"
         ],*/
         $query = (
             "SELECT " .
-            " " .
-            " $campi[0] " .
-            ", " .
-            " $campi[3] " .
+            " * ".
             "FROM " .
             $valutazioneTab . " " .
             "WHERE " .
@@ -2548,11 +2546,13 @@ class DBUtenti
 
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_valutazione,$tipo_like);
+            $stmt->bind_result($codice_valutazione, $cod_risposta,  $cod_utente, $tipo_like);
             $valutazione = array();
             while ($stmt->fetch()) {
                 $temp = array();
                 $temp[$campi[0]] = $codice_valutazione;
+                $temp[$campi[1]] = $cod_risposta;
+                $temp[$campi[2]] = $cod_utente;
                 $temp[$campi[3]] = $tipo_like;
                 array_push($valutazione, $temp);
 
@@ -2562,6 +2562,10 @@ class DBUtenti
             return null;
         }
     }
+
+
+
+
 
 
 
@@ -2641,6 +2645,55 @@ class DBUtenti
         return $result;
     }
 
+   /* public function visualizzaDomandeHome()
+    {
+
+
+        $domandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$domandaTab];
+
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE " .
+            $campi[2] . " > '00:00:00' " .
+            " " .
+            "ORDER by " .
+            $campi[1] .
+            " " .
+            "DESC"
+        );
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
+            $domande = array();
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_domanda;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $timer;
+                $temp[$campi[3]] = $titolo;
+                $temp[$campi[4]] = $descrizione;
+                $temp[$campi[5]] = $cod_utente;
+                $temp[$campi[6]] = $cod_categoria;
+                $temp[$campi[7]] = $cod_preferita;
+                array_push($domande, $temp);
+
+            }
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+    */
 
 
 }
