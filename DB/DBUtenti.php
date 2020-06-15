@@ -1350,7 +1350,6 @@ class DBUtenti
         //Invio la query
         $stmt = $this->connection->prepare($query);
 
-
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
