@@ -9,9 +9,6 @@ class EmailHelperAltervista
     //Funzione per inviare un'email con la nuova password
     function sendResetPasswordEmail($email, $password)
     {
-
-        $messaggio = "Usa questa password temporanea";
-
         $emailTo = $email;
         $subject = "AnswerOverflow - Recupero Password";
         $message = '<html><body><h1>AnswerOverflow</h1><div>Usa questa password temporanea: </div><b>' . $password . '</b><br><br></body></html>';
@@ -24,7 +21,6 @@ class EmailHelperAltervista
         } catch (Exception $e) {
             return false;
         }
-
     }
 
     function sendPropostaCategoriaEmail($proposta)
@@ -49,7 +45,6 @@ class EmailHelperAltervista
 
     function inviaSegnalazione($segnalazione, $utente_segnalato, $email_utente_segnalato)
     {
-
         $messaggio = "Un utente ha segnalato questo profilo";
 
         $emailTo = "answeroverflow@gmail.com";
@@ -65,6 +60,6 @@ class EmailHelperAltervista
         } catch (Exception $e) {
             return false;
         }
-
     }
+
 }
