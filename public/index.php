@@ -88,45 +88,26 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
 });
 
 //endpoint: visualizzaRispostePerDomanda
-$app->post('/visualizzarisposteperdomanda', function (Request $request, Response $response) {
+$app->post('/Visualizzarisposteperdomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
     $cod_domanda = $requestData['cod_domanda'];
     //Controllo la risposta dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->visualizzaRispostePerDomanda($cod_domanda);
+    $responseData['data'] = $db->visualizzarisposteperdomanda($cod_domanda);
 
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
+    if ($responseData['data'] == null) {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
-    }
-});
 
-$app->post('/risposteperdomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $codice_risposta = $requestData['codice_risposta'];
-    //Controllo la risposta dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->risposte($codice_risposta);
+    } else {
 
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
     }
 });
-
-
 
 
 // endpoint: /visualizzaRisposta OK
@@ -189,7 +170,6 @@ $app->post('/controlloEmail', function (Request $request, Response $response) {
 
 $app->post('/proponi_categoria', function (Request $request, Response $response){
     $requestData = $request->getParsedBody();
-    //$selezione = $requestData['selezione'];
     $proposta = $requestData['proposta'];
     $emailSender = new EmailHelperAltervista();
     $responseData = array();
@@ -313,11 +293,22 @@ $app->post('/ricercaScelteSondaggio', function (Request $request, Response $resp
     if ($responseData['data']) {
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
+        $scelte = array();
+
+        /*for ($i=0;$i <count($responseData['data']); $i++){
+
+            $response->getBody()->write(json_encode($responseData['data'][$i]));
+            if ($i!=count($responseData['data'])-1)
+            $response->getBody()->write(',');
+
+
+        }*/
         $response->getBody()->write(json_encode(array("Scelte" => $responseData)));
+//        print_r($scelte);
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Le scelte del sondaggio non sono presenti nel DB';
+        $responseData['message'] = 'Le scelte del sondaggio non sono state inserite';
         return $response->withJson($responseData);
     }
 });
@@ -663,14 +654,14 @@ $app->post('/modifica_tipo_like', function (Request $request, Response $response
         $responseData['message'] = 'Modifica effettuata'; //Messaggio di esiso positivo
 
     } else { //Se c'è stato un errore imprevisto
-        $responseData['error'] = true; //Campo errore = truev
+        $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = "Impossibile effettuare la modifica"; //Messaggio di esito negativo
     }
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
 //endpoint: /cancella valutazione
-$app->delete('/cancella_valutazione/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
+$app->delete('/cancellaVal/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
@@ -823,7 +814,7 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
 
 });
 
-// endpoint: /registrazione
+/// endpoint: /registrazione
 $app->post('/registrazione', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -872,8 +863,66 @@ $app->post('/visualizzaSondaggio', function (Request $request, Response $respons
         return $response->withJson($responseData);
     }
 });
+$app->post('/ricercaDomandaKeyword', function (Request $request, Response $response) {
 
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
 
+    $keyword = $requestData['keyword'];
+
+    $responseData['data'] = $db->ricercaDomanda($keyword);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Domanda" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+$app->post('/ricercaUserKeyword', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+
+    $keyword = $requestData['keyword'];
+
+    $responseData['data'] = $db->ricercaUtenteKeyword($keyword);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("utente" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+$app->post('/ricercaSondaggioKeyword', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+
+    $keyword = $requestData['keyword'];
+
+    $responseData['data'] = $db->ricercaSondaggioKeyword($keyword);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
 $app->post('/login', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -917,25 +966,6 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
     }
 });
 
-$app->post('/visualizzaUltimoMessaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-
-    $requestData = $request->getParsedBody();
-    $cod_chat = $requestData['cod_chat'];
-
-    $responseData['data'] = $db->visualizzaLastMessaggio($cod_chat);
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = 'Elemento visualizzato con successo';
-        $response->getBody()->write(json_encode(array("Messaggi" => $responseData)));
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true;
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
-    }
-});
-
 
 //endpoint inserisci domanda: OK
 $app->post('/inserisciDomanda', function (Request $request, Response $response) {
@@ -945,19 +975,16 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 
 
     $titolo = $requestData['titolo'];
-    $dataeora = $requestData['dataeora'];
     $timer = $requestData['timer'];
     $descrizione = $requestData['descrizione'];
-    $cod_utente = $requestData['cod_
-    
-    '];
+    $cod_utente = $requestData['cod_utente'];
     $cod_categoria = $requestData['cod_categoria'];
 
     //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
 
 
-    $result = $db->inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+    $result = $db->inserisciDomanda( $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($result) {
         $responseData['error'] = false; //Campo errore = false
@@ -1290,17 +1317,16 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
-
-    $dataeora = $requestData['dataeora'];
     $testo = $requestData['testo'];
     $visualizzato = $requestData['visualizzato'];
     $cod_chat = $requestData['cod_chat'];
+    $msg_utente_id = $requestData['msg_utente_id'];
 
 
     $responseData = array();
 
 
-    $responseDB = $db->inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat);
+    $responseDB = $db->inserisciMessaggio($testo, $visualizzato, $cod_chat,$msg_utente_id);
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Messaggio inserito con successo'; //Messaggio di esito positivo
@@ -1311,6 +1337,66 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
     }
 
     return $response->withJson($responseData);
+
+});
+
+
+$app->post('/trovachat', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $cod_utente0 = $requestData['cod_utente0'];
+    $cod_utente1 = $requestData['cod_utente1'];
+
+    $responseData['data'] = $db->trovaChat($cod_utente0, $cod_utente1);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Chat" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['data'] = $db->trovaChatContrario($cod_utente0, $cod_utente1);
+        if ($responseData['data'] != null) {
+            $responseData['error'] = false;
+            $responseData['message'] = 'Elemento visualizzato con successo';
+            $response->getBody()->write(json_encode(array("Chat" => $responseData)));
+            return $response->withHeader('Content-type', 'application/json');
+        }else{
+
+            $responseData['data'] = null;
+            $responseData['error'] = true;
+            $responseData['message'] = 'Errore imprevisto';
+            $response->getBody()->write(json_encode(array("Chat" => $responseData)));
+            return $response->withHeader('Content-type', 'application/json');
+
+            // return $response->withJson($responseData);
+        }
+    }
+});
+
+
+$app->post('/trovaUltimoMessaggioInviato', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+
+    $cod_chat = $requestData['cod_chat'];
+    $msg_utente_id = $requestData['msg_utente_id'];
+
+    $responseData['data'] = $db->trovaUltimoMessaggioInviato($cod_chat, $msg_utente_id);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Messaggio" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
 
 });
 
@@ -1485,8 +1571,61 @@ $app->post('/modificaPassword', function (Request $request, Response $response) 
     }
     return $response->withJson($responseData);
 });
+$app->post('/creachat', function (Request $request, Response $response) {
 
-// endpoint che serve per visualizzare le domande nella home
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
+    $cod_utente0 = $requestData['cod_utente0'];
+    $cod_utente1 = $requestData['cod_utente1'];
+
+
+    $responseData = array();
+
+
+    $responseDB = $db->creaChat($cod_utente0,$cod_utente1);
+    if ($responseDB) {
+
+        $responseData['cod_chat'] = $db->trovaChat($cod_utente0,$cod_utente1);
+        if($responseData['cod_chat'] == null){
+            $responseData['cod_chat'] = $db->trovaChatContrario($cod_utente0,$cod_utente1);
+        }
+        $responseData['error'] = false;
+        $responseData['message'] = 'Chat creata con successo'; //Messaggio di esito positivo
+        $response->getBody()->write(json_encode(array("Chat" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Chat non creata'; //Messaggio di esito negativo
+        return $response->withJson($responseData);
+    }
+
+
+
+});
+
+
+$app->post('/segnala_utente', function (Request $request, Response $response){
+    $requestData = $request->getParsedBody();
+    $email_utente_segnalato = $requestData['email_utente_segnalato'];
+    $utente_segnalato = $requestData['utente_segnalato'];
+    $segnalazione = $requestData['segnalazione'];
+
+    $emailSender = new EmailHelperAltervista();
+    $responseData = array();
+
+    if($emailSender->inviaSegnalazione($segnalazione, $utente_segnalato,$email_utente_segnalato)){
+        $responseData['error'] = false;
+        $responseData['message'] = "Segnalazione inviata con successo";
+    }else{
+        $responseData['error'] = true;
+        $responseData['message'] = "Impossibile inviare la segnalazione";
+    }
+    return $response->withJson($responseData);
+});
+
+
 $app->post('/visualizzadomandehome', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -1507,6 +1646,45 @@ $app->post('/visualizzadomandehome', function (Request $request, Response $respo
     }
 
 
+});
+$app->post('/visualizzasondaggihome', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $responseData['data'] = $db->visualizzaSondaggiHome();
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Sondaggi visualizzate con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Sondaggi" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+
+
+});
+
+$app->post('/risposteperdomanda', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $codice_domanda = $requestData['codice_domanda'];
+    //Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->risposte($codice_domanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
 });
 
 $app->post('/visualizzastatistichedomanda', function (Request $request, Response $response) {
@@ -1552,28 +1730,29 @@ $app->post('/visualizzacategoria', function (Request $request, Response $respons
         return $response->withJson($responseData);
     }
 
+
 });
 
 
 $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Response $response) {
-        $db = new DBUtenti();
-        $requestData = $request->getParsedBody();
-        $cod_utente = $requestData['cod_utente'];
-        //Controllo la domanda dal DB e compilo i campi della risposta
-        $responseData['data'] = $db->visualizzaStatisticheDomanda($cod_utente);
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+    //Controllo la domanda dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaStatisticheDomanda($cod_utente);
 
-        if ($responseData['data'] != null) {
-            $responseData['error'] = false; //Campo errore = false
-            $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-            $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-            //Metto in un json e lo inserisco nella risposta del servizio REST
-            //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
-            return $response->withHeader('Content-type', 'application/json');
-        } else {
-            $responseData['error'] = true; //Campo errore = true
-            $responseData['message'] = 'Errore imprevisto';
-            return $response->withJson($responseData);
-        }
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
 
 
 });
@@ -1625,7 +1804,6 @@ $app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Resp
 
 });
 
-// endpoint: /votaSondaggio
 $app->post('/votasondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -1649,6 +1827,44 @@ $app->post('/votasondaggio', function (Request $request, Response $response) {
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
+$app->post('/visualizzaUltimoMessaggio', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+
+    $requestData = $request->getParsedBody();
+    $cod_chat = $requestData['cod_chat'];
+
+    $responseData['data'] = $db->visualizzaLastMessaggio($cod_chat);
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+    }
+    return $response->withJson($responseData);
+});
+
+$app->post('/visualizzaMiedomande', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $email = $requestData['cod_utente'];
+    //Controllo la domanda dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaMio($email);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Domande visualizzate con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //Metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = true
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 $app->post('/sceglirispostapreferita', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -1670,6 +1886,49 @@ $app->post('/sceglirispostapreferita', function (Request $request, Response $res
     return $response->withJson($responseData);
 
 });
+
+$app->post('/visualizzaDomandeMie', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+//Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaMieDomande($cod_utente);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
+        //metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = false
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
+$app->post('/visualizzaSondaggiMiei', function (Request $request, Response $response) {
+    $db = new DBUtenti();
+    $requestData = $request->getParsedBody();
+    $cod_utente = $requestData['cod_utente'];
+//Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaMieiSondaggi($cod_utente);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Sondaggi" => $responseData)));
+        //metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = false
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 
 $app->post('/inserisciVotante', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -1702,12 +1961,14 @@ $app->post('/controllogiavotato', function (Request $request, Response $response
     if ($responseData['data'] != null) {
         $responseData['error'] = false;
         $responseData['message'] = "L'cod_utente è presente nel DB";
-        $response->getBody()->write(json_encode(array("Esito esistenza cod_utente" => $responseData)));
+        $response->getBody()->write(json_encode(array( $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'La mail non è presente nel DB';
-        return $response->withJson($responseData);
+        $response->getBody()->write(json_encode(array( $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+        //return $response->withJson($responseData);
     }
 });
 
@@ -1733,9 +1994,6 @@ $app->post('/controllogiavalutatorisposta', function (Request $request, Response
     }
 });
 
-
-
-
 $app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -1757,6 +2015,28 @@ $app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Res
     return $response->withJson($responseData);
 });
 
+/*
+$app->delete('/eliminaVal/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
+
+    $db = new DBUtenti();
+
+    $cod_risposta = $request->getAttribute("cod_risposta");
+    $cod_utente = $request->getAttribute("cod_utente");
+
+    $responseData = array();
+
+    $responseDB = $db->eliminaValutazione($cod_risposta, $cod_utente);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Valutazione rimossa con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, valutazione non rimossa'; //Messaggio di esito negativo
+    }
+
+    return $response->withJson($responseData);
+});*/
 
 $app->post('/togli_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -1807,10 +2087,12 @@ $app->post('/togli_dislike', function (Request $request, Response $response) {
 
 
 
+
+
+
+
 /**** ENDPOINT ****/
 
 
 // Run app = ho riempito $app e avvio il servizio REST
 $app->run();
-
-?>

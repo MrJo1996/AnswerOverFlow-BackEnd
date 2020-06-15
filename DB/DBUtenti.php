@@ -252,45 +252,6 @@ class DBUtenti
         }
     }
 
-    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
-    public function risposte($codice_risposta)
-    {
-        $rispostaTab = $this->tabelleDB[5];
-        $campi = $this->campiTabelleDB[$rispostaTab];
-        //QUERY: "SELECT * FROM `risposta` WHERE ID = 'value'"
-        $query = (
-            "SELECT " .
-            "* " .
-            "FROM " .
-            $rispostaTab . " " .
-            "WHERE " .
-            $campi[5] . " = ?"
-        );
-        //Invio la query
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $codice_risposta);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_risposta, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
-            $risposte = array();
-            while ($stmt->fetch()) { //Scansiono la risposta della query
-                $temp = array();
-                //Indicizzo con key i dati nell'array
-                $temp[$campi[0]] = $codice_risposta;
-                $temp[$campi[1]] = $descrizione;
-                $temp[$campi[2]] = $num_like;
-                $temp[$campi[3]] = $num_dislike;
-                $temp[$campi[4]] = $cod_utente;
-                $temp[$campi[5]] = $cod_domanda;
-                array_push($risposte, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $risposte
-            }
-            return $risposte; //ritorno array $risposte riempito con i risultati della query effettuata
-        } else {
-            return null;
-        }
-    }
-
     //Seleziono tutto il contenuto di una risposta secondo una determinata mail
     public function visualizzaRisposteUtente($email)
     {
@@ -330,7 +291,7 @@ class DBUtenti
         }
     }
 
-    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
+    //Seleziono tutte le chats di un utente secondo un determinato ID
     public function visualizzaChats($codice_utente)
     {
         $chatTab = $this->tabelleDB[8];
@@ -367,7 +328,7 @@ class DBUtenti
         }
     }
 
-    //Seleziono tutto il contenuto di una risposta secondo un determinato ID
+    //Seleziono tutte le categorie
     public function ricercaCategorie()
     {
         $categoriaTab = $this->tabelleDB[2];
@@ -439,7 +400,7 @@ class DBUtenti
         }
     }
 
-    //Seleziono tutto il contenuto di una risposta secondo una determinata mail
+    //Conto tutte le valutazioni di una risposta
     public function contaValutazioni($cods)
     {
         $rispostaTab = $this->tabelleDB[5];
@@ -551,7 +512,7 @@ class DBUtenti
     }
 
     //Si seleziona la tabella delle statistiche di un utente relativa ad una categoria
-    public function vcontrolloStats($id_utente, $id_categoria)
+    public function controlloStats($id_utente, $id_categoria)
     {
         $statsTab = $this->tabelleDB[1];
         $campi = $this->campiTabelleDB[$statsTab];
@@ -707,10 +668,11 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sssssss", $username, $password, $nome, $cognome, $bio, $avatar, $email);
+        $stmt->bind_param("sssssss", $username, $password, $nome, $cognome, $bio, $avatar, $email) ;
         $result = $stmt->execute();
         return $result;
     }
+
 
     //Modifica profilo utente
     public function modificaParteProfilo($username, $nome, $cognome, $bio, $email, $avatar)
@@ -923,47 +885,6 @@ class DBUtenti
 
     }
 
-    //Controllo se un utente ha gia valutato una risposta
-    public function checkIfUserHasAlreadyEvaluatedResponse($cod_risposta)
-    {
-
-        $valutazioneTab = $this->tabelleDB[10];
-        $campi = $this->campiTabelleDB[$valutazioneTab];
-
-        //Query = select cod_utente from 'valutazione' where cod_risposta = 'value'
-
-        $query = (
-            "SELECT " .
-            " $campi[1] " .
-            "FROM " .
-            $valutazioneTab . " " .
-            "WHERE " .
-            $campi[0] . " = ?"
-        );
-
-        //Invio la query
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $cod_risposta);
-
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($cod_utente);
-            $valutazione = array(); //controlla
-            while ($stmt->fetch()) {
-                $temp = array(); //
-                //indicizzo key con i dati nell'array
-                $temp[$campi[1]] = $cod_utente;
-                array_push($valutazione, $temp);
-
-            }
-            return $valutazione;
-        } else {
-            return null;
-        }
-
-    }
-
     //Modifica num_like per id risposta
     public function modificaNumLike($codice_risposta)
     {
@@ -1069,7 +990,7 @@ class DBUtenti
         return $result;
     }
 
-    //Modifica risposta (Mariano Buttino) :query numero 8
+    //Modifica risposta
     public function modificaRisposta($codice_risposta, $descrizione)
     {
 
@@ -1125,7 +1046,7 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Visualizza sondaggio per categoria (Mariano Buttino) :non in elenco
+    //Visualizza sondaggio per categoria
     public function visualizzaSondaggioPerCategoria($cod_categoria)
     {
 
@@ -1164,7 +1085,6 @@ class DBUtenti
             return null;
         }
     }
-
 
     public function login($username, $password)
     {
@@ -1215,7 +1135,6 @@ class DBUtenti
         }
     }
 
-
     public function visualizzaMessaggi($cod_chat)
     {
         $messaggioTab = $this->tabelleDB[9];
@@ -1227,7 +1146,8 @@ class DBUtenti
             "FROM " .
             $messaggioTab . " " .
             " WHERE " .
-            $campiMessaggio[4] . " = ? "
+            $campiMessaggio[4] . " = ? " .
+            " ORDER BY " .  $campiMessaggio[1] . "  ASC "
         );
 
         $stmt = $this->connection->prepare($query);
@@ -1235,7 +1155,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat);
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat, $msg_utente_id);
             $messaggio = array();
 
             while ($stmt->fetch()) {
@@ -1246,44 +1166,9 @@ class DBUtenti
                 $temp[$campiMessaggio[2]] = $testo;
                 $temp[$campiMessaggio[3]] = $visualizzato;
                 $temp[$campiMessaggio[4]] = $cod_chat;
+                $temp[$campiMessaggio[5]] = $msg_utente_id;
+
                 array_push($messaggio, $temp);
-            }
-            return $messaggio;
-        } else {
-            return null;
-        }
-    }
-
-    public function visualizzaLastMessaggio($cod_chat)
-    {
-        $messaggioTab = $this->tabelleDB[9];
-        $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
-
-        $query = (//SELECT * FROM messaggio WHERE cod_chat=? ORDER BY codice_messaggio DESC LIMIT 1
-            "SELECT "
-            . "* " .
-            "FROM " .
-            $messaggioTab . " " .
-            " WHERE " .
-            $campiMessaggio[4] . " = ? " .
-            "ORDER BY " . $campiMessaggio[0] . " DESC LIMIT 1"
-        );
-
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $cod_chat);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat, $idUtente);
-            $messaggio = array();
-
-            if ($stmt->fetch()) {
-                $messaggio[$campiMessaggio[0]] = $codice_messaggio;
-                $messaggio[$campiMessaggio[1]] = $dataeora;
-                $messaggio[$campiMessaggio[2]] = $testo;
-                $messaggio[$campiMessaggio[3]] = $visualizzato;
-                $messaggio[$campiMessaggio[4]] = $cod_chat;
-                $messaggio[$campiMessaggio[5]] = $idUtente;
             }
             return $messaggio;
         } else {
@@ -1317,6 +1202,7 @@ class DBUtenti
         );
 
         $stmt = $this->connection->prepare($query);
+
         $stmt->execute();
         $stmt->bind_param("ss", $categoria, $titoloDomanda);
         $stmt->store_result();
@@ -1555,46 +1441,42 @@ class DBUtenti
         }
 
     }
-
-    public function visualizzaDomandeHome()
+    public function ricercaDomanda($stringa)
     {
-
 
         $domandaTab = $this->tabelleDB[4];
         $campi = $this->campiTabelleDB[$domandaTab];
 
         //Query = select *from 'domanda' where id_domanda = 'value'
-        /*
-         *
-         *          codice_domanda",
-                    "dataeora",
-                    "timer",
-                    "titolo",
-                    "descrizione",
-                    "cod_utente",
-                    "cod_categoria",
-                    "cod_preferita"*/
+        $myString = $stringa;
+        $myArray = str_split($myString);
+        $wherePart="where ";
+        foreach($myArray as $key=>$character){
+            if ($key==0){
+                $wherePart.=" titolo REGEXP '[".$character."]'";}
+            else{
+                $wherePart.="and titolo REGEXP '[".$character."]'";
+            }
+        }
+        //echo $wherePart  ;
         $query = (
             "SELECT " .
             "* " .
             "FROM " .
             $domandaTab . " " .
-            "WHERE " .
-            $campi[2] . " > '00:00:00' " .
-            " " .
-            "ORDER by " .
-            $campi[1] .
-            " " .
-            "DESC"
+            $wherePart
         );
+        //  echo $query  ;
 
+        //Invio la query
         $stmt = $this->connection->prepare($query);
+
 
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
-            $domande = array();
+            $domande = array(); //controlla
             while ($stmt->fetch()) {
                 $temp = array(); //
                 //indicizzo key con i dati nell'array
@@ -1609,6 +1491,16 @@ class DBUtenti
                 array_push($domande, $temp);
 
             }
+            foreach ($domande as $key => $value) {
+                similar_text(strtolower( $value['titolo']),strtolower($stringa),$percent);
+                $domande[$key]['similarita']=$percent;
+                //  echo $value['titolo'].$percent;
+            }
+
+            usort($domande, function($a, $b) {
+                if ($a["similarita"] == $b["similarita"])
+                    return (0);
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
             return $domande;
         } else {
             return null;
@@ -1616,6 +1508,154 @@ class DBUtenti
 
     }
 
+
+    public function ricercaSondaggioKeyword($stringa)
+    {
+
+        $sondaggioTab = $this->tabelleDB[6];
+        $campi = $this->campiTabelleDB[$sondaggioTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+        $myString = $stringa;
+        $myArray = str_split($myString);
+        $wherePart="where ";
+        foreach($myArray as $key=>$character){
+            if ($key==0){
+                $wherePart.=" titolo REGEXP '[".$character."]'";}
+            else{
+                $wherePart.="and titolo REGEXP '[".$character."]'";
+            }
+        }
+        //echo $wherePart  ;
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $sondaggioTab . " " .
+            $wherePart
+        );
+        //  echo $query  ;
+        /*   "codice_sondaggio",
+                    "dataeora",
+                    "titolo",
+                    "timer",
+                    "cod_utente",
+                    "cod_categoria"*/
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+
+        // echo $campi;
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer,  $cod_utente, $cod_categoria);
+            $domande = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_sondaggio;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $titolo;
+                $temp[$campi[3]] = $timer;
+
+
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_categoria;
+
+                array_push($domande, $temp);
+
+            }
+            foreach ($domande as $key => $value) {
+                similar_text(strtolower( $value['titolo']),strtolower($stringa),$percent);
+                $domande[$key]['similarita']=$percent;
+                //  echo $value['titolo'].$percent;
+            }
+
+            usort($domande, function($a, $b) {
+                if ($a["similarita"] == $b["similarita"])
+                    return (0);
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+
+    public function ricercaUtenteKeyword($stringa)
+    {
+
+        $userTab = $this->tabelleDB[0];
+        $campi = $this->campiTabelleDB[$userTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+        $myString = $stringa;
+        $myArray = str_split($myString);
+        $wherePart="where ";
+        foreach($myArray as $key=>$character){
+            if ($key==0){
+                $wherePart.=" username REGEXP '[".$character."]'";}
+            else{
+                $wherePart.="and username REGEXP '[".$character."]'";
+            }
+        }
+        //echo $wherePart  ;
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $userTab . " " .
+            $wherePart
+        );
+        //  echo $query  ;
+        /*    "email",
+                    "username",
+                    "password",
+                    "nome",
+                    "cognome",
+                    "bio",
+                    "attivo",
+                    "avatar"*/
+        //Invio la query
+        $stmt = $this->connection->prepare($query);
+
+        // echo $campi;
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($email,$username, $password, $nome, $cognome,  $bio, $attivo,$avatar);
+            $users = array(); //controlla
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $email;
+                $temp[$campi[1]] = $username;
+                //  $temp[$campi[2]] = $password;
+                $temp[$campi[3]] = $nome;
+                $temp[$campi[4]] = $cognome;
+                $temp[$campi[5]] = $bio;
+                $temp[$campi[6]] = $attivo;
+                $temp[$campi[7]] = $avatar;
+
+                array_push($users, $temp);
+
+            }
+            foreach ($users as $key => $value) {
+                similar_text(strtolower( $value['username']),strtolower($stringa),$percent);
+                $users[$key]['similarita']=$percent;
+                //  echo $value['titolo'].$percent;
+            }
+
+            usort($users, function($a, $b) {
+                if ($a["similarita"] == $b["similarita"])
+                    return (0);
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
+            return $users;
+        } else {
+            return null;
+        }
+
+    }
 
     public function eliminaProfilo($email)
     {
@@ -1640,31 +1680,8 @@ class DBUtenti
         return $result;
     }
 
-    //Cancella risposta
-    /*public function cancellaRisposta($id_risposta_selezionata)
-    {
-        $tabella = $this->tabelleDB[5]; //Tabella per la query
-        $campi = $this->campiTabelleDB[$tabella];
-        //query:  "  DELETE * FROM Risposta where ID = $Id_risposta_selezionata"
-
-
-        $query = (
-            "DELETE FROM " .
-            $tabella . " WHERE " .
-            $campi[0] . " = ? "
-        );
-
-
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $id_risposta_selezionata);
-        $result = $stmt->execute();
-        $stmt->store_result();
-
-        return $result;
-    }*/
-
     // Rierca domanda NON aperta
-    public function ricercaDomanda($categoria/*, $titoloDomanda*/)
+    public function ricercaDomandaNonAperta($categoria)
     {
         $domandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$domandaTab];
@@ -1686,7 +1703,7 @@ class DBUtenti
             $campiDomanda[6] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $categoria/*, $titoloDomanda*/);
+        $stmt->bind_param("i", $categoria);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
@@ -1758,7 +1775,7 @@ class DBUtenti
     }
 
     //Inserisci domanda
-    public function inserisciDomanda($dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria)
+    public function inserisciDomanda($timer, $titolo, $descrizione, $cod_utente, $cod_categoria)
     {
         $DomandaTab = $this->tabelleDB[4];
         $campiDomanda = $this->campiTabelleDB[$DomandaTab];
@@ -1767,17 +1784,17 @@ class DBUtenti
             "INSERT INTO" . " " .
             $DomandaTab . " ( " .
 
-            $campiDomanda[1] . " , " .
+
             $campiDomanda[2] . " , " .
             $campiDomanda[3] . " , " .
             $campiDomanda[4] . " , " .
             $campiDomanda[5] . " , " .
             $campiDomanda[6] . " ) " .
             "VALUES" . " ( " .
-            " ? , ? , ? , ? , ? , ?  ) "
+            " ? , ? , ? , ? , ?  ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("iisssi", $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+        $stmt->bind_param("ssssi", $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
         return $stmt->execute();
     }
 
@@ -1827,7 +1844,7 @@ class DBUtenti
             "ORDER BY " . $campiSondaggio[0] . " DESC LIMIT 1"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("s", $cod_utente);
+        $stmt->bind_param("s",$cod_utente);
         $stmt->execute();
         $stmt->store_result();
 
@@ -1881,6 +1898,116 @@ class DBUtenti
         return $cod_chat_array;
     }
 
+
+    public function trovaUltimoMessaggioInviato($cod_chat, $msg_utente_id)
+    {
+        $messaggiTab = $this->tabelleDB[9];
+        $campiMessaggio = $this->campiTabelleDB[$messaggiTab];
+
+
+        //SELECT * FROM `messaggio` WHERE `messaggio`.`cod_chat` = ?
+        //AND `messaggio`.`msg_utente_id` = '?' ORDER BY `dataeora` desc limit 1
+
+        $query = (
+            "SELECT " .
+            " * " .
+            "FROM " .
+            $messaggiTab . "  " .
+            "WHERE " .
+            " " .
+            $campiMessaggio[4] . " = ? " . "  " . " AND " . "  " . $campiMessaggio[5] . " = ? " .
+            "ORDER BY " . $campiMessaggio[1] . " DESC LIMIT 1" );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $cod_chat, $msg_utente_id);
+        $stmt->execute();
+        $stmt->store_result();
+
+        $msg_array = array();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_messaggio,$dataeora,$testo,$visualizzato,$cod_chat,$msg_utente_id);
+
+            while ($stmt->fetch()) {
+                $temp = array();
+                $temp[$campiMessaggio[0]] = $codice_messaggio;
+                $temp[$campiMessaggio[1]] = $dataeora;
+                $temp[$campiMessaggio[2]] = $testo;
+                $temp[$campiMessaggio[3]] = $visualizzato;
+                $temp[$campiMessaggio[4]] = $cod_chat;
+                $temp[$campiMessaggio[5]] = $msg_utente_id;
+
+
+                // array_push($msg_array, $temp);
+            }
+        }
+
+        return $temp;
+    }
+
+    public function trovaChatContrario($cod_utente0, $cod_utente1)
+    {
+        $chatTab = $this->tabelleDB[8];
+        $campiChat = $this->campiTabelleDB[$chatTab];
+
+        //QUERY:  SELECT id FROM chat WHERE FK_Utente0 = $cod_utente0 AND FK_Utente1=        $cod_utente1
+        //               					OR           	        FK_Utente1 = $cod_utente0
+        //                                                      AND FK_Utente0 = $cod_utente1
+        $query = (
+            "SELECT  " .
+            $campiChat[0]  .
+            " FROM  " .
+            $chatTab . "  " .
+            "WHERE " .
+            "  " .
+            $campiChat[2] . " = ? " . "  " . " AND " . "  " . $campiChat[1] . " = ? ");
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($cod_chat);
+            if($stmt->fetch()) {
+                return $cod_chat;
+
+            }
+        } else  return null;
+    }
+
+    public function trovaChat($cod_utente0, $cod_utente1)
+    {
+        $chatTab = $this->tabelleDB[8];
+        $campiChat = $this->campiTabelleDB[$chatTab];
+
+        //QUERY:  SELECT id FROM chat WHERE FK_Utente0 = $cod_utente0 AND FK_Utente1=        $cod_utente1
+        //               					OR           	        FK_Utente1 = $cod_utente0
+        //                                                      AND FK_Utente0 = $cod_utente1
+        $query = (
+            "SELECT  " .
+            $campiChat[0] .
+            " FROM " .
+            $chatTab . "  " .
+            "WHERE " .
+            "  " .
+            $campiChat[1] . " = ? " . "  " . " AND " . "  " . $campiChat[2] . " = ? "  );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($cod_chat);
+            if ($stmt->fetch()) {
+                return   $cod_chat;
+
+            }
+        } else return null;
+
+    }
+
     //Crea Chat
     public function creaChat($cod_utente0, $cod_utente1)
     {
@@ -1905,7 +2032,7 @@ class DBUtenti
     }
 
     //Inserisci messaggio
-    public function inserisciMessaggio($dataeora, $testo, $visualizzato, $cod_chat)
+    public function inserisciMessaggio($testo, $visualizzato, $cod_chat,$msg_utente_id)
     {
 
         $messaggioTab = $this->tabelleDB[9];
@@ -1914,18 +2041,18 @@ class DBUtenti
         $query = (
             "INSERT INTO" . " " .
             $messaggioTab . " ( " .
-            $campiMessaggio[1] . " , " .
             $campiMessaggio[2] . " , " .
             $campiMessaggio[3] . " , " .
-            $campiMessaggio[4] . " ) " .
+            $campiMessaggio[4] . " , " .
+            $campiMessaggio[5] . " ) " .
+
             "VALUES" . " ( " .
-            " ? , ? , ?, ? ) "
+            " ? , ?, ?, ? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ssii", $dataeora, $testo, $visualizzato, $cod_chat);
+        $stmt->bind_param("siis",$testo, $visualizzato, $cod_chat,$msg_utente_id);
         return $stmt->execute();
     }
-
 
     //n3(team cassetta)Invia Messaggio
 
@@ -2046,6 +2173,7 @@ class DBUtenti
     }
 
 
+
     public function modificaPasssword($password, $email)
     {
         $utenteTab = $this->tabelleDB[0];
@@ -2066,21 +2194,168 @@ class DBUtenti
         return $result;
     }
 
-    public function visualizzaRispostePerDomanda($cod_domanda)
+    public function visualizzarisposteperdomanda($cod_domanda)
+    {
+
+        $rispostaTab = $this->tabelleDB[5];
+        $campiRisposta = $this->campiTabelleDB[$rispostaTab];
+        //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo, sondaggio.timer,
+        // WHERE sondaggio.cod_categoria = " ? "
+        $query = (
+            "SELECT " . "  ".
+            $rispostaTab . "." . $campiRisposta[0] . ",  " .
+            $rispostaTab . "." . $campiRisposta[1] . ",  " .
+            $rispostaTab . "." . $campiRisposta[2] . ",  " .
+            $rispostaTab . "." . $campiRisposta[3] . ",  " .
+            $rispostaTab . "." . $campiRisposta[4] . ",  " .
+            $rispostaTab . "." . $campiRisposta[5] . "  " .
+            "FROM " . "  ". $rispostaTab . " " .
+            "WHERE " . "  ". $rispostaTab . "." . $campiRisposta[5] . " = ?"
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $cod_domanda);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_risposta, $descrizione, $num_like, $num_dislike, $cod_utente, $cod_domanda);
+            $risposta = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campiRisposta[0]] = $codice_risposta;
+                $temp[$campiRisposta[1]] = $descrizione;
+                $temp[$campiRisposta[2]] = $num_like;
+                $temp[$campiRisposta[3]] = $num_dislike;
+                $temp[$campiRisposta[4]] = $cod_utente;
+                $temp[$campiRisposta[5]] = $cod_domanda;
+                array_push($risposta, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
+            }
+            return $risposta;//ritorno array $sondaggio riempito con i risultati della query effettuata.
+        } else {
+            return null;
+        }
+    }
+
+
+    public function visualizzaDomandeHome()
+    {
+
+
+        $domandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$domandaTab];
+
+        //Query = select *from 'domanda' where id_domanda = 'value'
+        /*
+         *
+         *          codice_domanda",
+                    "dataeora",
+                    "timer",
+                    "titolo",
+                    "descrizione",
+                    "cod_utente",
+                    "cod_categoria",
+                    "cod_preferita"*/
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $domandaTab . " " .
+            "WHERE " .
+            $campi[2] . " > '00:00:00' " .
+            " " .
+            "ORDER by " .
+            $campi[1] .
+            " " .
+            "DESC"
+        );
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
+            $domande = array();
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_domanda;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $timer;
+                $temp[$campi[3]] = $titolo;
+                $temp[$campi[4]] = $descrizione;
+                $temp[$campi[5]] = $cod_utente;
+                $temp[$campi[6]] = $cod_categoria;
+                $temp[$campi[7]] = $cod_preferita;
+                array_push($domande, $temp);
+
+            }
+            return $domande;
+        } else {
+            return null;
+        }
+
+    }
+
+    public function visualizzaSondaggiHome()
+    {
+
+
+        $sondaggioTab = $this->tabelleDB[6];
+        $campi = $this->campiTabelleDB[$sondaggioTab];
+        /*
+         *
+         "codice_sondaggio",
+            "dataeora",
+            "titolo",
+            "timer",
+            "cod_utente",
+            "cod_categoria"*/
+        $query = (
+            "SELECT " .
+            "* " .
+            "FROM " .
+            $sondaggioTab . " " .
+            "WHERE " .
+            $campi[3] . " > '00:00:00' " .
+            " " .
+            "ORDER by " .
+            $campi[1] .
+            " " .
+            "DESC"
+        );
+
+        $stmt = $this->connection->prepare($query);
+
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
+            $sondaggi = array();
+            while ($stmt->fetch()) {
+                $temp = array(); //
+                //indicizzo key con i dati nell'array
+                $temp[$campi[0]] = $codice_sondaggio;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $titolo;
+                $temp[$campi[3]] = $timer;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_categoria;
+                array_push($sondaggi, $temp);
+
+            }
+            return $sondaggi;
+        } else {
+            return null;
+        }
+
+    }
+
+    public function risposte($codice_domanda)
     {
         $rispostaTab = $this->tabelleDB[5];
         $campi = $this->campiTabelleDB[$rispostaTab];
-
-        /* "risposta" => [
-            "codice_risposta",
-            "descrizione",
-            "num_like",
-            "num_dislike",
-            "cod_utente",
-            "cod_domanda"
-        ],*/
-
-
         //QUERY: "SELECT * FROM `risposta` WHERE ID = 'value'"
         $query = (
             "SELECT " .
@@ -2088,12 +2363,12 @@ class DBUtenti
             "FROM " .
             $rispostaTab . " " .
             "WHERE " .
-            $campi[5] . " = ?" .
-             "ORDER BY " . $campi[0] . " DESC "
+            $campi[5] . " = ? " .
+            "ORDER BY  " . $campi[0] . "  DESC "
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i", $cod_domanda);
+        $stmt->bind_param("i", $codice_domanda);
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
@@ -2116,7 +2391,6 @@ class DBUtenti
         }
     }
 
-
     public function visualizzaStatisticheDomanda($cod_utente)
     {
 
@@ -2137,13 +2411,13 @@ class DBUtenti
         $query = (
             "SELECT " .
             "  COUNT(*) AS num_domande, " .
-            $campi[6] . " " .
+            $campi[6]. " ".
             "FROM " .
             $domandaTab . " " .
             "WHERE " .
             $campi[5] . " = ? " .
-            " GROUP BY " . $campi[6] . " " .
-            " ORDER BY " . $campi[6] . " " .
+            " GROUP BY " . $campi[6]. " ".
+            " ORDER BY " . $campi[6]. " ".
             "LIMIT 3"
 
         );
@@ -2217,7 +2491,7 @@ class DBUtenti
         $DomandaTab = $this->tabelleDB[4];
         $campi = $this->campiTabelleDB[$DomandaTab];
 
-        /*SELECT COUNT(*) AS num_domande, cod_categoria FROM domanda WHERE cod_utente ="gmailverificata"
+        /*SELECT COUNT(*) AS num_domande, cod_categoria FROM domanda WHERE cod_utente ="sim1cassetta@gmail.com"
         GROUP BY cod_categoria ORDER BY cod_categoria
          "codice_domanda",
                 "dataeora",
@@ -2230,13 +2504,13 @@ class DBUtenti
         */
         $query = (
             "SELECT " .
-            "  COUNT(*) AS num_risposte, " .
+            "  COUNT(*) AS num_domande, " .
             $campi[6] . " " .
             "FROM " .
             $DomandaTab . " " .
             "WHERE " .
             $campi[5] . " = ? " .
-            " GROUP BY " . $campi[6] . " " .
+            " GROUP BY " . $campi[6] . " ".
             " ORDER BY " . $campi[6] . " "
 
 
@@ -2250,23 +2524,21 @@ class DBUtenti
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($num_domande, $cod_categoria);
-            $domande = array(); //controlla
+            $domandeT = array(); //controlla
             while ($stmt->fetch()) {
                 $temp = array(); //
                 //indicizzo key con i dati nell'array
                 $temp["num_domande"] = $num_domande;
                 $temp[$campi[6]] = $cod_categoria;
-                array_push($domande, $temp);
+                array_push($domandeT, $temp);
 
             }
-            return $domande;
+            return $domandeT;
         } else {
             return null;
         }
 
     }
-
-
 
 
     public function visualizzaStatisticherisposta($cod_utente)
@@ -2316,85 +2588,6 @@ class DBUtenti
             "LIMIT 3"
         );
 
-      /*  $sondaggioTab . "." . $campiSondaggio[0] . ", " .
-        $sondaggioTab . "." . $campiSondaggio[1] . ", " .
-        $sondaggioTab . "." . $campiSondaggio[2] . ", " .
-        $sondaggioTab . "." . $campiSondaggio[3] . " " .
-
-        */
-        //Invio la query
-        $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("s", $cod_utente);
-
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($num_risposte, $cod_categoria);
-            $risposte = array(); //controlla
-            while ($stmt->fetch()) {
-                $temp = array(); //
-                //indicizzo key con i dati nell'array
-                $temp["num_risposte"] = $num_risposte;
-                $temp[$campiD[6]] = $cod_categoria;
-                array_push($risposte, $temp);
-
-            }
-            return $risposte;
-        } else {
-            return null;
-        }
-
-    }
-
-
-
-    public function visualizzaStatisticheTOTrisposta($cod_utente)
-    {
-
-        $RispostaTab = $this->tabelleDB[5];
-        $campi = $this->campiTabelleDB[$RispostaTab];
-        $DomandaTab = $this->tabelleDB[4];
-        $campiD = $this->campiTabelleDB[$DomandaTab];
-
-        /*SELECT COUNT(*) AS num_risposte, cod_categoria FROM risposta ris JOIN domanda dom
-        WHERE ris.cod_domanda = dom.codice_domanda AND ris.cod_utente = "gmailverificata"
-        GROUP BY dom.cod_categoria ORDER BY dom.cod_categoria
-
-         "codice_domanda",
-                "dataeora",
-                "timer",
-                "titolo",
-                "descrizione",
-                "cod_utente",
-                "cod_categoria",
-                "cod_preferita"
-
-
-        "risposta" => [
-            "codice_risposta",
-            "descrizione",
-            "num_like",
-            "num_dislike",
-            "cod_utente",
-            "cod_domanda"
-        ],
-        */
-        $query = (
-            "SELECT " .
-            "  COUNT(*) AS num_domande, " .
-            $campiD[6] . " " .
-            "FROM " .
-            $RispostaTab . " " .
-            "JOIN " .
-            $DomandaTab . " " .
-            "WHERE " .
-            $campi[5]=$campiD[0] . " " .
-                $campi[5] . " = ? " .
-                " GROUP BY " . $campiD[6] . " " .
-                " ORDER BY " . $campiD[6] . " "
-
-
-        );
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
@@ -2419,6 +2612,7 @@ class DBUtenti
         }
 
     }
+
 
     public function votaSondaggio($codice_scelta, $cod_sondaggio)
     {
@@ -2432,8 +2626,8 @@ class DBUtenti
             $campiScelta[2] . " = " . $campiScelta[2] . " +1 " .
             "WHERE " .
             $campiScelta[0] . "= ? " . " ".
-              "AND " .
-              $campiScelta[3] . "= ?  "
+            "AND " .
+            $campiScelta[3] . "= ?  "
         );
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ii",   $codice_scelta, $cod_sondaggio);
@@ -2441,6 +2635,44 @@ class DBUtenti
         $result = $stmt->execute();
         return $result;
     }
+
+    public function visualizzaLastMessaggio($cod_chat)
+    {
+        $messaggioTab = $this->tabelleDB[9];
+        $campiMessaggio = $this->campiTabelleDB[$messaggioTab];
+
+        $query = (//SELECT * FROM messaggio WHERE cod_chat=? ORDER BY codice_messaggio DESC LIMIT 1
+            "SELECT "
+            . "* " .
+            "FROM " .
+            $messaggioTab . " " .
+            " WHERE " .
+            $campiMessaggio[4] . " = ? " .
+            "ORDER BY " . $campiMessaggio[0] . " DESC LIMIT 1"
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("i", $cod_chat);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat, $idUtente);
+            $messaggio = array();
+
+            if ($stmt->fetch()) {
+                $messaggio[$campiMessaggio[0]] = $codice_messaggio;
+                $messaggio[$campiMessaggio[1]] = $dataeora;
+                $messaggio[$campiMessaggio[2]] = $testo;
+                $messaggio[$campiMessaggio[3]] = $visualizzato;
+                $messaggio[$campiMessaggio[4]] = $cod_chat;
+                $messaggio[$campiMessaggio[5]] = $idUtente;
+            }
+            return $messaggio;
+        } else {
+            return null;
+        }
+    }
+
 
     public function scegliRispostaPreferita($codice_domanda, $cod_preferita)
     {
@@ -2467,7 +2699,93 @@ class DBUtenti
         return $stmt->execute();
     }
 
-    //Visto che non è ancora presente in DB, la si crea
+    public function visualizzaMieDomande($cod_utente)
+    {
+
+        $domandaTab = $this->tabelleDB[4];
+        $campi = $this->campiTabelleDB[$domandaTab];
+        $query = (
+            "SELECT " .
+            $domandaTab . "." . $campi[0] . ", " .
+            $domandaTab . "." . $campi[1] . ", " .
+            $domandaTab . "." . $campi[2] . ", " .
+            $domandaTab . "." . $campi[3] . ", " .
+            $domandaTab . "." . $campi[4] . ", " .
+            $domandaTab . "." . $campi[5] . ", " .
+            $domandaTab . "." . $campi[6] . ", " .
+            $domandaTab . "." . $campi[7] . " " .
+            "FROM " . $domandaTab . " " .
+            "WHERE " . $domandaTab . "." . $campi[5] . " = ?"
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
+            $domanda = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_domanda;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $timer;
+                $temp[$campi[3]] = $titolo;
+                $temp[$campi[4]] = $descrizione;
+                $temp[$campi[5]] = $cod_utente;
+                $temp[$campi[6]] = $cod_categoria;
+                $temp[$campi[7]] = $cod_preferita;
+                array_push($domanda, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
+            }
+            return $domanda;//ritorno array $sondaggio riempito con i risultati della query effettuata.
+        } else {
+            return null;
+        }
+    }
+
+    public function visualizzaMieiSondaggi($cod_utente)
+    {
+
+        $sondaggioTab = $this->tabelleDB[6];
+        $campi = $this->campiTabelleDB[$sondaggioTab];
+        $query = (
+            "SELECT " .
+            $sondaggioTab . "." . $campi[0] . ", " .
+            $sondaggioTab . "." . $campi[1] . ", " .
+            $sondaggioTab . "." . $campi[2] . ", " .
+            $sondaggioTab . "." . $campi[3] . ", " .
+            $sondaggioTab . "." . $campi[4] . ", " .
+            $sondaggioTab . "." . $campi[5] . " " .
+            "FROM " . $sondaggioTab . " " .
+            "WHERE " . $sondaggioTab . "." . $campi[4] . " = ?"
+        );
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->bind_param("s", $cod_utente);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
+            $sondaggio = array();
+            while ($stmt->fetch()) { //Scansiono la risposta della query
+                $temp = array();
+                //Indicizzo con key i dati nell'array
+                $temp[$campi[0]] = $codice_sondaggio;
+                $temp[$campi[1]] = $dataeora;
+                $temp[$campi[2]] = $titolo;
+                $temp[$campi[3]] = $timer;
+                $temp[$campi[4]] = $cod_utente;
+                $temp[$campi[5]] = $cod_categoria;
+                array_push($sondaggio, $temp); //Inserisco l'array $temp all'ultimo posto dell'array $sondaggio
+            }
+            return $sondaggio;//ritorno array $sondaggio riempito con i risultati della query effettuata.
+        } else {
+            return null;
+        }
+    }
+
+
     public function inserisciNuovoVotante($cod_scelta, $cod_utente, $cod_sondaggio)
     {
         $votantiTab = $this->tabelleDB[11];
@@ -2493,14 +2811,14 @@ class DBUtenti
 
     public function controlloGiaVotato($cod_utente, $cod_sondaggio)
     {
-        $valutazioneTab = $this->tabelleDB[11]; //Tabella per la query
-        $campi = $this->campiTabelleDB[$valutazioneTab]; //Campi per la query
+        $votanteTab = $this->tabelleDB[11]; //Tabella per la query
+        $campi = $this->campiTabelleDB[$votanteTab]; //Campi per la query
         //QUERY: "SELECT email FROM utente WHERE email = ?
         $query = (
             "SELECT *" .
-              " " .
+            " " .
             "FROM " .
-            $valutazioneTab . " " .
+            $votanteTab . " " .
             "WHERE " .
             $campi[1] . " = ? " .
             "AND " .  " " .
@@ -2515,8 +2833,6 @@ class DBUtenti
         //Se ha trovato un match tra la mail inserita e la tab utente, restituisce una bool TRUE
         return $stmt->num_rows > 0;
     }
-
-
 
     public function controlloGiaValutatoRisposta($cod_utente, $cod_risposta)
     {
@@ -2565,10 +2881,6 @@ class DBUtenti
 
 
 
-
-
-
-
     public function eliminaValutazione($codice_valutazione)
     {
         $valutazioneTab = $this->tabelleDB[10]; //Tabella per la query
@@ -2589,8 +2901,6 @@ class DBUtenti
 
         return $result;
     }
-
-
 
     public function togliLike($codice_risposta)
     {
@@ -2645,56 +2955,6 @@ class DBUtenti
         return $result;
     }
 
-   /* public function visualizzaDomandeHome()
-    {
-
-
-        $domandaTab = $this->tabelleDB[4];
-        $campi = $this->campiTabelleDB[$domandaTab];
-
-        $query = (
-            "SELECT " .
-            "* " .
-            "FROM " .
-            $domandaTab . " " .
-            "WHERE " .
-            $campi[2] . " > '00:00:00' " .
-            " " .
-            "ORDER by " .
-            $campi[1] .
-            " " .
-            "DESC"
-        );
-
-        $stmt = $this->connection->prepare($query);
-
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_domanda, $dataeora, $timer, $titolo, $descrizione, $cod_utente, $cod_categoria, $cod_preferita);
-            $domande = array();
-            while ($stmt->fetch()) {
-                $temp = array(); //
-                //indicizzo key con i dati nell'array
-                $temp[$campi[0]] = $codice_domanda;
-                $temp[$campi[1]] = $dataeora;
-                $temp[$campi[2]] = $timer;
-                $temp[$campi[3]] = $titolo;
-                $temp[$campi[4]] = $descrizione;
-                $temp[$campi[5]] = $cod_utente;
-                $temp[$campi[6]] = $cod_categoria;
-                $temp[$campi[7]] = $cod_preferita;
-                array_push($domande, $temp);
-
-            }
-            return $domande;
-        } else {
-            return null;
-        }
-
-    }
-    */
-
-
 }
+
 ?>

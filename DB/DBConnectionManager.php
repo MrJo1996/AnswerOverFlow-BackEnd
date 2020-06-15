@@ -5,8 +5,8 @@ class DBConnectionManager
     private $connection;
     private $host = "localhost";
     private $username = "root";
-    private $passwd = "root";
-    private $dbname = "answeroverflow"; //nome su phpMyAdmin
+    private $passwd = "";
+    private $dbname = "my_answeroverflow"; //nome su phpMyAdmin
 
     function runConnection()
     {
