@@ -1,14 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Andrea
- * Date: 11/05/18
- * Time: 21:11
- */
-
 /* In questo file php vengono elencati tutti gli endpoint disponibili al servizio REST */
 
-//Importiamo Slim e le sue librerie
+//Import Slim e le sue librerie
 use Slim\App;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -17,7 +10,6 @@ require_once '../vendor/autoload.php';
 require '../DB/DBConnectionManager.php';
 require '../DB/DBUtenti.php';
 
-/*require '../Helper/EmailHelper/EmailHelper.php';*/
 require '../Helper/EmailHelper/EmailHelperAltervista.php';
 require '../Helper/RandomPasswordHelper/RandomPasswordHelper.php';
 
@@ -62,12 +54,18 @@ $app->add(function ($req, $res, $next) {
         //logica del servizio  ---- (COME SI FA IL JS)
 
         return "risposta";
+    }
 
-    } */
+    Per il testing in Postman metodi Delete:
+       -selezionare come method DELETE
+       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
+       -send
+    */
 
-/*************** LISTA DI ENDPOINT **************/
 
-// endpoint: /visualizzaRisposta OK
+/*************** LISTA ENDPOINT **************/
+
+// endpoint: /visualizzaRisposta
 $app->post('/visualizzarisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -110,7 +108,7 @@ $app->post('/Visualizzarisposteperdomanda', function (Request $request, Response
 });
 
 
-// endpoint: /visualizzaRisposta OK
+// endpoint: /visualizzaRisposta
 $app->post('/visualizzaRisposteUtente', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -120,7 +118,7 @@ $app->post('/visualizzaRisposteUtente', function (Request $request, Response $re
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
@@ -149,7 +147,7 @@ $app->post('/visualizzaChats', function (Request $request, Response $response) {
     }
 });
 
-// endpoint: /controlloEmail OK
+// endpoint: /controlloEmail
 $app->post('/controlloEmail', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -168,16 +166,16 @@ $app->post('/controlloEmail', function (Request $request, Response $response) {
     }
 });
 
-$app->post('/proponi_categoria', function (Request $request, Response $response){
+$app->post('/proponi_categoria', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
     $proposta = $requestData['proposta'];
     $emailSender = new EmailHelperAltervista();
     $responseData = array();
 
-    if($emailSender->sendPropostaCategoriaEmail($proposta)){
+    if ($emailSender->sendPropostaCategoriaEmail($proposta)) {
         $responseData['error'] = false;
         $responseData['message'] = "Proposta inviata con successo";
-    }else{
+    } else {
         $responseData['error'] = true;
         $responseData['message'] = "Impossibile inviare la proposta";
     }
@@ -185,12 +183,11 @@ $app->post('/proponi_categoria', function (Request $request, Response $response)
 });
 
 //endpoint /recupero password/modifica password
-//ci sono da apportare modifiche alla funzione EmailSender
 $app->post('/recupero', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
-    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $requestData = $request->getParsedBody();
     $email = $requestData['email'];
 
     //Risposta del servizio REST
@@ -223,7 +220,7 @@ $app->post('/recupero', function (Request $request, Response $response) {
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-// endpoint: /aChiAppartieniRisposta OK
+// endpoint: /aChiAppartieniRisposta
 $app->post('/aChiAppartieniRisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -242,7 +239,7 @@ $app->post('/aChiAppartieniRisposta', function (Request $request, Response $resp
     }
 });
 
-// endpoint: /aChiAppartieniDomanda OK
+// endpoint: /aChiAppartieniDomanda
 $app->post('/aChiAppartieniDomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -261,29 +258,7 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
     }
 });
 
-// endpoint: /ricercaScelteDelSondaggio
-
-
-/*$app->post('/visualizzadomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $codice_domanda = $requestData['codice_domanda'];
-    //Controllo la domanda dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->visualizzaDomanda($codice_domanda);
-
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
-    }
-*/
+// endpoint: /ricercaScelteSondaggio
 $app->post('/ricercaScelteSondaggio', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -295,16 +270,7 @@ $app->post('/ricercaScelteSondaggio', function (Request $request, Response $resp
         $responseData['message'] = "Operazione andata a buon fine";
         $scelte = array();
 
-        /*for ($i=0;$i <count($responseData['data']); $i++){
-
-            $response->getBody()->write(json_encode($responseData['data'][$i]));
-            if ($i!=count($responseData['data'])-1)
-            $response->getBody()->write(',');
-
-
-        }*/
         $response->getBody()->write(json_encode(array("Scelte" => $responseData)));
-//        print_r($scelte);
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -351,7 +317,7 @@ $app->post('/ricercaCategorie', function (Request $request, Response $response) 
     }
 });
 
-// endpoint: /controlloStats OK
+// endpoint: /controlloStats
 $app->post('/controlloStats', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -371,9 +337,8 @@ $app->post('/controlloStats', function (Request $request, Response $response) {
     }
 });
 
-// endpoint: /selezionaRisposteValutate OK
+// endpoint: /selezionaRisposteValutate
 // Seleziona i codici delle risposte che hanno ricevuto almeno una valutazione
-// Da utilizzare in AggiornaStats
 $app->post('/selezionaRisposteValutate', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -393,9 +358,8 @@ $app->post('/selezionaRisposteValutate', function (Request $request, Response $r
     }
 });
 
-// endpoint: /contaRisposteValutate OK
+// endpoint: /contaRisposteValutate
 // Conta il numero di risposte che hanno ricevuto una valutazione
-// Da utilizzare in AggiornaStats
 $app->post('/contaRisposteValutate', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -417,7 +381,6 @@ $app->post('/contaRisposteValutate', function (Request $request, Response $respo
 
 // endpoint: /contaValutazioni OK
 // Conta il numero di like e dislike ricevuti
-// Da utilizzare in AggiornaStats
 $app->post('/contaValutazioni', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -438,7 +401,7 @@ $app->post('/contaValutazioni', function (Request $request, Response $response) 
     }
 });
 
-// endpoint: /aggiornaStats   OK
+// endpoint: /aggiornaStats
 $app->post('/aggiornaStats', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -452,18 +415,18 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
         $nValutazioni = count($cods);
         $statistiche = $db->controlloStats($email, $codice_categoria);
 
-        if ($statistiche != null) { //Se la mail e la categoria hanno già una stats
-            if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //vengono aggiornate
+        if ($statistiche != null) {
+            if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
                 $responseData['error'] = false;
                 $responseData['message'] = "Stats aggiornate correttamente";
-            } else { //non è stato possibile aggiornarle
+            } else {
                 $responseData['error'] = true;
                 $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
             }
-        } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) { //Altrimenti la si crea
+        } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
             $responseData['error'] = false;
             $responseData['message'] = "Statistiche create e like inserito";
-        } else { //non è stato possibile crearle
+        } else {
             $responseData['error'] = true;
             $responseData['message'] = "Probabilmente l'utente o la categoria inserita non esiste";
         }
@@ -472,57 +435,8 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
         $responseData['message'] = "Non ha senso aggiornare le statistiche perchè l'utente non
         esiste o non ha risposto a domande nelle categoria immessa";
     }
-//    echo $valutazioni ["num_like"];
-
     return $response->withJson($responseData);
 });
-
-/* endpoint: per testare aggiornaStats
-$app->post('/aggiornaStats1', function (Request $request, Response $response)
-{
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $email = $requestData['email'];
-    $codice_categoria = $requestData['codice_categoria'];
-    $valutazione = $requestData['sommatoria_valutazioni'];
-    $n_valutazioni = $requestData['numero_valutazioni'];
-    $responseData['data'] = $db->aggiornaStats($email, $codice_categoria, $valutazione, $n_valutazioni);
-
-    if($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = "Statistiche aggiornate";
-        $response->getBody()->write(json_encode(array("Statistiche aggiornate" => $responseData)));
-        $newResponse = $response-> withHeader('Content-type', 'application/json');
-        return $newResponse;
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
-        return $response->withJson($responseData);
-    }
-}); */
-
-/* //endpoint per testare insertStats
-$app->post('/insertStats', function (Request $request, Response $response)
-{
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $email = $requestData['email'];
-    $codice_categoria = $requestData['codice_categoria'];
-    $valutazione = $requestData['sommatoria_valutazioni'];
-    $responseData['data'] = $db->insertStats($email, $codice_categoria, $valutazione);
-
-    if($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = "Statistiche inserite";
-        $response->getBody()->write(json_encode(array("Statistiche inserite" => $responseData)));
-        $newResponse = $response-> withHeader('Content-type', 'application/json');
-        return $newResponse;
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Le statistiche ricercate non sono state trovate';
-        return $response->withJson($responseData);
-    }
-});*/
 
 // endpoint: /visualizzaNumLikeRisposta
 $app->post('/visualizza_num_like', function (Request $request, Response $response) {
@@ -585,8 +499,7 @@ $app->post('/check_if_user_has_already_evaluated_response', function (Request $r
 });
 
 
-
-// endpoint: /modificaNumLike : numero 5
+// endpoint: /modifica_num_like
 $app->post('/modifica_num_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -595,7 +508,7 @@ $app->post('/modifica_num_like', function (Request $request, Response $response)
     echo "PARAMS:";
     echo $codice_risposta . "     ";
     //Risposta del servizio REST
-    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseData = array();
     $responseDB = $db->modificaNumLike($codice_risposta);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
@@ -609,7 +522,7 @@ $app->post('/modifica_num_like', function (Request $request, Response $response)
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-// endpoint: /modificaNumDisLike : numero 5
+// endpoint: /modificaNumDisLike
 $app->post('/modifica_num_dislike', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -633,7 +546,7 @@ $app->post('/modifica_num_dislike', function (Request $request, Response $respon
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-// endpoint: /modificaTipo_like : numero 5
+// endpoint: /modificaTipo_like
 $app->post('/modifica_tipo_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -668,10 +581,6 @@ $app->delete('/cancellaVal/{cod_risposta},{cod_utente}', function (Request $requ
     $cod_risposta = $request->getAttribute("cod_risposta");
     $cod_utente = $request->getAttribute("cod_utente");
 
-    //Stampa codice passed
-    echo "\n\n Codice risposta passato: " . $cod_risposta;
-    echo "\n\n Codice utente passato: " . $cod_utente;
-
     $responseData = array();
 
     $responseDB = $db->cancellaValutazione($cod_risposta, $cod_utente);
@@ -686,15 +595,10 @@ $app->delete('/cancellaVal/{cod_risposta},{cod_utente}', function (Request $requ
 
     return $response->withJson($responseData);
 
-    /*Per il testing in Postman:
-       -selezionare come method DELETE
-       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
-       -send
-    */
 });
 
 
-// endpoint: /modificaRisposta :numero 8
+// endpoint: /modificaRisposta
 $app->post('/modificaRisposta', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -717,7 +621,7 @@ $app->post('/modificaRisposta', function (Request $request, Response $response) 
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-//endpoint: / visualizza sondaggio per categoria :non in elenco
+//endpoint: / visualizza sondaggio per categoria
 
 $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -740,7 +644,7 @@ $app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Respo
     }
 });
 
-//endpoint: /visualizzaProfilo...OK
+//endpoint: /visualizzaProfilo
 $app->post('/visualizzaProfilo', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -760,7 +664,7 @@ $app->post('/visualizzaProfilo', function (Request $request, Response $response)
     }
 });
 
-//endpoint: /modificaProfilo...OK
+//endpoint: /modificaProfilo
 $app->post('/modificaProfilo', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -790,7 +694,7 @@ $app->post('/modificaProfilo', function (Request $request, Response $response) {
     return $response->withJson($responseData);
 });
 
-// endpoint: /visualizzaDomanda OK
+// endpoint: /visualizzaDomanda
 $app->post('/visualizzadomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -810,8 +714,6 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
     }
-
-
 });
 
 /// endpoint: /registrazione
@@ -863,6 +765,7 @@ $app->post('/visualizzaSondaggio', function (Request $request, Response $respons
         return $response->withJson($responseData);
     }
 });
+
 $app->post('/ricercaDomandaKeyword', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -883,6 +786,7 @@ $app->post('/ricercaDomandaKeyword', function (Request $request, Response $respo
         return $response->withJson($responseData);
     }
 });
+
 $app->post('/ricercaUserKeyword', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -903,6 +807,7 @@ $app->post('/ricercaUserKeyword', function (Request $request, Response $response
         return $response->withJson($responseData);
     }
 });
+
 $app->post('/ricercaSondaggioKeyword', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -923,6 +828,7 @@ $app->post('/ricercaSondaggioKeyword', function (Request $request, Response $res
         return $response->withJson($responseData);
     }
 });
+
 $app->post('/login', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -946,7 +852,6 @@ $app->post('/login', function (Request $request, Response $response) {
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-
 $app->post('/visualizzaMessaggi', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -966,7 +871,6 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
     }
 });
 
-
 //endpoint inserisci domanda: OK
 $app->post('/inserisciDomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -981,10 +885,9 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
     $cod_categoria = $requestData['cod_categoria'];
 
     //Risposta del servizio REST
-    $responseData = array(); //La risposta e' un array di informazioni da compilare
+    $responseData = array();
 
-
-    $result = $db->inserisciDomanda( $timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
+    $result = $db->inserisciDomanda($timer, $titolo, $descrizione, $cod_utente, $cod_categoria);
     //Controllo la risposta dal DB e compilo i campi della risposta
     if ($result) {
         $responseData['error'] = false; //Campo errore = false
@@ -998,12 +901,12 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 });
 
 
-//n11(TEAM cassetta) endpoint: /inserisciSondaggio  CASSETTA  OK
+//endpoint: /inserisciSondaggio
 $app->post('/inseriscisondaggio', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
-    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $requestData = $request->getParsedBody();//Dati richiesti dal servizio
 
     $timer = $requestData['timer'];
     $dataeora = $requestData['dataeora'];
@@ -1030,7 +933,7 @@ $app->post('/inseriscisondaggio', function (Request $request, Response $response
 });
 
 
-//ENDPOINT invia messaggio(NON FUNZIONA)
+//ENDPOINT invia messaggio
 
 $app->post('/inviamessaggio', function (Request $request, Response $response) {
 
@@ -1144,55 +1047,8 @@ $app->post('/inserisci_risposta', function (Request $request, Response $response
 
 });
 
-
-//endpoint: /ricercaSondaggio non aperto
-$app->post('/ricercaSondaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-
-    $requestData = $request->getParsedBody();
-
-    $categoria = $requestData['categoria'];
-    $titoloSondaggio = $requestData['titolo'];
-
-    $responseData['data'] = $db->ricercaSondaggio($categoria, $titoloSondaggio);
-
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = 'Elemento visualizzato con successo';
-        $response->getBody()->write(json_encode(array("Sondaggi trovati" => $responseData)));
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true;
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
-    }
-});
-
-//endpoint: /ricercaDomanda non aperta
-$app->post('/ricercaDomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-
-    $requestData = $request->getParsedBody();
-
-    $categoria = $requestData['categoria'];
-    // $titoloDomanda = $requestData['titolo'];
-
-    $responseData['data'] = $db->ricercaDomanda($categoria/*,$titoloDomanda*/);
-
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false;
-        $responseData['message'] = 'Elemento visualizzato con successo';
-        $response->getBody()->write(json_encode(array("Domande trovate" => $responseData)));
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true;
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
-    }
-});
-
 //endpoint: /rimuove i sondaggi che hanno il timer scaduto
-$app->delete('/timerScadutoSondaggi', function (Request $request, Response $response){
+$app->delete('/timerScadutoSondaggi', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
     $responseData = array();
@@ -1201,12 +1057,12 @@ $app->delete('/timerScadutoSondaggi', function (Request $request, Response $resp
     $cancellazioni = true;
     $responseData['eliminati'] = array();
 
-    if ($responseData['data']){
+    if ($responseData['data']) {
         $now = strtotime("now");
-        for ($i = 0; $i < count($responseData['data']); $i++){
+        for ($i = 0; $i < count($responseData['data']); $i++) {
             $timerSondaggio = strtotime($responseData['data'][$i]['timer']) - strtotime("TODAY");
             $fineSondaggio = strtotime($responseData['data'][$i]['dataeora']) + $timerSondaggio;
-            if ($fineSondaggio < $now){
+            if ($fineSondaggio < $now) {
                 $format = 'd/m/Y H:i:s';
                 echo "\nVecchio sondaggio scaduto il " . date($format, $fineSondaggio);
                 $cod_oldSondaggio = $responseData['data'][$i]['codice_sondaggio'];
@@ -1215,14 +1071,14 @@ $app->delete('/timerScadutoSondaggi', function (Request $request, Response $resp
                 array_push($responseData['eliminati'], $cod_oldSondaggio);
             }
         }
-        if ($cancellazioni){
+        if ($cancellazioni) {
             $responseData['error'] = false;
             $responseData['message'] = "Le eliminazioni necessarie sono state effettuate";
-        }else{
+        } else {
             $responseData['error'] = true;
             $responseData['message'] = "La cancellazione non è andata a buon fine";
         }
-    }else{
+    } else {
         $responseData['error'] = true;
         $responseData['message'] = "Non è possibile comunicare con il server";
     }
@@ -1252,24 +1108,15 @@ $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, R
     }
 
     return $response->withJson($responseData);
-
-    /*Per il testing in Postman:
-       -selezionare come method DELETE
-       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
-       -send
-    */
 });
 
 
-//endpoint: /rimuoviProfilo  OK
+//endpoint: /rimuoviProfilo
 $app->delete('/eliminaProfilo/{email}', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
 
     $email = $request->getAttribute("email");
-
-//Stampa codice passed
-    echo "\n\n email passata: " . $email;
 
     $responseData = array();
 
@@ -1284,11 +1131,10 @@ $app->delete('/eliminaProfilo/{email}', function (Request $request, Response $re
     }
 
     return $response->withJson($responseData);
-
 });
 
 
-//endpoint: /cancellaSondaggio OK
+//endpoint: /cancellaSondaggio
 $app->delete('/cancellaSondaggio/{codice_sondaggio}', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -1315,7 +1161,7 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
 
     $db = new DBUtenti();
 
-    $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+    $requestData = $request->getParsedBody();
 
     $testo = $requestData['testo'];
     $visualizzato = $requestData['visualizzato'];
@@ -1326,7 +1172,7 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
     $responseData = array();
 
 
-    $responseDB = $db->inserisciMessaggio($testo, $visualizzato, $cod_chat,$msg_utente_id);
+    $responseDB = $db->inserisciMessaggio($testo, $visualizzato, $cod_chat, $msg_utente_id);
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Messaggio inserito con successo'; //Messaggio di esito positivo
@@ -1363,15 +1209,13 @@ $app->post('/trovachat', function (Request $request, Response $response) {
             $responseData['message'] = 'Elemento visualizzato con successo';
             $response->getBody()->write(json_encode(array("Chat" => $responseData)));
             return $response->withHeader('Content-type', 'application/json');
-        }else{
+        } else {
 
             $responseData['data'] = null;
             $responseData['error'] = true;
             $responseData['message'] = 'Errore imprevisto';
             $response->getBody()->write(json_encode(array("Chat" => $responseData)));
             return $response->withHeader('Content-type', 'application/json');
-
-            // return $response->withJson($responseData);
         }
     }
 });
@@ -1392,7 +1236,7 @@ $app->post('/trovaUltimoMessaggioInviato', function (Request $request, Response 
         $responseData['message'] = 'Elemento visualizzato con successo';
         $response->getBody()->write(json_encode(array("Messaggio" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
-    }else{
+    } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
@@ -1525,9 +1369,6 @@ $app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request,
 
     $codice = $request->getAttribute("codice_sondaggio");
 
-    //Stampa codice passed
-    echo "\n\n Codice passato: " . $codice;
-
     $responseData = array();
 
     $responseDB = $db->rimuoviSondaggio($codice);
@@ -1541,15 +1382,9 @@ $app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request,
     }
 
     return $response->withJson($responseData);
-
-    /*Per il testing in Postman:
-       -selezionare come method DELETE
-       -comporre l'url come sempre ma aggiungendo "/x" dove "x" è il paramentro da passare alla funzione, per intenderci il paramentro che veniva specificato nel body dei metodi post.
-       -send
-    */
 });
 
-//endpoint: /modificaPassword...OK
+//endpoint: /modificaPassword
 $app->post('/modificaPassword', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -1560,7 +1395,7 @@ $app->post('/modificaPassword', function (Request $request, Response $response) 
     $email = $requestData['email'];
 
     $responseData = array();
-    $responseDB = $db->modificaPasssword($password,  $email);
+    $responseDB = $db->modificaPasssword($password, $email);
 
     if ($responseDB) {
         $responseData['error'] = false;
@@ -1571,6 +1406,7 @@ $app->post('/modificaPassword', function (Request $request, Response $response) 
     }
     return $response->withJson($responseData);
 });
+
 $app->post('/creachat', function (Request $request, Response $response) {
 
     $db = new DBUtenti();
@@ -1580,16 +1416,14 @@ $app->post('/creachat', function (Request $request, Response $response) {
     $cod_utente0 = $requestData['cod_utente0'];
     $cod_utente1 = $requestData['cod_utente1'];
 
-
     $responseData = array();
 
-
-    $responseDB = $db->creaChat($cod_utente0,$cod_utente1);
+    $responseDB = $db->creaChat($cod_utente0, $cod_utente1);
     if ($responseDB) {
 
-        $responseData['cod_chat'] = $db->trovaChat($cod_utente0,$cod_utente1);
-        if($responseData['cod_chat'] == null){
-            $responseData['cod_chat'] = $db->trovaChatContrario($cod_utente0,$cod_utente1);
+        $responseData['cod_chat'] = $db->trovaChat($cod_utente0, $cod_utente1);
+        if ($responseData['cod_chat'] == null) {
+            $responseData['cod_chat'] = $db->trovaChatContrario($cod_utente0, $cod_utente1);
         }
         $responseData['error'] = false;
         $responseData['message'] = 'Chat creata con successo'; //Messaggio di esito positivo
@@ -1600,13 +1434,10 @@ $app->post('/creachat', function (Request $request, Response $response) {
         $responseData['message'] = 'Chat non creata'; //Messaggio di esito negativo
         return $response->withJson($responseData);
     }
-
-
-
 });
 
 
-$app->post('/segnala_utente', function (Request $request, Response $response){
+$app->post('/segnala_utente', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
     $email_utente_segnalato = $requestData['email_utente_segnalato'];
     $utente_segnalato = $requestData['utente_segnalato'];
@@ -1615,10 +1446,10 @@ $app->post('/segnala_utente', function (Request $request, Response $response){
     $emailSender = new EmailHelperAltervista();
     $responseData = array();
 
-    if($emailSender->inviaSegnalazione($segnalazione, $utente_segnalato,$email_utente_segnalato)){
+    if ($emailSender->inviaSegnalazione($segnalazione, $utente_segnalato, $email_utente_segnalato)) {
         $responseData['error'] = false;
         $responseData['message'] = "Segnalazione inviata con successo";
-    }else{
+    } else {
         $responseData['error'] = true;
         $responseData['message'] = "Impossibile inviare la segnalazione";
     }
@@ -1629,15 +1460,13 @@ $app->post('/segnala_utente', function (Request $request, Response $response){
 $app->post('/visualizzadomandehome', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
-    //Controllo la domanda dal DB e compilo i campi della risposta
     $responseData['data'] = $db->visualizzaDomandeHome();
 
     if ($responseData['data'] != null) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Domande visualizzate con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1647,6 +1476,7 @@ $app->post('/visualizzadomandehome', function (Request $request, Response $respo
 
 
 });
+
 $app->post('/visualizzasondaggihome', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
@@ -1664,15 +1494,12 @@ $app->post('/visualizzasondaggihome', function (Request $request, Response $resp
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
     }
-
-
 });
 
 $app->post('/risposteperdomanda', function (Request $request, Response $response) {
     $db = new DBUtenti();
     $requestData = $request->getParsedBody();
     $codice_domanda = $requestData['codice_domanda'];
-    //Controllo la risposta dal DB e compilo i campi della risposta
     $responseData['data'] = $db->risposte($codice_domanda);
 
     if ($responseData['data'] != null) {
@@ -1698,8 +1525,7 @@ $app->post('/visualizzastatistichedomanda', function (Request $request, Response
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1721,8 +1547,6 @@ $app->post('/visualizzacategoria', function (Request $request, Response $respons
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Categoria visualizzata con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Categoria" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1745,8 +1569,7 @@ $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Respo
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1768,8 +1591,6 @@ $app->post('/visualizzaStatisticherisposta', function (Request $request, Respons
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1792,8 +1613,7 @@ $app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Resp
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Risposte" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1812,10 +1632,8 @@ $app->post('/votasondaggio', function (Request $request, Response $response) {
     $cod_sondaggio = $requestData['cod_sondaggio'];
 
 
-    //Risposta del servizio REST
     $responseData = array(); //La risposta e' un array di informazioni da compilare
     $responseDB = $db->votaSondaggio($codice_scelta, $cod_sondaggio);
-    //Controllo la risposta dal DB e compilo i campi della risposta
     if ($responseDB) {
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Sondaggio votato con successo'; //Messaggio di esiso positivo
@@ -1855,8 +1673,7 @@ $app->post('/visualizzaMiedomande', function (Request $request, Response $respon
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Domande visualizzate con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //Metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
@@ -1898,8 +1715,7 @@ $app->post('/visualizzaDomandeMie', function (Request $request, Response $respon
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-        //metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = false
@@ -1919,8 +1735,7 @@ $app->post('/visualizzaSondaggiMiei', function (Request $request, Response $resp
         $responseData['error'] = false; //Campo errore = false
         $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
         $response->getBody()->write(json_encode(array("Sondaggi" => $responseData)));
-        //metto in un json e lo inserisco nella risposta del servizio REST
-        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = false
@@ -1936,7 +1751,7 @@ $app->post('/inserisciVotante', function (Request $request, Response $response) 
     $cod_scelta = $requestData['cod_scelta'];
     $cod_utente = $requestData['cod_utente'];
     $cod_sondaggio = $requestData['cod_sondaggio'];
-    $responseData['data'] = $db->inserisciNuovoVotante($cod_scelta, $cod_utente, $cod_sondaggio );
+    $responseData['data'] = $db->inserisciNuovoVotante($cod_scelta, $cod_utente, $cod_sondaggio);
 
     if ($responseData['data']) {
         $responseData['error'] = false;
@@ -1961,14 +1776,13 @@ $app->post('/controllogiavotato', function (Request $request, Response $response
     if ($responseData['data'] != null) {
         $responseData['error'] = false;
         $responseData['message'] = "L'cod_utente è presente nel DB";
-        $response->getBody()->write(json_encode(array( $responseData)));
+        $response->getBody()->write(json_encode(array($responseData)));
         return $response->withHeader('Content-type', 'application/json');
     } else {
         $responseData['error'] = true; //Campo errore = true
         $responseData['message'] = 'La mail non è presente nel DB';
-        $response->getBody()->write(json_encode(array( $responseData)));
+        $response->getBody()->write(json_encode(array($responseData)));
         return $response->withHeader('Content-type', 'application/json');
-        //return $response->withJson($responseData);
     }
 });
 
@@ -2015,29 +1829,6 @@ $app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Res
     return $response->withJson($responseData);
 });
 
-/*
-$app->delete('/eliminaVal/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
-
-    $db = new DBUtenti();
-
-    $cod_risposta = $request->getAttribute("cod_risposta");
-    $cod_utente = $request->getAttribute("cod_utente");
-
-    $responseData = array();
-
-    $responseDB = $db->eliminaValutazione($cod_risposta, $cod_utente);
-    if ($responseDB) {
-        $responseData['error'] = false;
-        $responseData['message'] = 'Valutazione rimossa con successo'; //Messaggio di esito positivo
-
-    } else {
-        $responseData['error'] = true;
-        $responseData['message'] = 'Errore, valutazione non rimossa'; //Messaggio di esito negativo
-    }
-
-    return $response->withJson($responseData);
-});*/
-
 $app->post('/togli_like', function (Request $request, Response $response) {
     $db = new DBUtenti();
 
@@ -2059,7 +1850,6 @@ $app->post('/togli_like', function (Request $request, Response $response) {
     }
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
-
 
 $app->post('/togli_dislike', function (Request $request, Response $response) {
     $db = new DBUtenti();
@@ -2084,15 +1874,8 @@ $app->post('/togli_dislike', function (Request $request, Response $response) {
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
-
-
-
-
-
-
-
 /**** ENDPOINT ****/
 
 
-// Run app = ho riempito $app e avvio il servizio REST
+// Run app
 $app->run();

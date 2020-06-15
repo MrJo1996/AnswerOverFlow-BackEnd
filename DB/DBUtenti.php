@@ -668,7 +668,7 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("sssssss", $username, $password, $nome, $cognome, $bio, $avatar, $email) ;
+        $stmt->bind_param("sssssss", $username, $password, $nome, $cognome, $bio, $avatar, $email);
         $result = $stmt->execute();
         return $result;
     }
@@ -694,7 +694,7 @@ class DBUtenti
         );
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ssssss", $username,  $nome, $cognome, $bio, $avatar, $email);
+        $stmt->bind_param("ssssss", $username, $nome, $cognome, $bio, $avatar, $email);
         $result = $stmt->execute();
         return $result;
     }
@@ -931,7 +931,7 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i",  $codice_risposta);
+        $stmt->bind_param("i", $codice_risposta);
 
         $result = $stmt->execute();
 
@@ -1147,7 +1147,7 @@ class DBUtenti
             $messaggioTab . " " .
             " WHERE " .
             $campiMessaggio[4] . " = ? " .
-            " ORDER BY " .  $campiMessaggio[1] . "  ASC "
+            " ORDER BY " . $campiMessaggio[1] . "  ASC "
         );
 
         $stmt = $this->connection->prepare($query);
@@ -1441,6 +1441,7 @@ class DBUtenti
         }
 
     }
+
     public function ricercaDomanda($stringa)
     {
 
@@ -1450,12 +1451,12 @@ class DBUtenti
         //Query = select *from 'domanda' where id_domanda = 'value'
         $myString = $stringa;
         $myArray = str_split($myString);
-        $wherePart="where ";
-        foreach($myArray as $key=>$character){
-            if ($key==0){
-                $wherePart.=" titolo REGEXP '[".$character."]'";}
-            else{
-                $wherePart.="and titolo REGEXP '[".$character."]'";
+        $wherePart = "where ";
+        foreach ($myArray as $key => $character) {
+            if ($key == 0) {
+                $wherePart .= " titolo REGEXP '[" . $character . "]'";
+            } else {
+                $wherePart .= "and titolo REGEXP '[" . $character . "]'";
             }
         }
         //echo $wherePart  ;
@@ -1492,15 +1493,16 @@ class DBUtenti
 
             }
             foreach ($domande as $key => $value) {
-                similar_text(strtolower( $value['titolo']),strtolower($stringa),$percent);
-                $domande[$key]['similarita']=$percent;
+                similar_text(strtolower($value['titolo']), strtolower($stringa), $percent);
+                $domande[$key]['similarita'] = $percent;
                 //  echo $value['titolo'].$percent;
             }
 
-            usort($domande, function($a, $b) {
+            usort($domande, function ($a, $b) {
                 if ($a["similarita"] == $b["similarita"])
                     return (0);
-                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);
+            });
             return $domande;
         } else {
             return null;
@@ -1518,12 +1520,12 @@ class DBUtenti
         //Query = select *from 'domanda' where id_domanda = 'value'
         $myString = $stringa;
         $myArray = str_split($myString);
-        $wherePart="where ";
-        foreach($myArray as $key=>$character){
-            if ($key==0){
-                $wherePart.=" titolo REGEXP '[".$character."]'";}
-            else{
-                $wherePart.="and titolo REGEXP '[".$character."]'";
+        $wherePart = "where ";
+        foreach ($myArray as $key => $character) {
+            if ($key == 0) {
+                $wherePart .= " titolo REGEXP '[" . $character . "]'";
+            } else {
+                $wherePart .= "and titolo REGEXP '[" . $character . "]'";
             }
         }
         //echo $wherePart  ;
@@ -1548,7 +1550,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer,  $cod_utente, $cod_categoria);
+            $stmt->bind_result($codice_sondaggio, $dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
             $domande = array(); //controlla
             while ($stmt->fetch()) {
                 $temp = array(); //
@@ -1566,15 +1568,16 @@ class DBUtenti
 
             }
             foreach ($domande as $key => $value) {
-                similar_text(strtolower( $value['titolo']),strtolower($stringa),$percent);
-                $domande[$key]['similarita']=$percent;
+                similar_text(strtolower($value['titolo']), strtolower($stringa), $percent);
+                $domande[$key]['similarita'] = $percent;
                 //  echo $value['titolo'].$percent;
             }
 
-            usort($domande, function($a, $b) {
+            usort($domande, function ($a, $b) {
                 if ($a["similarita"] == $b["similarita"])
                     return (0);
-                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);
+            });
             return $domande;
         } else {
             return null;
@@ -1591,12 +1594,12 @@ class DBUtenti
         //Query = select *from 'domanda' where id_domanda = 'value'
         $myString = $stringa;
         $myArray = str_split($myString);
-        $wherePart="where ";
-        foreach($myArray as $key=>$character){
-            if ($key==0){
-                $wherePart.=" username REGEXP '[".$character."]'";}
-            else{
-                $wherePart.="and username REGEXP '[".$character."]'";
+        $wherePart = "where ";
+        foreach ($myArray as $key => $character) {
+            if ($key == 0) {
+                $wherePart .= " username REGEXP '[" . $character . "]'";
+            } else {
+                $wherePart .= "and username REGEXP '[" . $character . "]'";
             }
         }
         //echo $wherePart  ;
@@ -1623,7 +1626,7 @@ class DBUtenti
         $stmt->execute();
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($email,$username, $password, $nome, $cognome,  $bio, $attivo,$avatar);
+            $stmt->bind_result($email, $username, $password, $nome, $cognome, $bio, $attivo, $avatar);
             $users = array(); //controlla
             while ($stmt->fetch()) {
                 $temp = array(); //
@@ -1641,15 +1644,16 @@ class DBUtenti
 
             }
             foreach ($users as $key => $value) {
-                similar_text(strtolower( $value['username']),strtolower($stringa),$percent);
-                $users[$key]['similarita']=$percent;
+                similar_text(strtolower($value['username']), strtolower($stringa), $percent);
+                $users[$key]['similarita'] = $percent;
                 //  echo $value['titolo'].$percent;
             }
 
-            usort($users, function($a, $b) {
+            usort($users, function ($a, $b) {
                 if ($a["similarita"] == $b["similarita"])
                     return (0);
-                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);});
+                return (($a["similarita"] > $b["similarita"]) ? -1 : 1);
+            });
             return $users;
         } else {
             return null;
@@ -1844,7 +1848,7 @@ class DBUtenti
             "ORDER BY " . $campiSondaggio[0] . " DESC LIMIT 1"
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("s",$cod_utente);
+        $stmt->bind_param("s", $cod_utente);
         $stmt->execute();
         $stmt->store_result();
 
@@ -1916,7 +1920,7 @@ class DBUtenti
             "WHERE " .
             " " .
             $campiMessaggio[4] . " = ? " . "  " . " AND " . "  " . $campiMessaggio[5] . " = ? " .
-            "ORDER BY " . $campiMessaggio[1] . " DESC LIMIT 1" );
+            "ORDER BY " . $campiMessaggio[1] . " DESC LIMIT 1");
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ss", $cod_chat, $msg_utente_id);
@@ -1926,7 +1930,7 @@ class DBUtenti
         $msg_array = array();
 
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_messaggio,$dataeora,$testo,$visualizzato,$cod_chat,$msg_utente_id);
+            $stmt->bind_result($codice_messaggio, $dataeora, $testo, $visualizzato, $cod_chat, $msg_utente_id);
 
             while ($stmt->fetch()) {
                 $temp = array();
@@ -1955,7 +1959,7 @@ class DBUtenti
         //                                                      AND FK_Utente0 = $cod_utente1
         $query = (
             "SELECT  " .
-            $campiChat[0]  .
+            $campiChat[0] .
             " FROM  " .
             $chatTab . "  " .
             "WHERE " .
@@ -1969,7 +1973,7 @@ class DBUtenti
 
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($cod_chat);
-            if($stmt->fetch()) {
+            if ($stmt->fetch()) {
                 return $cod_chat;
 
             }
@@ -1991,7 +1995,7 @@ class DBUtenti
             $chatTab . "  " .
             "WHERE " .
             "  " .
-            $campiChat[1] . " = ? " . "  " . " AND " . "  " . $campiChat[2] . " = ? "  );
+            $campiChat[1] . " = ? " . "  " . " AND " . "  " . $campiChat[2] . " = ? ");
 
         $stmt = $this->connection->prepare($query);
         $stmt->bind_param("ss", $cod_utente0, $cod_utente1);
@@ -2001,7 +2005,7 @@ class DBUtenti
         if ($stmt->num_rows > 0) {
             $stmt->bind_result($cod_chat);
             if ($stmt->fetch()) {
-                return   $cod_chat;
+                return $cod_chat;
 
             }
         } else return null;
@@ -2032,7 +2036,7 @@ class DBUtenti
     }
 
     //Inserisci messaggio
-    public function inserisciMessaggio($testo, $visualizzato, $cod_chat,$msg_utente_id)
+    public function inserisciMessaggio($testo, $visualizzato, $cod_chat, $msg_utente_id)
     {
 
         $messaggioTab = $this->tabelleDB[9];
@@ -2050,7 +2054,7 @@ class DBUtenti
             " ? , ?, ?, ? ) "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("siis",$testo, $visualizzato, $cod_chat,$msg_utente_id);
+        $stmt->bind_param("siis", $testo, $visualizzato, $cod_chat, $msg_utente_id);
         return $stmt->execute();
     }
 
@@ -2173,7 +2177,6 @@ class DBUtenti
     }
 
 
-
     public function modificaPasssword($password, $email)
     {
         $utenteTab = $this->tabelleDB[0];
@@ -2202,15 +2205,15 @@ class DBUtenti
         //query: SELECT sondaggio.cod_sondaggio, sondaggio.dataeora, sondaggio.titolo, sondaggio.timer,
         // WHERE sondaggio.cod_categoria = " ? "
         $query = (
-            "SELECT " . "  ".
+            "SELECT " . "  " .
             $rispostaTab . "." . $campiRisposta[0] . ",  " .
             $rispostaTab . "." . $campiRisposta[1] . ",  " .
             $rispostaTab . "." . $campiRisposta[2] . ",  " .
             $rispostaTab . "." . $campiRisposta[3] . ",  " .
             $rispostaTab . "." . $campiRisposta[4] . ",  " .
             $rispostaTab . "." . $campiRisposta[5] . "  " .
-            "FROM " . "  ". $rispostaTab . " " .
-            "WHERE " . "  ". $rispostaTab . "." . $campiRisposta[5] . " = ?"
+            "FROM " . "  " . $rispostaTab . " " .
+            "WHERE " . "  " . $rispostaTab . "." . $campiRisposta[5] . " = ?"
         );
 
         $stmt = $this->connection->prepare($query);
@@ -2411,13 +2414,13 @@ class DBUtenti
         $query = (
             "SELECT " .
             "  COUNT(*) AS num_domande, " .
-            $campi[6]. " ".
+            $campi[6] . " " .
             "FROM " .
             $domandaTab . " " .
             "WHERE " .
             $campi[5] . " = ? " .
-            " GROUP BY " . $campi[6]. " ".
-            " ORDER BY " . $campi[6]. " ".
+            " GROUP BY " . $campi[6] . " " .
+            " ORDER BY " . $campi[6] . " " .
             "LIMIT 3"
 
         );
@@ -2510,7 +2513,7 @@ class DBUtenti
             $DomandaTab . " " .
             "WHERE " .
             $campi[5] . " = ? " .
-            " GROUP BY " . $campi[6] . " ".
+            " GROUP BY " . $campi[6] . " " .
             " ORDER BY " . $campi[6] . " "
 
 
@@ -2575,13 +2578,13 @@ class DBUtenti
         $query = (
             "SELECT " .
             "  COUNT(*) AS num_domande, " .
-            $DomandaTab . "." .  $campiD[6] . " " .
+            $DomandaTab . "." . $campiD[6] . " " .
             "FROM " .
             $RispostaTab . " " .
             "JOIN " .
             $DomandaTab . " " .
             "WHERE " .
-            $RispostaTab . "." .  $campi[5].  " = " . $DomandaTab . "." . $campiD[0] . " AND  " .
+            $RispostaTab . "." . $campi[5] . " = " . $DomandaTab . "." . $campiD[0] . " AND  " .
             $RispostaTab . "." . $campi[4] . " = ? " . " " .
             " GROUP BY " . $DomandaTab . "." . $campiD[6] . " " .
             " ORDER BY " . $DomandaTab . "." . $campiD[6] . " " .
@@ -2625,12 +2628,12 @@ class DBUtenti
             "SET " .
             $campiScelta[2] . " = " . $campiScelta[2] . " +1 " .
             "WHERE " .
-            $campiScelta[0] . "= ? " . " ".
+            $campiScelta[0] . "= ? " . " " .
             "AND " .
             $campiScelta[3] . "= ?  "
         );
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii",   $codice_scelta, $cod_sondaggio);
+        $stmt->bind_param("ii", $codice_scelta, $cod_sondaggio);
 
         $result = $stmt->execute();
         return $result;
@@ -2695,7 +2698,7 @@ class DBUtenti
 
         //invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("ii", $cod_preferita, $codice_domanda  );
+        $stmt->bind_param("ii", $cod_preferita, $codice_domanda);
         return $stmt->execute();
     }
 
@@ -2821,7 +2824,7 @@ class DBUtenti
             $votanteTab . " " .
             "WHERE " .
             $campi[1] . " = ? " .
-            "AND " .  " " .
+            "AND " . " " .
             $campi[2] . " = ? "
         );
         //Invio la query
@@ -2848,12 +2851,12 @@ class DBUtenti
         ],*/
         $query = (
             "SELECT " .
-            " * ".
+            " * " .
             "FROM " .
             $valutazioneTab . " " .
             "WHERE " .
             $campi[2] . " = ? " .
-            "AND " .  " " .
+            "AND " . " " .
             $campi[1] . " = ? "
         );
         $stmt = $this->connection->prepare($query);
@@ -2862,7 +2865,7 @@ class DBUtenti
 
         $stmt->store_result();
         if ($stmt->num_rows > 0) {
-            $stmt->bind_result($codice_valutazione, $cod_risposta,  $cod_utente, $tipo_like);
+            $stmt->bind_result($codice_valutazione, $cod_risposta, $cod_utente, $tipo_like);
             $valutazione = array();
             while ($stmt->fetch()) {
                 $temp = array();
@@ -2878,7 +2881,6 @@ class DBUtenti
             return null;
         }
     }
-
 
 
     public function eliminaValutazione($codice_valutazione)
@@ -2947,7 +2949,7 @@ class DBUtenti
 
         //Invio la query
         $stmt = $this->connection->prepare($query);
-        $stmt->bind_param("i",  $codice_risposta);
+        $stmt->bind_param("i", $codice_risposta);
 
         $result = $stmt->execute();
 
