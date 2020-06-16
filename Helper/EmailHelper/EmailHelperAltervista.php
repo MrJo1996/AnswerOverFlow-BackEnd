@@ -11,7 +11,7 @@ class EmailHelperAltervista
     {
         $emailTo = $email;
         $subject = "AnswerOverflow - Recupero Password";
-        $message = '<html><body><h1>AnswerOverflow</h1><div>Usa questa password temporanea: </div><b>' . $password . '</b><br><br></body></html>';
+        $message = '<html lang=""><body><h1>AnswerOverflow</h1><div>Usa questa password temporanea: </div><b>' . $password . '</b><br><br></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
@@ -29,7 +29,7 @@ class EmailHelperAltervista
 
         $emailTo = "answeroverflow@gmail.com";
         $subject = "AnswerOverflow - Nuova proposta per categoria";
-        $message = '<html><body><h1>AnswerOverflow</h1><div>';
+        $message = '<html lang=""><body><h1>AnswerOverflow</h1><div>';
         $message .= $messaggio . '<br><br>Categoria proposta: ' . $proposta . '<br><br></div></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
@@ -49,7 +49,7 @@ class EmailHelperAltervista
 
         $emailTo = "answeroverflow@gmail.com";
         $subject = "AnswerOverFLow - Segnalazione Utente";
-        $message = '<html><body><h1>AnswerOverFLow</h1><div>';
+        $message = '<html lang=""><body><h1>AnswerOverFLow</h1><div>';
         $message .= $messaggio . ':<br><br>Username: ' . $utente_segnalato . '<br>' . 'E-mail:' . $email_utente_segnalato . '<br><br>Segnalazione inviata per: ' . $segnalazione . '<br><br></div></body></html>';
         $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
