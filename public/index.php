@@ -8,7 +8,12 @@ use Slim\Http\Response;
 
 require_once '../vendor/autoload.php';
 require '../DB/DBConnectionManager.php';
-require '../DB/DBUtenti.php';
+require '../DB/DBAuthServices.php';
+require '../DB/DBInsertServices.php';
+require '../DB/DBDeleteServices.php';
+require '../DB/DBSearchServices.php';
+require '../DB/DBViewServices.php';
+require '../DB/DBUpdateServices.php';
 
 require '../Helper/EmailHelper/EmailHelperAltervista.php';
 require '../Helper/RandomPasswordHelper/RandomPasswordHelper.php';
@@ -51,7 +56,7 @@ $app->add(function ($req, $res, $next) {
 
     app->"richiesta http"('/nome endpoint', function (Request "dati inviati dal client", Response "dati risposti dal server") {
 
-        //logica del servizio
+        //logica del servizio  ---- (COME SI FA IL JS)
 
         return "risposta";
     }
@@ -67,7 +72,7 @@ $app->add(function ($req, $res, $next) {
 
 // endpoint: /visualizzaRisposta
 $app->post('/visualizzarisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_risposta = $requestData['codice_risposta'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -87,7 +92,7 @@ $app->post('/visualizzarisposta', function (Request $request, Response $response
 
 //endpoint: visualizzaRispostePerDomanda
 $app->post('/Visualizzarisposteperdomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_domanda = $requestData['cod_domanda'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -108,9 +113,9 @@ $app->post('/Visualizzarisposteperdomanda', function (Request $request, Response
 });
 
 
-// endpoint: /visualizzaRisposteUtente
+// endpoint: /visualizzaRisposta
 $app->post('/visualizzaRisposteUtente', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -129,7 +134,7 @@ $app->post('/visualizzaRisposteUtente', function (Request $request, Response $re
 });
 
 $app->post('/visualizzaChats', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
 
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['codice_utente'];
@@ -149,7 +154,7 @@ $app->post('/visualizzaChats', function (Request $request, Response $response) {
 
 // endpoint: /controlloEmail
 $app->post('/controlloEmail', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBAuthServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $responseData['data'] = $db->controlloEmail($email);
@@ -185,7 +190,7 @@ $app->post('/proponi_categoria', function (Request $request, Response $response)
 //endpoint /recupero password/modifica password
 $app->post('/recupero', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBAuthServices();
 
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
@@ -222,7 +227,7 @@ $app->post('/recupero', function (Request $request, Response $response) {
 
 // endpoint: /aChiAppartieniRisposta
 $app->post('/aChiAppartieniRisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_risposta = $requestData['codice_risposta'];
     $responseData['data'] = $db->aChiAppartieniRisposta($codice_risposta);
@@ -241,7 +246,7 @@ $app->post('/aChiAppartieniRisposta', function (Request $request, Response $resp
 
 // endpoint: /aChiAppartieniDomanda
 $app->post('/aChiAppartieniDomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_domanda = $requestData['codice_domanda'];
     $responseData['data'] = $db->aChiAppartieniDomanda($codice_domanda);
@@ -260,7 +265,7 @@ $app->post('/aChiAppartieniDomanda', function (Request $request, Response $respo
 
 // endpoint: /ricercaScelteSondaggio
 $app->post('/ricercaScelteSondaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
     $requestData = $request->getParsedBody();
     $codice_sondaggio = $requestData['codice_sondaggio'];
     $responseData['data'] = $db->ricercaScelteDelSondaggio($codice_sondaggio);
@@ -268,7 +273,6 @@ $app->post('/ricercaScelteSondaggio', function (Request $request, Response $resp
     if ($responseData['data']) {
         $responseData['error'] = false;
         $responseData['message'] = "Operazione andata a buon fine";
-        $scelte = array();
 
         $response->getBody()->write(json_encode(array("Scelte" => $responseData)));
         return $response->withHeader('Content-type', 'application/json');
@@ -281,7 +285,7 @@ $app->post('/ricercaScelteSondaggio', function (Request $request, Response $resp
 
 // endpoint: /inserisciScelteDelSondaggio
 $app->post('/inserisciScelteSondaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
     $requestData = $request->getParsedBody();
     $codice_sondaggio = $requestData['codice_sondaggio'];
     $descrizione = $requestData['descrizione'];
@@ -301,8 +305,8 @@ $app->post('/inserisciScelteSondaggio', function (Request $request, Response $re
 
 // endpoint: /ricercaCategorie
 $app->post('/ricercaCategorie', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
+    $db = new DBSearchServices();
+    $request->getParsedBody();
     $responseData['data'] = $db->ricercaCategorie();
 
     if ($responseData['data']) {
@@ -319,7 +323,7 @@ $app->post('/ricercaCategorie', function (Request $request, Response $response) 
 
 // endpoint: /controlloStats
 $app->post('/controlloStats', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
@@ -340,7 +344,7 @@ $app->post('/controlloStats', function (Request $request, Response $response) {
 // endpoint: /selezionaRisposteValutate
 // Seleziona i codici delle risposte che hanno ricevuto almeno una valutazione
 $app->post('/selezionaRisposteValutate', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
@@ -361,7 +365,7 @@ $app->post('/selezionaRisposteValutate', function (Request $request, Response $r
 // endpoint: /contaRisposteValutate
 // Conta il numero di risposte che hanno ricevuto una valutazione
 $app->post('/contaRisposteValutate', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
@@ -382,7 +386,7 @@ $app->post('/contaRisposteValutate', function (Request $request, Response $respo
 // endpoint: /contaValutazioni OK
 // Conta il numero di like e dislike ricevuti
 $app->post('/contaValutazioni', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
@@ -403,7 +407,10 @@ $app->post('/contaValutazioni', function (Request $request, Response $response) 
 
 // endpoint: /aggiornaStats
 $app->post('/aggiornaStats', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
+    $dbIns = new DBInsertServices();
+    $dbUp = new DBUpdateServices();
+
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
     $codice_categoria = $requestData['codice_categoria'];
@@ -416,14 +423,14 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
         $statistiche = $db->controlloStats($email, $codice_categoria);
 
         if ($statistiche != null) {
-            if ($db->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
+            if ($dbUp->aggiornaStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
                 $responseData['error'] = false;
                 $responseData['message'] = "Stats aggiornate correttamente";
             } else {
                 $responseData['error'] = true;
                 $responseData['message'] = "Il DB non risponde correttamente all' aggiornamento delle statistiche";
             }
-        } elseif ($db->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
+        } elseif ($dbIns->insertStats($email, $codice_categoria, $nLike, $nDislike, $nValutazioni)) {
             $responseData['error'] = false;
             $responseData['message'] = "Statistiche create e like inserito";
         } else {
@@ -440,7 +447,7 @@ $app->post('/aggiornaStats', function (Request $request, Response $response) {
 
 // endpoint: /visualizzaNumLikeRisposta
 $app->post('/visualizza_num_like', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_risposta = $requestData['codice_risposta'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -460,7 +467,7 @@ $app->post('/visualizza_num_like', function (Request $request, Response $respons
 
 // endpoint: /visualizzaNumDislikeRisposta
 $app->post('/visualizza_num_dislike', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_risposta = $requestData['codice_risposta'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -480,11 +487,10 @@ $app->post('/visualizza_num_dislike', function (Request $request, Response $resp
 
 // endpoint: /modifica_num_like
 $app->post('/modifica_num_like', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
-
     //Risposta del servizio REST
     $responseData = array();
     $responseDB = $db->modificaNumLike($codice_risposta);
@@ -502,7 +508,7 @@ $app->post('/modifica_num_like', function (Request $request, Response $response)
 
 // endpoint: /modificaNumDisLike
 $app->post('/modifica_num_dislike', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
@@ -525,7 +531,7 @@ $app->post('/modifica_num_dislike', function (Request $request, Response $respon
 
 // endpoint: /modificaTipo_like
 $app->post('/modifica_tipo_like', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $cod_risposta = $requestData['cod_risposta'];
@@ -550,7 +556,7 @@ $app->post('/modifica_tipo_like', function (Request $request, Response $response
 //endpoint: /cancella valutazione
 $app->delete('/cancellaVal/{cod_risposta},{cod_utente}', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $cod_risposta = $request->getAttribute("cod_risposta");
     $cod_utente = $request->getAttribute("cod_utente");
@@ -574,7 +580,7 @@ $app->delete('/cancellaVal/{cod_risposta},{cod_utente}', function (Request $requ
 
 // endpoint: /modificaRisposta
 $app->post('/modificaRisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
@@ -595,9 +601,32 @@ $app->post('/modificaRisposta', function (Request $request, Response $response) 
     return $response->withJson($responseData); //Invio la risposta del servizio REST al client
 });
 
+//endpoint: / visualizza sondaggio per categoria
+
+$app->post('/visualizzaSondaggioPerCategoria', function (Request $request, Response $response) {
+    $db = new DBViewServices();
+    $requestData = $request->getParsedBody();
+    $cod_categoria = $requestData['cod_categoria'];
+//Controllo la risposta dal DB e compilo i campi della risposta
+    $responseData['data'] = $db->visualizzaSondaggioPerCategoria($cod_categoria);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false; //Campo errore = false
+        $responseData['message'] = 'Elemento visualizzato con successo'; //Messaggio di esiso positivo
+        $response->getBody()->write(json_encode(array("Sondaggio" => $responseData)));
+        //metto in un json e lo inserisco nella risposta del servizio REST
+        //Definisco il Content-type come json, i dati sono strutturati e lo dichiaro al browser
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true; //Campo errore = false
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
+});
+
 //endpoint: /visualizzaProfilo
 $app->post('/visualizzaProfilo', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
 
     $requestData = $request->getParsedBody();
     $email = $requestData['email'];
@@ -617,7 +646,7 @@ $app->post('/visualizzaProfilo', function (Request $request, Response $response)
 
 //endpoint: /modificaProfilo
 $app->post('/modificaProfilo', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();
 
@@ -647,7 +676,7 @@ $app->post('/modificaProfilo', function (Request $request, Response $response) {
 
 // endpoint: /visualizzaDomanda
 $app->post('/visualizzadomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_domanda = $requestData['codice_domanda'];
     //Controllo la domanda dal DB e compilo i campi della risposta
@@ -670,7 +699,7 @@ $app->post('/visualizzadomanda', function (Request $request, Response $response)
 /// endpoint: /registrazione
 $app->post('/registrazione', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBAuthServices();
     $requestData = $request->getParsedBody();
 
     $email = $requestData['email'];
@@ -698,7 +727,7 @@ $app->post('/registrazione', function (Request $request, Response $response) {
 //endpoint: /visualizzaSondaggio
 $app->post('/visualizzaSondaggio', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
 
     $codice_sondaggio = $requestData['codice_sondaggio'];
@@ -719,7 +748,7 @@ $app->post('/visualizzaSondaggio', function (Request $request, Response $respons
 
 $app->post('/ricercaDomandaKeyword', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
     $requestData = $request->getParsedBody();
 
     $keyword = $requestData['keyword'];
@@ -740,7 +769,7 @@ $app->post('/ricercaDomandaKeyword', function (Request $request, Response $respo
 
 $app->post('/ricercaUserKeyword', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
     $requestData = $request->getParsedBody();
 
     $keyword = $requestData['keyword'];
@@ -761,7 +790,7 @@ $app->post('/ricercaUserKeyword', function (Request $request, Response $response
 
 $app->post('/ricercaSondaggioKeyword', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
     $requestData = $request->getParsedBody();
 
     $keyword = $requestData['keyword'];
@@ -781,7 +810,7 @@ $app->post('/ricercaSondaggioKeyword', function (Request $request, Response $res
 });
 
 $app->post('/login', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBAuthServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $username = $requestData['username'];
@@ -804,7 +833,7 @@ $app->post('/login', function (Request $request, Response $response) {
 });
 
 $app->post('/visualizzaMessaggi', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
 
     $requestData = $request->getParsedBody();
     $cod_chat = $requestData['cod_chat'];
@@ -822,11 +851,12 @@ $app->post('/visualizzaMessaggi', function (Request $request, Response $response
     }
 });
 
-//endpoint inseriscidomanda
+//endpoint inserisci domanda: OK
 $app->post('/inserisciDomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
+
 
     $titolo = $requestData['titolo'];
     $timer = $requestData['timer'];
@@ -854,7 +884,8 @@ $app->post('/inserisciDomanda', function (Request $request, Response $response) 
 //endpoint: /inserisciSondaggio
 $app->post('/inseriscisondaggio', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
+    $dbSearch = new DBSearchServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio
 
@@ -866,9 +897,10 @@ $app->post('/inseriscisondaggio', function (Request $request, Response $response
 
     $responseData = array();
 
+
     $responseDB = $db->inserisciSondaggio($dataeora, $titolo, $timer, $cod_utente, $cod_categoria);
     if ($responseDB) {
-        $responseData['data'] = $db->prendiCodiceSondaggio($cod_utente);
+        $responseData['data'] = $dbSearch->prendiCodiceSondaggio($cod_utente);
         $responseData['error'] = false;
         $responseData['message'] = 'Sondaggio inserito con successo'; //Messaggio di esito positivo
 
@@ -884,7 +916,7 @@ $app->post('/inseriscisondaggio', function (Request $request, Response $response
 //ENDPOINT invia messaggio
 $app->post('/inviamessaggio', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
@@ -902,18 +934,18 @@ $app->post('/inviamessaggio', function (Request $request, Response $response) {
         $responseData['error'] = false;
         $responseData['message'] = 'Messaggio inviato con successo';
 
-
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Messaggio non inviato'; //Messaggio di esito negativo
     }
+
     return $response->withJson($responseData);
 });
 
 
 // endpoint: /modificaSondaggio
 $app->post('/modificaSondaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $titolo = $requestData['titolo'];
@@ -938,7 +970,7 @@ $app->post('/modificaSondaggio', function (Request $request, Response $response)
 // endpoint: /inserisicValutazione
 $app->post('/inserisci_valutazione', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
@@ -947,7 +979,6 @@ $app->post('/inserisci_valutazione', function (Request $request, Response $respo
     $tipo_like = $requestData['tipo_like'];
 
     $responseData = array();
-
 
     $responseDB = $db->inserisciValutazione($cod_risposta, $cod_utente, $tipo_like);
     if ($responseDB) {
@@ -958,15 +989,13 @@ $app->post('/inserisci_valutazione', function (Request $request, Response $respo
         $responseData['error'] = true;
         $responseData['message'] = 'Valutazione non inserita'; //Messaggio di esito negativo
     }
-
     return $response->withJson($responseData);
-
 });
 
-// endpoint: /inserisciRisposta
+// endpoint: /inserisicRisposta
 $app->post('/inserisci_risposta', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
@@ -975,7 +1004,6 @@ $app->post('/inserisci_risposta', function (Request $request, Response $response
     $cod_domanda = $requestData['cod_domanda'];
 
     $responseData = array();
-
 
     $responseDB = $db->inserisciRisposta($descrizione, $cod_utente, $cod_domanda);
     if ($responseDB) {
@@ -988,26 +1016,79 @@ $app->post('/inserisci_risposta', function (Request $request, Response $response
     }
 
     return $response->withJson($responseData);
+});
 
+$app->delete('/timerScadutoSondaggi', function (Request $request, Response $response) {
+    $db = new DBViewServices();
+    $dbDel = new DBDeleteServices();
+
+    $responseData = array();
+
+    $responseData['data'] = $db->visualizzaSondaggi();
+    $cancellazioni = true;
+    $responseData['eliminati'] = array();
+
+    if ($responseData['data']) {
+        $now = strtotime("now");
+        for ($i = 0; $i < count($responseData['data']); $i++) {
+            $timerSondaggio = strtotime($responseData['data'][$i]['timer']) - strtotime("TODAY");
+            $fineSondaggio = strtotime($responseData['data'][$i]['dataeora']) + $timerSondaggio;
+            if ($fineSondaggio < $now) {
+                $format = 'd/m/Y H:i:s';
+                $cod_oldSondaggio = $responseData['data'][$i]['codice_sondaggio'];
+                if (!$responseDB = $dbDel->cancellaSondaggio($cod_oldSondaggio))
+                    $cancellazioni = false;
+                array_push($responseData['eliminati'], $cod_oldSondaggio);
+            }
+        }
+        if ($cancellazioni) {
+            $responseData['error'] = false;
+            $responseData['message'] = "Le eliminazioni necessarie sono state effettuate";
+        } else {
+            $responseData['error'] = true;
+            $responseData['message'] = "La cancellazione non è andata a buon fine";
+        }
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = "Non è possibile comunicare con il server";
+    }
+    return $response->withJson($responseData);
 });
 
 //endpoint: /rimuoviRisposta
 $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, Response $response) {
-
-    $db = new DBUtenti();
-
+    $db = new DBDeleteServices();
     $codice = $request->getAttribute("codice_risposta");
-
     $responseData = array();
-
     $responseDB = $db->rimuoviRisposta($codice);
     if ($responseDB) {
         $responseData['error'] = false;
         $responseData['message'] = 'Risposta rimossa con successo'; //Messaggio di esito positivo
-
     } else {
         $responseData['error'] = true;
         $responseData['message'] = 'Errore, risposta non rimossa'; //Messaggio di esito negativo
+    }
+    return $response->withJson($responseData);
+});
+
+
+//endpoint: /rimuoviProfilo
+$app->delete('/eliminaProfilo/{email}', function (Request $request, Response $response) {
+
+    $db = new DBDeleteServices();
+
+    $email = $request->getAttribute("email");
+
+    $responseData = array();
+
+    $responseDB = $db->eliminaProfilo($email);
+    if ($responseDB) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Profilo rimosso con successo'; //Messaggio di esito positivo
+
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore, utente non rimosso'; //Messaggio di esito negativo
     }
 
     return $response->withJson($responseData);
@@ -1017,7 +1098,7 @@ $app->delete('/rimuoviRisposta/{codice_risposta}', function (Request $request, R
 //endpoint: /cancellaSondaggio
 $app->delete('/cancellaSondaggio/{codice_sondaggio}', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $codice = $request->getAttribute("codice_sondaggio");
 
@@ -1039,7 +1120,7 @@ $app->delete('/cancellaSondaggio/{codice_sondaggio}', function (Request $request
 
 $app->post('/inseriscimessaggio', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1048,7 +1129,9 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
     $cod_chat = $requestData['cod_chat'];
     $msg_utente_id = $requestData['msg_utente_id'];
 
+
     $responseData = array();
+
 
     $responseDB = $db->inserisciMessaggio($testo, $visualizzato, $cod_chat, $msg_utente_id);
     if ($responseDB) {
@@ -1061,11 +1144,12 @@ $app->post('/inseriscimessaggio', function (Request $request, Response $response
     }
 
     return $response->withJson($responseData);
+
 });
 
 
 $app->post('/trovachat', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1099,7 +1183,7 @@ $app->post('/trovachat', function (Request $request, Response $response) {
 
 
 $app->post('/trovaUltimoMessaggioInviato', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1118,11 +1202,10 @@ $app->post('/trovaUltimoMessaggioInviato', function (Request $request, Response 
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
     }
-
 });
 
 $app->post('/modificaDomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1145,12 +1228,36 @@ $app->post('/modificaDomanda', function (Request $request, Response $response) {
         $responseData['message'] = 'Impossibile effettuare la modifica';
     }
     return $response->withJson($responseData);
+
+});
+
+//endpoint: /ricercaDomandaAperta
+$app->post('/ricercaDomandaAperta', function (Request $request, Response $response) {
+    $db = new DBSearchServices();
+
+    $requestData = $request->getParsedBody();
+
+    $categoria = $requestData['categoria'];
+    $titoloDomanda = $requestData['titolo'];
+
+    $responseData['data'] = $db->ricercaDomandaAperta($categoria, $titoloDomanda);
+
+    if ($responseData['data'] != null) {
+        $responseData['error'] = false;
+        $responseData['message'] = 'Elemento visualizzato con successo';
+        $response->getBody()->write(json_encode(array("Domande trovate" => $responseData)));
+        return $response->withHeader('Content-type', 'application/json');
+    } else {
+        $responseData['error'] = true;
+        $responseData['message'] = 'Errore imprevisto';
+        return $response->withJson($responseData);
+    }
 });
 
 //ricercaprofiloperusername
 $app->post('/ricercaprofiloperusername', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
     $requestData = $request->getParsedBody();
 
     $username = $requestData['username'];
@@ -1172,7 +1279,7 @@ $app->post('/ricercaprofiloperusername', function (Request $request, Response $r
 //endpoint: /cancellaDomanda
 $app->delete('/cancellaDomanda/{codice_domanda}', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $codice = $request->getAttribute("codice_domanda");
 
@@ -1194,7 +1301,7 @@ $app->delete('/cancellaDomanda/{codice_domanda}', function (Request $request, Re
 //endpoint: /rimuoviSondaggio
 $app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $codice = $request->getAttribute("codice_sondaggio");
 
@@ -1215,7 +1322,7 @@ $app->delete('/rimuoviSondaggio/{codice_sondaggio}', function (Request $request,
 
 //endpoint: /modificaPassword
 $app->post('/modificaPassword', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBUpdateServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1238,7 +1345,8 @@ $app->post('/modificaPassword', function (Request $request, Response $response) 
 
 $app->post('/creachat', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBSearchServices();
+    $dbIns = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
 
@@ -1247,7 +1355,7 @@ $app->post('/creachat', function (Request $request, Response $response) {
 
     $responseData = array();
 
-    $responseDB = $db->creaChat($cod_utente0, $cod_utente1);
+    $responseDB = $dbIns->creaChat($cod_utente0, $cod_utente1);
     if ($responseDB) {
 
         $responseData['cod_chat'] = $db->trovaChat($cod_utente0, $cod_utente1);
@@ -1264,6 +1372,7 @@ $app->post('/creachat', function (Request $request, Response $response) {
         return $response->withJson($responseData);
     }
 });
+
 
 $app->post('/segnala_utente', function (Request $request, Response $response) {
     $requestData = $request->getParsedBody();
@@ -1284,8 +1393,9 @@ $app->post('/segnala_utente', function (Request $request, Response $response) {
     return $response->withJson($responseData);
 });
 
+
 $app->post('/visualizzadomandehome', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $responseData['data'] = $db->visualizzaDomandeHome();
 
@@ -1303,7 +1413,7 @@ $app->post('/visualizzadomandehome', function (Request $request, Response $respo
 });
 
 $app->post('/visualizzasondaggihome', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $responseData['data'] = $db->visualizzaSondaggiHome();
 
@@ -1322,7 +1432,7 @@ $app->post('/visualizzasondaggihome', function (Request $request, Response $resp
 });
 
 $app->post('/risposteperdomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_domanda = $requestData['codice_domanda'];
     $responseData['data'] = $db->risposte($codice_domanda);
@@ -1340,7 +1450,7 @@ $app->post('/risposteperdomanda', function (Request $request, Response $response
 });
 
 $app->post('/visualizzastatistichedomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     //Controllo la domanda dal DB e compilo i campi della risposta
@@ -1360,7 +1470,7 @@ $app->post('/visualizzastatistichedomanda', function (Request $request, Response
 });
 
 $app->post('/visualizzacategoria', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $codice_categoria = $requestData['codice_categoria'];
     //Controllo la domanda dal DB e compilo i campi della risposta
@@ -1380,7 +1490,7 @@ $app->post('/visualizzacategoria', function (Request $request, Response $respons
 
 
 $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     //Controllo la domanda dal DB e compilo i campi della risposta
@@ -1397,10 +1507,12 @@ $app->post('/visualizzaTOTStatisticheDomanda', function (Request $request, Respo
         $responseData['message'] = 'Errore imprevisto';
         return $response->withJson($responseData);
     }
+
+
 });
 
 $app->post('/visualizzaStatisticherisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -1418,8 +1530,9 @@ $app->post('/visualizzaStatisticherisposta', function (Request $request, Respons
     }
 });
 
+
 $app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     //Controllo la risposta dal DB e compilo i campi della risposta
@@ -1439,12 +1552,11 @@ $app->post('/visualizzaStatisticheTOTrisposta', function (Request $request, Resp
 });
 
 $app->post('/votasondaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_scelta = $requestData['codice_scelta'];
     $cod_sondaggio = $requestData['cod_sondaggio'];
-
 
     $responseData = array(); //La risposta e' un array di informazioni da compilare
     $responseDB = $db->votaSondaggio($codice_scelta, $cod_sondaggio);
@@ -1460,7 +1572,7 @@ $app->post('/votasondaggio', function (Request $request, Response $response) {
 });
 
 $app->post('/visualizzaUltimoMessaggio', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
 
     $requestData = $request->getParsedBody();
     $cod_chat = $requestData['cod_chat'];
@@ -1476,28 +1588,8 @@ $app->post('/visualizzaUltimoMessaggio', function (Request $request, Response $r
     return $response->withJson($responseData);
 });
 
-$app->post('/visualizzaMiedomande', function (Request $request, Response $response) {
-    $db = new DBUtenti();
-    $requestData = $request->getParsedBody();
-    $email = $requestData['cod_utente'];
-    //Controllo la domanda dal DB e compilo i campi della risposta
-    $responseData['data'] = $db->visualizzaMio($email);
-
-    if ($responseData['data'] != null) {
-        $responseData['error'] = false; //Campo errore = false
-        $responseData['message'] = 'Domande visualizzate con successo'; //Messaggio di esiso positivo
-        $response->getBody()->write(json_encode(array("Domande" => $responseData)));
-
-        return $response->withHeader('Content-type', 'application/json');
-    } else {
-        $responseData['error'] = true; //Campo errore = true
-        $responseData['message'] = 'Errore imprevisto';
-        return $response->withJson($responseData);
-    }
-});
-
 $app->post('/sceglirispostapreferita', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
 
     $requestData = $request->getParsedBody();
 
@@ -1515,11 +1607,10 @@ $app->post('/sceglirispostapreferita', function (Request $request, Response $res
         $responseData['message'] = 'Impossibile scegliere la risposta';
     }
     return $response->withJson($responseData);
-
 });
 
 $app->post('/visualizzaDomandeMie', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
 //Controllo la risposta dal DB e compilo i campi della risposta
@@ -1539,7 +1630,7 @@ $app->post('/visualizzaDomandeMie', function (Request $request, Response $respon
 });
 
 $app->post('/visualizzaSondaggiMiei', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
 //Controllo la risposta dal DB e compilo i campi della risposta
@@ -1560,7 +1651,7 @@ $app->post('/visualizzaSondaggiMiei', function (Request $request, Response $resp
 
 
 $app->post('/inserisciVotante', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBInsertServices();
     $requestData = $request->getParsedBody();
     $cod_scelta = $requestData['cod_scelta'];
     $cod_utente = $requestData['cod_utente'];
@@ -1581,7 +1672,7 @@ $app->post('/inserisciVotante', function (Request $request, Response $response) 
 
 
 $app->post('/controllogiavotato', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     $cod_sondaggio = $requestData['cod_sondaggio'];
@@ -1600,8 +1691,9 @@ $app->post('/controllogiavotato', function (Request $request, Response $response
     }
 });
 
+
 $app->post('/controllogiavalutatorisposta', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBViewServices();
     $requestData = $request->getParsedBody();
     $cod_utente = $requestData['cod_utente'];
     $cod_risposta = $requestData['cod_risposta'];
@@ -1623,7 +1715,7 @@ $app->post('/controllogiavalutatorisposta', function (Request $request, Response
 
 $app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Response $response) {
 
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $codice_valutazione = $request->getAttribute("codice_valutazione");
 
@@ -1638,12 +1730,11 @@ $app->delete('/eliminaVal/{codice_valutazione}', function (Request $request, Res
         $responseData['error'] = true;
         $responseData['message'] = 'Errore, valutazione non rimossa'; //Messaggio di esito negativo
     }
-
     return $response->withJson($responseData);
 });
 
 $app->post('/togli_like', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
@@ -1664,7 +1755,7 @@ $app->post('/togli_like', function (Request $request, Response $response) {
 });
 
 $app->post('/togli_dislike', function (Request $request, Response $response) {
-    $db = new DBUtenti();
+    $db = new DBDeleteServices();
 
     $requestData = $request->getParsedBody();//Dati richiesti dal servizio REST
     $codice_risposta = $requestData['codice_risposta'];
@@ -1686,7 +1777,6 @@ $app->post('/togli_dislike', function (Request $request, Response $response) {
 });
 
 /**** ENDPOINT ****/
-
 
 // Run app
 $app->run();
